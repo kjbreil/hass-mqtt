@@ -37,6 +37,9 @@ func (d *Tag) AddMessageHandler() {
 func (d Tag) GetUniqueId() string {
 	return ""
 }
+func (d Tag) GetName() string {
+	return ""
+}
 func (d *Tag) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -47,11 +50,13 @@ func (d *Tag) PopulateDevice(Manufacturer string, SoftwareName string, InstanceN
 func (d *Tag) UpdateState() {
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Tag.Mutex.Lock()
 		if state != stateStore.Tag.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, common.QoS, common.Retain, state)
 			stateStore.Tag.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Tag.Mutex.Unlock()
 	}
 }
 func (d *Tag) Subscribe() {

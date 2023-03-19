@@ -59,6 +59,9 @@ func (d *Button) AddMessageHandler() {
 func (d *Button) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Button) GetName() string {
+	return *d.Name
+}
 func (d *Button) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -69,19 +72,23 @@ func (d *Button) PopulateDevice(Manufacturer string, SoftwareName string, Instan
 func (d *Button) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Button.Mutex.Lock()
 		if state != stateStore.Button.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Button.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Button.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Button.Mutex.Lock()
 		if state != stateStore.Button.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Button.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Button.Mutex.Unlock()
 	}
 }
 func (d *Button) Subscribe() {

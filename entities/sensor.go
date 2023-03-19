@@ -62,6 +62,9 @@ func (d *Sensor) AddMessageHandler() {
 func (d *Sensor) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Sensor) GetName() string {
+	return *d.Name
+}
 func (d *Sensor) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -72,27 +75,33 @@ func (d *Sensor) PopulateDevice(Manufacturer string, SoftwareName string, Instan
 func (d *Sensor) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Sensor.Mutex.Lock()
 		if state != stateStore.Sensor.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.Sensor.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Sensor.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Sensor.Mutex.Lock()
 		if state != stateStore.Sensor.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.Sensor.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Sensor.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Sensor.Mutex.Lock()
 		if state != stateStore.Sensor.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.Sensor.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Sensor.Mutex.Unlock()
 	}
 }
 func (d *Sensor) Subscribe() {

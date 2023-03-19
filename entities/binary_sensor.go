@@ -61,6 +61,9 @@ func (d *BinarySensor) AddMessageHandler() {
 func (d *BinarySensor) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *BinarySensor) GetName() string {
+	return *d.Name
+}
 func (d *BinarySensor) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -71,27 +74,33 @@ func (d *BinarySensor) PopulateDevice(Manufacturer string, SoftwareName string, 
 func (d *BinarySensor) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.BinarySensor.Mutex.Lock()
 		if state != stateStore.BinarySensor.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.BinarySensor.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.BinarySensor.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.BinarySensor.Mutex.Lock()
 		if state != stateStore.BinarySensor.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.BinarySensor.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.BinarySensor.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.BinarySensor.Mutex.Lock()
 		if state != stateStore.BinarySensor.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.BinarySensor.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.BinarySensor.Mutex.Unlock()
 	}
 }
 func (d *BinarySensor) Subscribe() {

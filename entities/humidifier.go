@@ -81,6 +81,9 @@ func (d *Humidifier) AddMessageHandler() {
 func (d *Humidifier) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Humidifier) GetName() string {
+	return *d.Name
+}
 func (d *Humidifier) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -91,43 +94,53 @@ func (d *Humidifier) PopulateDevice(Manufacturer string, SoftwareName string, In
 func (d *Humidifier) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Humidifier.Mutex.Lock()
 		if state != stateStore.Humidifier.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Humidifier.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Humidifier.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Humidifier.Mutex.Lock()
 		if state != stateStore.Humidifier.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Humidifier.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Humidifier.Mutex.Unlock()
 	}
 	if d.ModeStateTopic != nil {
 		state := d.ModeStateFunc()
+		stateStore.Humidifier.Mutex.Lock()
 		if state != stateStore.Humidifier.ModeState[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.ModeStateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Humidifier.ModeState[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Humidifier.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Humidifier.Mutex.Lock()
 		if state != stateStore.Humidifier.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Humidifier.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Humidifier.Mutex.Unlock()
 	}
 	if d.TargetHumidityStateTopic != nil {
 		state := d.TargetHumidityStateFunc()
+		stateStore.Humidifier.Mutex.Lock()
 		if state != stateStore.Humidifier.TargetHumidityState[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.TargetHumidityStateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Humidifier.TargetHumidityState[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Humidifier.Mutex.Unlock()
 	}
 }
 func (d *Humidifier) Subscribe() {

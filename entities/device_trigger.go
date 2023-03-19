@@ -42,6 +42,9 @@ func (d *DeviceTrigger) AddMessageHandler() {
 func (d DeviceTrigger) GetUniqueId() string {
 	return ""
 }
+func (d DeviceTrigger) GetName() string {
+	return ""
+}
 func (d *DeviceTrigger) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -52,11 +55,13 @@ func (d *DeviceTrigger) PopulateDevice(Manufacturer string, SoftwareName string,
 func (d *DeviceTrigger) UpdateState() {
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.DeviceTrigger.Mutex.Lock()
 		if state != stateStore.DeviceTrigger.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.DeviceTrigger.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.DeviceTrigger.Mutex.Unlock()
 	}
 }
 func (d *DeviceTrigger) Subscribe() {

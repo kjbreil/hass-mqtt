@@ -88,6 +88,9 @@ func (d *Fan) AddMessageHandler() {
 func (d *Fan) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Fan) GetName() string {
+	return *d.Name
+}
 func (d *Fan) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -98,51 +101,63 @@ func (d *Fan) PopulateDevice(Manufacturer string, SoftwareName string, InstanceN
 func (d *Fan) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 	if d.OscillationStateTopic != nil {
 		state := d.OscillationStateFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.OscillationState[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.OscillationStateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.OscillationState[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 	if d.PercentageStateTopic != nil {
 		state := d.PercentageStateFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.PercentageState[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.PercentageStateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.PercentageState[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 	if d.PresetModeStateTopic != nil {
 		state := d.PresetModeStateFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.PresetModeState[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.PresetModeStateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.PresetModeState[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Fan.Mutex.Lock()
 		if state != stateStore.Fan.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Fan.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Fan.Mutex.Unlock()
 	}
 }
 func (d *Fan) Subscribe() {

@@ -56,6 +56,9 @@ func (d *DeviceTracker) AddMessageHandler() {
 func (d *DeviceTracker) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *DeviceTracker) GetName() string {
+	return *d.Name
+}
 func (d *DeviceTracker) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -66,27 +69,33 @@ func (d *DeviceTracker) PopulateDevice(Manufacturer string, SoftwareName string,
 func (d *DeviceTracker) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.DeviceTracker.Mutex.Lock()
 		if state != stateStore.DeviceTracker.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.DeviceTracker.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.DeviceTracker.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.DeviceTracker.Mutex.Lock()
 		if state != stateStore.DeviceTracker.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.DeviceTracker.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.DeviceTracker.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.DeviceTracker.Mutex.Lock()
 		if state != stateStore.DeviceTracker.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), common.Retain, state)
 			stateStore.DeviceTracker.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.DeviceTracker.Mutex.Unlock()
 	}
 }
 func (d *DeviceTracker) Subscribe() {

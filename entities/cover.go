@@ -88,6 +88,9 @@ func (d *Cover) AddMessageHandler() {
 func (d *Cover) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Cover) GetName() string {
+	return *d.Name
+}
 func (d *Cover) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -98,43 +101,53 @@ func (d *Cover) PopulateDevice(Manufacturer string, SoftwareName string, Instanc
 func (d *Cover) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Cover.Mutex.Lock()
 		if state != stateStore.Cover.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Cover.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Cover.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Cover.Mutex.Lock()
 		if state != stateStore.Cover.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Cover.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Cover.Mutex.Unlock()
 	}
 	if d.PositionTopic != nil {
 		state := d.PositionFunc()
+		stateStore.Cover.Mutex.Lock()
 		if state != stateStore.Cover.Position[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.PositionTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Cover.Position[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Cover.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Cover.Mutex.Lock()
 		if state != stateStore.Cover.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Cover.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Cover.Mutex.Unlock()
 	}
 	if d.TiltStatusTopic != nil {
 		state := d.TiltStatusFunc()
+		stateStore.Cover.Mutex.Lock()
 		if state != stateStore.Cover.TiltStatus[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.TiltStatusTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Cover.TiltStatus[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Cover.Mutex.Unlock()
 	}
 }
 func (d *Cover) Subscribe() {

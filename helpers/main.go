@@ -42,6 +42,7 @@ func main() {
 		// ),
 		jen.Id("GetRawId").Params().String(),
 		jen.Id("GetUniqueId").Params().String(),
+		jen.Id("GetName").Params().String(),
 		jen.Id("PopulateDevice").Params(jen.Id("Manufacturer").String(), jen.Id("SoftwareName").String(), jen.Id("InstanceName").String(), jen.Id("SWVersion").String(), jen.Id("Identifier").String()),
 		jen.Id("PopulateTopics").Params(),
 		jen.Id("UpdateState").Params(),
@@ -62,6 +63,7 @@ func main() {
 				g.Add(
 					jen.Id(strcase.ToCamel(d.Name)).StructFunc(
 						func(h *jen.Group) {
+							h.Add(jen.Id("Mutex").Op("*").Qual("sync", "Mutex"))
 							for _, key := range keyNames {
 								if d.JSONContainer.Exists(key) && strings.HasSuffix(key, "topic") {
 									if !IsCommand(key, d) {
@@ -112,9 +114,15 @@ func main() {
 									Op("=").
 									Make(jen.Map(jen.String()).String()),
 							)
+
 						}
 					}
 				}
+
+				g.Add(
+					jen.Id("s").Dot(strcase.ToCamel(d.Name)).Dot("Mutex").
+						Op("=").Op("&").Qual("sync", "Mutex").Values(),
+				)
 			}
 			g.Add(
 				jen.Return(jen.Id("s")),
@@ -189,7 +197,6 @@ func main() {
 		).Id("AddMessageHandler").Params().Block(
 			jen.Id("d").Dot("MQTT").Dot("MessageHandler").Op("=").Id("MakeMessageHandler").Params(jen.Id("d")),
 		)
-
 		// d.GetUniqueID()
 		if d.JSONContainer.Exists("unique_id") {
 			external[d.Name].Func().Params(
@@ -204,6 +211,21 @@ func main() {
 				jen.Return(jen.Lit("")),
 			)
 		}
+		// d.GetName()
+		if d.JSONContainer.Exists("unique_id") {
+			external[d.Name].Func().Params(
+				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+			).Id("GetName").Params().String().Block(
+				jen.Return(jen.Op("*").Id("d").Dot("Name")),
+			)
+		} else {
+			external[d.Name].Func().Params(
+				jen.Id("d").Id(strcase.ToCamel(d.Name)),
+			).Id("GetName").Params().String().Block(
+				jen.Return(jen.Lit("")),
+			)
+		}
+
 		// d.PopulateDevice()
 		if d.JSONContainer.Exists("device") {
 			external[d.Name].Func().Params(
@@ -232,6 +254,7 @@ func main() {
 				jen.Id("_").String()).
 				Block()
 		}
+
 		external[d.Name].Func().Params(
 			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
 		).Id("UpdateState").Params(
@@ -252,6 +275,8 @@ func main() {
 									jen.Id("d").Dot(cam).Op("!=").Nil(),
 								).Block(
 									jen.Id("state").Op(":=").Id("d").Dot(strcase.ToCamel(trimmed+"_func")).Params(),
+									jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Lock").Call(),
+
 									jen.If(
 										jen.Id("state").Op("!=").Id("stateStore").Dot(strcase.ToCamel(d.Name)).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).
 											Op("||").
@@ -279,6 +304,7 @@ func main() {
 										jen.Id("stateStore").Dot(camName).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).Op("=").Id("state"),
 										jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
 									),
+									jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Unlock").Call(),
 								),
 							)
 						}
@@ -661,7 +687,10 @@ func main() {
 	////////////////////////////////////////////////////////////////////////////////
 
 	for k, v := range external {
-		v.Save("./entities/" + k + ".go")
+		err := v.Save("./entities/" + k + ".go")
+		if err != nil {
+			panic(err)
+		}
 	}
 
 }

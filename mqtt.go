@@ -22,14 +22,14 @@ type Client struct {
 }
 
 type Config struct {
-	NodeID string `json:"node_id"`
+	NodeID string `json:"node_id" yaml:"node_id"`
 	MQTT   struct {
-		Host     string  `json:"host"`
-		Port     int     `json:"port"`
-		SSL      bool    `json:"ssl"`
-		UserName *string `json:"user_name,omitempty"`
-		Password *string `json:"password,omitempty"`
-	} `json:"MQTT"`
+		Host     string  `json:"host" yaml:"host"`
+		Port     int     `json:"port" yaml:"port"`
+		SSL      bool    `json:"ssl" yaml:"ssl"`
+		UserName *string `json:"user_name,omitempty" yaml:"user_name"`
+		Password *string `json:"password,omitempty" yaml:"password"`
+	} `json:"MQTT" yaml:"mqtt"`
 }
 
 func NewClient(c Config) (*Client, error) {
@@ -42,9 +42,13 @@ func NewClient(c Config) (*Client, error) {
 	return client, nil
 }
 
+var (
+	ErrNoDeviceFound = fmt.Errorf("no device found")
+)
+
 func (c *Client) Connect() error {
 	if len(c.devices) == 0 {
-		return fmt.Errorf("no devices added")
+		return ErrNoDeviceFound
 	}
 
 	entities.NodeID = c.NodeID

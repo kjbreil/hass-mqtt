@@ -52,6 +52,9 @@ func (d *Camera) AddMessageHandler() {
 func (d *Camera) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Camera) GetName() string {
+	return *d.Name
+}
 func (d *Camera) PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string) {
 	d.Device.Manufacturer = &Manufacturer
 	d.Device.Model = &SoftwareName
@@ -62,27 +65,33 @@ func (d *Camera) PopulateDevice(Manufacturer string, SoftwareName string, Instan
 func (d *Camera) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Camera.Mutex.Lock()
 		if state != stateStore.Camera.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, common.QoS, common.Retain, state)
 			stateStore.Camera.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Camera.Mutex.Unlock()
 	}
 	if d.JsonAttributesTopic != nil {
 		state := d.JsonAttributesFunc()
+		stateStore.Camera.Mutex.Lock()
 		if state != stateStore.Camera.JsonAttributes[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, common.QoS, common.Retain, state)
 			stateStore.Camera.JsonAttributes[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Camera.Mutex.Unlock()
 	}
 	if d.StateTopic != nil {
 		state := d.StateFunc()
+		stateStore.Camera.Mutex.Lock()
 		if state != stateStore.Camera.State[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.StateTopic, common.QoS, common.Retain, state)
 			stateStore.Camera.State[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Camera.Mutex.Unlock()
 	}
 }
 func (d *Camera) Subscribe() {

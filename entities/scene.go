@@ -42,15 +42,20 @@ func (d *Scene) AddMessageHandler() {
 func (d *Scene) GetUniqueId() string {
 	return *d.UniqueId
 }
+func (d *Scene) GetName() string {
+	return *d.Name
+}
 func (d *Scene) PopulateDevice(_ string, _ string, _ string, _ string, _ string) {}
 func (d *Scene) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.AvailabilityFunc()
+		stateStore.Scene.Mutex.Lock()
 		if state != stateStore.Scene.Availability[d.GetUniqueId()] || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
 			stateStore.Scene.Availability[d.GetUniqueId()] = state
 			token.WaitTimeout(common.WaitTimeout)
 		}
+		stateStore.Scene.Mutex.Unlock()
 	}
 }
 func (d *Scene) Subscribe() {

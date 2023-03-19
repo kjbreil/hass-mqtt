@@ -18,14 +18,17 @@ func main() {
 	c := hass_mqtt.Config{
 		NodeID: "hass_mqtt_example",
 		MQTT: struct {
-			Host     string  `json:"host"`
-			Port     int     `json:"port"`
-			SSL      bool    `json:"ssl"`
-			UserName *string `json:"user_name,omitempty"`
-			Password *string `json:"password,omitempty"`
+			Host     string  `json:"host" yaml:"host"`
+			Port     int     `json:"port" yaml:"port"`
+			SSL      bool    `json:"ssl" yaml:"ssl"`
+			UserName *string `json:"user_name,omitempty" yaml:"user_name"`
+			Password *string `json:"password,omitempty" yaml:"password"`
 		}{
-			Host: "192.168.1.12",
-			Port: 1883,
+			Host:     "192.168.1.12",
+			Port:     1883,
+			SSL:      false,
+			UserName: nil,
+			Password: nil,
 		},
 	}
 
@@ -41,7 +44,6 @@ func main() {
 			Name:     &fanName,
 			UniqueId: &uniqueId,
 			CommandFunc: func(message mqtt.Message, client mqtt.Client) {
-
 			},
 		})
 	if err != nil {
