@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -34,18 +35,64 @@ func main() {
 
 	client, _ := hass_mqtt.NewClient(c)
 
-	_ = client.Add(device.New("Purifier", "some_awesome_purifier", "Air Pure 1000", "Kaygel", "0.0.1"))
+	//_ = client.Add(device.New("Purifier", "some_awesome_purifier", "Air Pure 1000", "Kaygel", "0.0.1"))
+	//
+	//fanName := "Some Awesome Purifier"
+	//uniqueId := strcase.ToDelimited(fmt.Sprintf("%s", fanName), uint8(0x2d))
+	//
+	//err := client.Get("some_awesome_purifier").Add(
+	//	&entities.Fan{
+	//		Name:     &fanName,
+	//		UniqueId: &uniqueId,
+	//		CommandFunc: func(message mqtt.Message, client mqtt.Client) {
+	//		},
+	//	})
+	//if err != nil {
+	//	log.Panicln(err)
+	//}
 
-	fanName := "Some Awesome Purifier"
-	uniqueId := strcase.ToDelimited(fmt.Sprintf("%s", fanName), uint8(0x2d))
+	d := device.New("TEST LIGHT", "test_light_mqtt", "Ligherifric", "Kaygel", "0.0.1")
 
-	err := client.Get("some_awesome_purifier").Add(
-		&entities.Fan{
-			Name:     &fanName,
-			UniqueId: &uniqueId,
-			CommandFunc: func(message mqtt.Message, client mqtt.Client) {
-			},
-		})
+	_ = client.Add(d)
+
+	lightName := "TEST LIGHT"
+	uniqueId := strcase.ToDelimited(fmt.Sprintf("%s", lightName), uint8(0x2d))
+
+	type lightState struct {
+		State    string    `json:"state"`
+		LastSeen time.Time `json:"last_seen"`
+	}
+
+	ls := &lightState{
+		State:    "ON",
+		LastSeen: time.Now(),
+	}
+
+	l := &entities.Light{
+		Name:     &lightName,
+		UniqueId: &uniqueId,
+		CommandFunc: func(message mqtt.Message, client mqtt.Client) {
+			switch string(message.Payload()) {
+			case "ON":
+				fmt.Println("Light ON")
+				ls.State = "ON"
+			case "OFF":
+				fmt.Println("Light OFF")
+				ls.State = "OFF"
+
+			}
+		},
+		StateFunc: func() string {
+			//data, err := json.Marshal(ls)
+			//if err == nil {
+			//	return string(data)
+			//}
+			return "ON"
+		},
+	}
+
+	err := client.Get("test_light_mqtt").Add(l)
+
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -55,6 +102,13 @@ func main() {
 		log.Panicln(err)
 
 	}
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		for range ticker.C {
+			l.UpdateState()
+		}
+	}()
+	l.UpdateState()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

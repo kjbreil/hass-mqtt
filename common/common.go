@@ -7,7 +7,7 @@ import (
 var (
 	Retain                = true
 	RetainClient          = false
-	QoS              byte = 2
+	QoS              byte = 1
 	HADiscoveryDelay      = 500 * time.Millisecond
 	WaitTimeout           = 500 * time.Millisecond
 )
