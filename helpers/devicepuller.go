@@ -16,29 +16,34 @@ import (
 )
 
 var DeviceNames = []string{
-	"alarm_control_panel",
-	"binary_sensor",
-	"button",
-	"camera",
-	"climate",
-	"cover",
-	"device_tracker",
-	"device_trigger",
-	"fan",
-	"humidifier",
+	//"button",
 	"light",
-	"lock",
-	"number",
-	"scene",
-	"select",
-	"sensor",
-	"siren",
-	"switch",
-	"tag",
-	"text",
-	"update",
-	"vacuum",
 }
+
+//var DeviceNames = []string{
+//	"alarm_control_panel",
+//	"binary_sensor",
+//	"button",
+//	"camera",
+//	"climate",
+//	"cover",
+//	"device_tracker",
+//	"device_trigger",
+//	"fan",
+//	"humidifier",
+//	"light",
+//	"lock",
+//	"number",
+//	"scene",
+//	"select",
+//	"sensor",
+//	"siren",
+//	"switch",
+//	"tag",
+//	"text",
+//	"update",
+//	"vacuum",
+//}
 
 type Device struct {
 	Name          string
@@ -113,7 +118,7 @@ func splitDocument(devicename string) (string, error) {
 	if devicename == "vacuum" {
 		dat = dat[strings.Index(dat, "## State Configuration"):]
 	} else if devicename == "light" {
-		dat = between(dat, "## Default schema - Configuration", "## Default schema - Examples")
+		dat = between(dat, "## JSON schema - Configuration", "## JSON schema - Examples")
 	}
 
 	match := between(dat, "{% configuration %}", "{% endconfiguration %}")

@@ -11,7 +11,10 @@ import (
 func main() {
 
 	devices := DevicesInit()
+
 	loadKeyNames()
+
+	entities := extractEntity(devices)
 
 	external := make(map[string]*jen.File)
 
@@ -32,30 +35,7 @@ func main() {
 
 	sort.Strings(keyNames)
 
-	external["types"].Type().Id("Entity").Interface(
-		// jen.UnionFunc(
-		// 	func(g *jen.Group) {
-		// 		for _, d := range devices {
-		// 			g.Add(jen.Id(strcase.ToCamel(d.Name)))
-		// 		}
-		// 	},
-		// ),
-		jen.Id("GetRawId").Params().String(),
-		jen.Id("GetUniqueId").Params().String(),
-		jen.Id("GetName").Params().String(),
-		jen.Id("PopulateDevice").Params(jen.Id("Manufacturer").String(), jen.Id("SoftwareName").String(), jen.Id("InstanceName").String(), jen.Id("SWVersion").String(), jen.Id("Identifier").String()),
-		jen.Id("PopulateTopics").Params(),
-		jen.Id("UpdateState").Params(),
-		jen.Id("Subscribe").Params(),
-		jen.Id("UnSubscribe").Params(),
-		jen.Id("AddMessageHandler").Params(),
-		jen.Id("DeleteTopic").Params(),
-		jen.Id("Initialize").Params(),
-		jen.Id("SetMQTTFields").Params(
-			jen.Id("MQTTFields"),
-		),
-		jen.Id("GetMQTTFields").Params().Id("MQTTFields"),
-	)
+	generateTypes(external)
 
 	external["store"].Type().Id("StateStore").StructFunc(
 		func(g *jen.Group) {
@@ -130,495 +110,497 @@ func main() {
 		},
 	)
 
-	for _, d := range devices {
+	generateEntities(entities, external)
 
-		camName := strcase.ToCamel(d.Name)
-
-		st := make(map[string][]*jen.Statement)
-
-		// Add standalone base level fields
-		for _, key := range keyNames {
-			if d.JSONContainer.Exists(key) {
-				st[key] = append(st[key], d.FieldAdder(key), d.FunctionAdder(key))
-			}
-		}
-
-		if d.JSONContainer.Exists("device") {
-			st["device"] = append(st["device"], jen.Id(strcase.ToCamel("device")).StructFunc(
-				func(g *jen.Group) {
-					for _, v := range []string{
-						"configuration_url",
-						"connections",
-						"identifiers",
-						"manufacturer",
-						"model",
-						"name",
-						"suggested_area",
-						"sw_version",
-						"via_device",
-					} {
-						g.Add(
-							jen.Id(strcase.ToCamel(v)).Op("*").String().Tag(map[string]string{"json": v + ",omitempty"}).Comment(d.JSONContainer.Path("device.keys." + v + ".description").String()),
-						)
-					}
-				},
-			).Tag(map[string]string{"json": "device,omitempty"}).Comment("Device configuration parameters"))
-		}
-
-		sortedKeys := []string{}
-		for key := range st {
-			sortedKeys = append(sortedKeys, key)
-		}
-		sort.Strings(sortedKeys)
-
-		// Device MQTT Struct
-		external[d.Name].Type().Id(strcase.ToCamel(d.Name)).StructFunc(
-			func(g *jen.Group) {
-				for _, key := range sortedKeys {
-					v := st[key]
-					for _, val := range v {
-						g.Add(val)
-					}
-				}
-				g.Id("MQTT").Op("*").Id("MQTTFields").Tag(map[string]string{"json": "-"}).Comment("MQTT configuration parameters")
-			},
-		)
-
-		// d.GetRawID()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("GetRawId").Params().String().Block(
-			jen.Return(jen.Lit(d.Name)),
-		)
-
-		// d.AddMessageHandler()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("AddMessageHandler").Params().Block(
-			jen.Id("d").Dot("MQTT").Dot("MessageHandler").Op("=").Id("MakeMessageHandler").Params(jen.Id("d")),
-		)
-		// d.GetUniqueID()
-		if d.JSONContainer.Exists("unique_id") {
-			external[d.Name].Func().Params(
-				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-			).Id("GetUniqueId").Params().String().Block(
-				jen.Return(jen.Op("*").Id("d").Dot("UniqueId")),
-			)
-		} else {
-			external[d.Name].Func().Params(
-				jen.Id("d").Id(strcase.ToCamel(d.Name)),
-			).Id("GetUniqueId").Params().String().Block(
-				jen.Return(jen.Lit("")),
-			)
-		}
-		// d.GetName()
-		if d.JSONContainer.Exists("unique_id") {
-			external[d.Name].Func().Params(
-				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-			).Id("GetName").Params().String().Block(
-				jen.Return(jen.Op("*").Id("d").Dot("Name")),
-			)
-		} else {
-			external[d.Name].Func().Params(
-				jen.Id("d").Id(strcase.ToCamel(d.Name)),
-			).Id("GetName").Params().String().Block(
-				jen.Return(jen.Lit("")),
-			)
-		}
-
-		// d.PopulateDevice()
-		if d.JSONContainer.Exists("device") {
-			external[d.Name].Func().Params(
-				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-			).Id("PopulateDevice").Params(
-				jen.Id("Manufacturer").String(),
-				jen.Id("SoftwareName").String(),
-				jen.Id("InstanceName").String(),
-				jen.Id("SWVersion").String(),
-				jen.Id("Identifier").String()).
-				Block(
-					jen.Id("d.Device.Manufacturer").Op("=&").Id("Manufacturer"),
-					jen.Id("d.Device.Model").Op("=&").Id("SoftwareName"),
-					jen.Id("d.Device.Name").Op("=&").Id("InstanceName"),
-					jen.Id("d.Device.SwVersion").Op("=&").Id("SWVersion"),
-					jen.Id("d.Device.Identifiers").Op("=&").Id("Identifier"),
-				)
-		} else {
-			external[d.Name].Func().Params(
-				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-			).Id("PopulateDevice").Params(
-				jen.Id("_").String(),
-				jen.Id("_").String(),
-				jen.Id("_").String(),
-				jen.Id("_").String(),
-				jen.Id("_").String()).
-				Block()
-		}
-
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("UpdateState").Params(
-		//jen.Id("state").Id("string"),
-		).BlockFunc(
-			func(g *jen.Group) {
-				for _, key := range sortedKeys {
-					if strings.HasSuffix(key, "topic") {
-						if !IsCommand(key, d) {
-							if key == "topic" {
-								key = "state_topic"
-							}
-							trimmed := strings.TrimSuffix(strings.TrimSuffix(key, "topic"), "_")
-							cam := strcase.ToCamel(key)
-							camTrimmed := strcase.ToCamel(trimmed)
-							g.Add(
-								jen.If(
-									jen.Id("d").Dot(cam).Op("!=").Nil(),
-								).Block(
-									jen.Id("state").Op(":=").Id("d").Dot(strcase.ToCamel(trimmed+"_func")).Params(),
-									jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Lock").Call(),
-
-									jen.If(
-										jen.Id("state").Op("!=").Id("stateStore").Dot(strcase.ToCamel(d.Name)).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).
-											Op("||").
-											Params(jen.Id("d").Dot("MQTT").Dot("ForceUpdate").Op("!=").Nil().Op("&&").Op("*").Id("d").Dot("MQTT").Dot("ForceUpdate")),
-									).Block(
-										jen.Id("token").Op(":=").Params(jen.Op("*").Id("d").Dot("MQTT").Dot("Client")).Dot("Publish").ParamsFunc(
-											func(g *jen.Group) {
-												g.Add(jen.Op("*").Id("d").Dot(cam))
-
-												if d.JSONContainer.Exists("qos") {
-													g.Add(jen.Byte().Params(jen.Op("*").Id("d").Dot("Qos")))
-												} else {
-													g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"))
-												}
-
-												if d.JSONContainer.Exists("retain") {
-													g.Add(jen.Op("*").Id("d").Dot("Retain"))
-												} else {
-													g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"))
-												}
-
-												g.Add(jen.Id("state"))
-											},
-										),
-										jen.Id("stateStore").Dot(camName).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).Op("=").Id("state"),
-										jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-									),
-									jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Unlock").Call(),
-								),
-							)
-						}
-					}
-				}
-			},
-		)
-
-		// d.Subscribe()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("Subscribe").Params().BlockFunc(
-			func(g *jen.Group) {
-
-				g.Add(
-					jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-				)
-
-				g.Add(
-					jen.List(jen.Id("message"), jen.Err()).Op(":=").Qual("encoding/json", "Marshal").Params(jen.Id("d")),
-				)
-				g.Add(
-					jen.If(
-						jen.Id("err").Op("!=").Id("nil"),
-					).Block(
-						jen.Qual("log", "Fatal").Params(jen.Err()),
-					),
-				)
-
-				for _, key := range sortedKeys {
-					if strings.HasSuffix(key, "topic") {
-						if IsCommand(key, d) {
-							cam := strcase.ToCamel(key)
-
-							g.Add(
-								jen.If(
-									jen.Id("d").Dot(cam).Op("!=").Nil(),
-								).Block(
-									jen.Id("t").Op(":=").Id("c").Dot("Subscribe").Params(
-										jen.Op("*").Id("d").Dot(cam),
-										jen.Lit(0),
-										jen.Id("d").Dot("MQTT").Dot("MessageHandler"),
-									),
-									jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-									jen.If(
-										jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
-									).Block(
-										jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
-									),
-								),
-							)
-						}
-					}
-				}
-
-				g.Add(
-					jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-						jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
-						jen.Lit(0),
-						jen.Lit(true),
-						jen.Id("message"),
-					),
-				)
-
-				g.Add(
-					jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-				)
-
-				for _, key := range keyNames {
-					if d.JSONContainer.Exists(key) {
-						if key == "availability_topic" {
-							g.Add(
-								jen.Id("d").Dot("AvailabilityFunc").Params(),
-							)
-						}
-					}
-				}
-
-				g.Add(
-					jen.Id("d").Dot("UpdateState").Params(),
-				)
-
-			},
-		)
-
-		// d.UnSubscribe()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("UnSubscribe").Params().BlockFunc(
-			func(g *jen.Group) {
-				if d.JSONContainer.Exists("availability_topic") {
-					g.Add(
-						jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-					)
-
-					g.Add(
-						jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-							jen.Op("*").Id("d").Dot("AvailabilityTopic"),
-							jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"),
-							jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"),
-							jen.Lit("offline"),
-						),
-					)
-
-					g.Add(
-						jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-					)
-
-					for _, key := range sortedKeys {
-						if strings.HasSuffix(key, "topic") {
-							if IsCommand(key, d) {
-								cam := strcase.ToCamel(key)
-
-								g.Add(
-									jen.If(
-										jen.Id("d").Dot(cam).Op("!=").Nil(),
-									).Block(
-										jen.Id("t").Op(":=").Id("c").Dot("Unsubscribe").Params(
-											jen.Op("*").Id("d").Dot(cam),
-										),
-										jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-										jen.If(
-											jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
-										).Block(
-											jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
-										),
-									),
-								)
-							}
-						}
-					}
-				}
-			},
-		)
-
-		// d.AnnounceAvailable()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("AnnounceAvailable").Params().BlockFunc(
-			func(g *jen.Group) {
-				if d.JSONContainer.Exists("availability_topic") {
-					g.Add(
-						jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-					)
-					g.Add(
-						jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-							jen.Op("*").Id("d").Dot("AvailabilityTopic"),
-							jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"),
-							jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"),
-							jen.Lit("online"),
-						),
-					)
-					g.Add(
-						jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-					)
-				}
-			},
-		)
-
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("Initialize").Params().BlockFunc(func(g *jen.Group) {
-			if d.JSONContainer.Exists("qos") {
-				g.Add(
-					jen.If(
-						jen.Id("d").Dot("Qos").Op("==").Nil(),
-					).Block(
-						jen.Id("d").Dot("Qos").Op("=").New(jen.Int()),
-						jen.Op("*").Id("d").Dot("Qos").Op("=").Int().Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS")),
-					),
-				)
-			}
-			if d.JSONContainer.Exists("retain") {
-				g.Add(
-					jen.If(
-						jen.Id("d").Dot("Retain").Op("==").Nil(),
-					).Block(
-						jen.Id("d").Dot("Retain").Op("=").New(jen.Bool()),
-						jen.Op("*").Id("d").Dot("Retain").Op("=").Qual("github.com/kjbreil/hass-mqtt/common", "RetainClient"),
-					),
-				)
-			}
-			if d.JSONContainer.Exists("unique_id") {
-				g.Add(
-					jen.If(jen.Id("d").Dot("UniqueId").Op("==").Nil()).BlockFunc(
-						func(g *jen.Group) {
-							g.Add(
-								jen.Id("d").Dot("UniqueId").Op("=").New(jen.String()))
-							g.Add(
-								jen.Op("*").Id("d").Dot("UniqueId").Op("=").Qual("github.com/iancoleman/strcase", "ToDelimited").Params(
-									jen.Op("*").Id("d").Dot("Name"),
-									jen.Lit(uint8('-')),
-								))
-						},
-					),
-				)
-			}
-			if d.JSONContainer.Exists("availability_topic") {
-				g.Add(
-					jen.If(
-						jen.Id("d").Dot("AvailabilityFunc").Op("==").Nil(),
-					).Block(
-						jen.Id("d").Dot("AvailabilityFunc").Op("=").Id("AvailabilityFunc"),
-					),
-				)
-			}
-			g.Add(
-				jen.If(
-					jen.Id("d").Dot("MQTT").Op("==").Nil(),
-				).Block(
-					jen.Id("d").Dot("MQTT").Op("=").New(jen.Id("MQTTFields")),
-				),
-			)
-			g.Add(jen.Id("d").Dot("AddMessageHandler").Params())
-			g.Add(jen.Id("d").Dot("PopulateTopics").Params())
-		})
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("DeleteTopic").Params().BlockFunc(func(g *jen.Group) {
-			g.Add(
-				jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-			)
-			g.Add(
-				jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-					jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
-					jen.Lit(0),
-					jen.Lit(true),
-					jen.Lit(""),
-				),
-			)
-
-			g.Add(
-				jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-			)
-
-			g.Add(
-				jen.Qual("time", "Sleep").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "HADiscoveryDelay")),
-			)
-		})
-
-		// d.PopulateTopics()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("PopulateTopics").Params().BlockFunc(func(g *jen.Group) {
-			for _, name := range keyNames {
-				if strings.HasSuffix(name, "topic") && d.JSONContainer.Exists(name) {
-					if name == "topic" {
-						name = "state_topic"
-					}
-					lName := strcase.ToCamel(strings.TrimSuffix(strings.TrimSuffix(name, "topic"), "_"))
-					g.Add(
-						jen.If(
-							jen.Id("d").Dot(lName + "Func").Op("!=").Nil(),
-						).BlockFunc(
-							func(g *jen.Group) {
-								g.Add(jen.Id("d").Dot(strcase.ToCamel(
-									func(key string) string {
-										var s string
-										if key == "topic" {
-											s = "state_topic"
-										} else {
-											s = key
-										}
-										return s
-									}(name),
-								)).Op("=").New(jen.String()))
-								g.Add(jen.Op("*").Id("d").Dot(strcase.ToCamel(
-									func(key string) string {
-										var s string
-										if key == "topic" {
-											s = "state_topic"
-										} else {
-											s = key
-										}
-										return s
-									}(name),
-								)).Op("=").Id("GetTopic").Params(jen.Id("d"), jen.Lit(name)))
-								if IsCommand(name, d) {
-									g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "TopicStore").Index(
-										jen.Op("*").Id("d").Dot(strcase.ToCamel(name)),
-									).Op("=").Id("&d").Dot(lName + "Func"))
-								}
-							},
-						),
-					)
-				}
-			}
-		})
-
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("SetMQTTFields").Params(
-			jen.Id("fields").Id("MQTTFields"),
-		).BlockFunc(
-			func(g *jen.Group) {
-				g.Add(
-					jen.Op("*").Id("d").Dot("MQTT").Op("=").Id("fields"),
-				)
-			},
-		)
-
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("GetMQTTFields").Params().Params(
-			jen.Id("fields").Id("MQTTFields"),
-		).BlockFunc(
-			func(g *jen.Group) {
-				g.Add(
-					jen.Return(jen.Op("*").Id("d").Dot("MQTT")),
-				)
-			},
-		)
-
-	}
+	//for _, d := range devices {
+	//
+	//	camName := strcase.ToCamel(d.Name)
+	//
+	//	st := make(map[string][]*jen.Statement)
+	//
+	//	// Add standalone base level fields
+	//	for _, key := range keyNames {
+	//		if d.JSONContainer.Exists(key) {
+	//			st[key] = append(st[key], d.FieldAdder(key), d.FunctionAdder(key))
+	//		}
+	//	}
+	//
+	//	if d.JSONContainer.Exists("device") {
+	//		st["device"] = append(st["device"], jen.Id(strcase.ToCamel("device")).StructFunc(
+	//			func(g *jen.Group) {
+	//				for _, v := range []string{
+	//					"configuration_url",
+	//					"connections",
+	//					"identifiers",
+	//					"manufacturer",
+	//					"model",
+	//					"name",
+	//					"suggested_area",
+	//					"sw_version",
+	//					"via_device",
+	//				} {
+	//					g.Add(
+	//						jen.Id(strcase.ToCamel(v)).Op("*").String().Tag(map[string]string{"json": v + ",omitempty"}).Comment(d.JSONContainer.Path("device.keys." + v + ".description").String()),
+	//					)
+	//				}
+	//			},
+	//		).Tag(map[string]string{"json": "device,omitempty"}).Comment("Device configuration parameters"))
+	//	}
+	//
+	//	sortedKeys := []string{}
+	//	for key := range st {
+	//		sortedKeys = append(sortedKeys, key)
+	//	}
+	//	sort.Strings(sortedKeys)
+	//
+	//	// Device MQTT Struct
+	//	external[d.Name].Type().Id(strcase.ToCamel(d.Name)).StructFunc(
+	//		func(g *jen.Group) {
+	//			for _, key := range sortedKeys {
+	//				v := st[key]
+	//				for _, val := range v {
+	//					g.Add(val)
+	//				}
+	//			}
+	//			g.Id("MQTT").Op("*").Id("MQTTFields").Tag(map[string]string{"json": "-"}).Comment("MQTT configuration parameters")
+	//		},
+	//	)
+	//
+	//	// d.GetRawID()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("GetRawId").Params().String().Block(
+	//		jen.Return(jen.Lit(d.Name)),
+	//	)
+	//
+	//	// d.AddMessageHandler()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("AddMessageHandler").Params().Block(
+	//		jen.Id("d").Dot("MQTT").Dot("MessageHandler").Op("=").Id("MakeMessageHandler").Params(jen.Id("d")),
+	//	)
+	//	// d.GetUniqueID()
+	//	if d.JSONContainer.Exists("unique_id") {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//		).Id("GetUniqueId").Params().String().Block(
+	//			jen.Return(jen.Op("*").Id("d").Dot("UniqueId")),
+	//		)
+	//	} else {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Id(strcase.ToCamel(d.Name)),
+	//		).Id("GetUniqueId").Params().String().Block(
+	//			jen.Return(jen.Lit("")),
+	//		)
+	//	}
+	//	// d.GetName()
+	//	if d.JSONContainer.Exists("unique_id") {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//		).Id("GetName").Params().String().Block(
+	//			jen.Return(jen.Op("*").Id("d").Dot("Name")),
+	//		)
+	//	} else {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Id(strcase.ToCamel(d.Name)),
+	//		).Id("GetName").Params().String().Block(
+	//			jen.Return(jen.Lit("")),
+	//		)
+	//	}
+	//
+	//	// d.PopulateDevice()
+	//	if d.JSONContainer.Exists("device") {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//		).Id("PopulateDevice").Params(
+	//			jen.Id("Manufacturer").String(),
+	//			jen.Id("SoftwareName").String(),
+	//			jen.Id("InstanceName").String(),
+	//			jen.Id("SWVersion").String(),
+	//			jen.Id("Identifier").String()).
+	//			Block(
+	//				jen.Id("d.Device.Manufacturer").Op("=&").Id("Manufacturer"),
+	//				jen.Id("d.Device.Model").Op("=&").Id("SoftwareName"),
+	//				jen.Id("d.Device.Name").Op("=&").Id("InstanceName"),
+	//				jen.Id("d.Device.SwVersion").Op("=&").Id("SWVersion"),
+	//				jen.Id("d.Device.Identifiers").Op("=&").Id("Identifier"),
+	//			)
+	//	} else {
+	//		external[d.Name].Func().Params(
+	//			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//		).Id("PopulateDevice").Params(
+	//			jen.Id("_").String(),
+	//			jen.Id("_").String(),
+	//			jen.Id("_").String(),
+	//			jen.Id("_").String(),
+	//			jen.Id("_").String()).
+	//			Block()
+	//	}
+	//
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("UpdateState").Params(
+	//	//jen.Id("state").Id("string"),
+	//	).BlockFunc(
+	//		func(g *jen.Group) {
+	//			for _, key := range sortedKeys {
+	//				if strings.HasSuffix(key, "topic") {
+	//					if !IsCommand(key, d) {
+	//						if key == "topic" {
+	//							key = "state_topic"
+	//						}
+	//						trimmed := strings.TrimSuffix(strings.TrimSuffix(key, "topic"), "_")
+	//						cam := strcase.ToCamel(key)
+	//						camTrimmed := strcase.ToCamel(trimmed)
+	//						g.Add(
+	//							jen.If(
+	//								jen.Id("d").Dot(cam).Op("!=").Nil(),
+	//							).Block(
+	//								jen.Id("state").Op(":=").Id("d").Dot(strcase.ToCamel(trimmed+"_func")).Params(),
+	//								jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Lock").Call(),
+	//
+	//								jen.If(
+	//									jen.Id("state").Op("!=").Id("stateStore").Dot(strcase.ToCamel(d.Name)).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).
+	//										Op("||").
+	//										Params(jen.Id("d").Dot("MQTT").Dot("ForceUpdate").Op("!=").Nil().Op("&&").Op("*").Id("d").Dot("MQTT").Dot("ForceUpdate")),
+	//								).Block(
+	//									jen.Id("token").Op(":=").Params(jen.Op("*").Id("d").Dot("MQTT").Dot("Client")).Dot("Publish").ParamsFunc(
+	//										func(g *jen.Group) {
+	//											g.Add(jen.Op("*").Id("d").Dot(cam))
+	//
+	//											if d.JSONContainer.Exists("qos") {
+	//												g.Add(jen.Byte().Params(jen.Op("*").Id("d").Dot("Qos")))
+	//											} else {
+	//												g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"))
+	//											}
+	//
+	//											if d.JSONContainer.Exists("retain") {
+	//												g.Add(jen.Op("*").Id("d").Dot("Retain"))
+	//											} else {
+	//												g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"))
+	//											}
+	//
+	//											g.Add(jen.Id("state"))
+	//										},
+	//									),
+	//									jen.Id("stateStore").Dot(camName).Dot(camTrimmed).Index(jen.Id("d").Dot("GetUniqueId").Params()).Op("=").Id("state"),
+	//									jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//								),
+	//								jen.Id("stateStore").Dot(camName).Dot("Mutex").Dot("Unlock").Call(),
+	//							),
+	//						)
+	//					}
+	//				}
+	//			}
+	//		},
+	//	)
+	//
+	//	// d.Subscribe()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("Subscribe").Params().BlockFunc(
+	//		func(g *jen.Group) {
+	//
+	//			g.Add(
+	//				jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+	//			)
+	//
+	//			g.Add(
+	//				jen.List(jen.Id("message"), jen.Err()).Op(":=").Qual("encoding/json", "Marshal").Params(jen.Id("d")),
+	//			)
+	//			g.Add(
+	//				jen.If(
+	//					jen.Id("err").Op("!=").Id("nil"),
+	//				).Block(
+	//					jen.Qual("log", "Fatal").Params(jen.Err()),
+	//				),
+	//			)
+	//
+	//			for _, key := range sortedKeys {
+	//				if strings.HasSuffix(key, "topic") {
+	//					if IsCommand(key, d) {
+	//						cam := strcase.ToCamel(key)
+	//
+	//						g.Add(
+	//							jen.If(
+	//								jen.Id("d").Dot(cam).Op("!=").Nil(),
+	//							).Block(
+	//								jen.Id("t").Op(":=").Id("c").Dot("Subscribe").Params(
+	//									jen.Op("*").Id("d").Dot(cam),
+	//									jen.Lit(0),
+	//									jen.Id("d").Dot("MQTT").Dot("MessageHandler"),
+	//								),
+	//								jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//								jen.If(
+	//									jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
+	//								).Block(
+	//									jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
+	//								),
+	//							),
+	//						)
+	//					}
+	//				}
+	//			}
+	//
+	//			g.Add(
+	//				jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+	//					jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
+	//					jen.Lit(0),
+	//					jen.Lit(true),
+	//					jen.Id("message"),
+	//				),
+	//			)
+	//
+	//			g.Add(
+	//				jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//			)
+	//
+	//			for _, key := range keyNames {
+	//				if d.JSONContainer.Exists(key) {
+	//					if key == "availability_topic" {
+	//						g.Add(
+	//							jen.Id("d").Dot("AvailabilityFunc").Params(),
+	//						)
+	//					}
+	//				}
+	//			}
+	//
+	//			g.Add(
+	//				jen.Id("d").Dot("UpdateState").Params(),
+	//			)
+	//
+	//		},
+	//	)
+	//
+	//	// d.UnSubscribe()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("UnSubscribe").Params().BlockFunc(
+	//		func(g *jen.Group) {
+	//			if d.JSONContainer.Exists("availability_topic") {
+	//				g.Add(
+	//					jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+	//				)
+	//
+	//				g.Add(
+	//					jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+	//						jen.Op("*").Id("d").Dot("AvailabilityTopic"),
+	//						jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"),
+	//						jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"),
+	//						jen.Lit("offline"),
+	//					),
+	//				)
+	//
+	//				g.Add(
+	//					jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//				)
+	//
+	//				for _, key := range sortedKeys {
+	//					if strings.HasSuffix(key, "topic") {
+	//						if IsCommand(key, d) {
+	//							cam := strcase.ToCamel(key)
+	//
+	//							g.Add(
+	//								jen.If(
+	//									jen.Id("d").Dot(cam).Op("!=").Nil(),
+	//								).Block(
+	//									jen.Id("t").Op(":=").Id("c").Dot("Unsubscribe").Params(
+	//										jen.Op("*").Id("d").Dot(cam),
+	//									),
+	//									jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//									jen.If(
+	//										jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
+	//									).Block(
+	//										jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
+	//									),
+	//								),
+	//							)
+	//						}
+	//					}
+	//				}
+	//			}
+	//		},
+	//	)
+	//
+	//	// d.AnnounceAvailable()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("AnnounceAvailable").Params().BlockFunc(
+	//		func(g *jen.Group) {
+	//			if d.JSONContainer.Exists("availability_topic") {
+	//				g.Add(
+	//					jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+	//				)
+	//				g.Add(
+	//					jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+	//						jen.Op("*").Id("d").Dot("AvailabilityTopic"),
+	//						jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"),
+	//						jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"),
+	//						jen.Lit("online"),
+	//					),
+	//				)
+	//				g.Add(
+	//					jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//				)
+	//			}
+	//		},
+	//	)
+	//
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("Initialize").Params().BlockFunc(func(g *jen.Group) {
+	//		if d.JSONContainer.Exists("qos") {
+	//			g.Add(
+	//				jen.If(
+	//					jen.Id("d").Dot("Qos").Op("==").Nil(),
+	//				).Block(
+	//					jen.Id("d").Dot("Qos").Op("=").New(jen.Int()),
+	//					jen.Op("*").Id("d").Dot("Qos").Op("=").Int().Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS")),
+	//				),
+	//			)
+	//		}
+	//		if d.JSONContainer.Exists("retain") {
+	//			g.Add(
+	//				jen.If(
+	//					jen.Id("d").Dot("Retain").Op("==").Nil(),
+	//				).Block(
+	//					jen.Id("d").Dot("Retain").Op("=").New(jen.Bool()),
+	//					jen.Op("*").Id("d").Dot("Retain").Op("=").Qual("github.com/kjbreil/hass-mqtt/common", "RetainClient"),
+	//				),
+	//			)
+	//		}
+	//		if d.JSONContainer.Exists("unique_id") {
+	//			g.Add(
+	//				jen.If(jen.Id("d").Dot("UniqueId").Op("==").Nil()).BlockFunc(
+	//					func(g *jen.Group) {
+	//						g.Add(
+	//							jen.Id("d").Dot("UniqueId").Op("=").New(jen.String()))
+	//						g.Add(
+	//							jen.Op("*").Id("d").Dot("UniqueId").Op("=").Qual("github.com/iancoleman/strcase", "ToDelimited").Params(
+	//								jen.Op("*").Id("d").Dot("Name"),
+	//								jen.Lit(uint8('-')),
+	//							))
+	//					},
+	//				),
+	//			)
+	//		}
+	//		if d.JSONContainer.Exists("availability_topic") {
+	//			g.Add(
+	//				jen.If(
+	//					jen.Id("d").Dot("AvailabilityFunc").Op("==").Nil(),
+	//				).Block(
+	//					jen.Id("d").Dot("AvailabilityFunc").Op("=").Id("AvailabilityFunc"),
+	//				),
+	//			)
+	//		}
+	//		g.Add(
+	//			jen.If(
+	//				jen.Id("d").Dot("MQTT").Op("==").Nil(),
+	//			).Block(
+	//				jen.Id("d").Dot("MQTT").Op("=").New(jen.Id("MQTTFields")),
+	//			),
+	//		)
+	//		g.Add(jen.Id("d").Dot("AddMessageHandler").Params())
+	//		g.Add(jen.Id("d").Dot("PopulateTopics").Params())
+	//	})
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("DeleteTopic").Params().BlockFunc(func(g *jen.Group) {
+	//		g.Add(
+	//			jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+	//		)
+	//		g.Add(
+	//			jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+	//				jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
+	//				jen.Lit(0),
+	//				jen.Lit(true),
+	//				jen.Lit(""),
+	//			),
+	//		)
+	//
+	//		g.Add(
+	//			jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+	//		)
+	//
+	//		g.Add(
+	//			jen.Qual("time", "Sleep").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "HADiscoveryDelay")),
+	//		)
+	//	})
+	//
+	//	// d.PopulateTopics()
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("PopulateTopics").Params().BlockFunc(func(g *jen.Group) {
+	//		for _, name := range keyNames {
+	//			if strings.HasSuffix(name, "topic") && d.JSONContainer.Exists(name) {
+	//				if name == "topic" {
+	//					name = "state_topic"
+	//				}
+	//				lName := strcase.ToCamel(strings.TrimSuffix(strings.TrimSuffix(name, "topic"), "_"))
+	//				g.Add(
+	//					jen.If(
+	//						jen.Id("d").Dot(lName + "Func").Op("!=").Nil(),
+	//					).BlockFunc(
+	//						func(g *jen.Group) {
+	//							g.Add(jen.Id("d").Dot(strcase.ToCamel(
+	//								func(key string) string {
+	//									var s string
+	//									if key == "topic" {
+	//										s = "state_topic"
+	//									} else {
+	//										s = key
+	//									}
+	//									return s
+	//								}(name),
+	//							)).Op("=").New(jen.String()))
+	//							g.Add(jen.Op("*").Id("d").Dot(strcase.ToCamel(
+	//								func(key string) string {
+	//									var s string
+	//									if key == "topic" {
+	//										s = "state_topic"
+	//									} else {
+	//										s = key
+	//									}
+	//									return s
+	//								}(name),
+	//							)).Op("=").Id("GetTopic").Params(jen.Id("d"), jen.Lit(name)))
+	//							if IsCommand(name, d) {
+	//								g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "TopicStore").Index(
+	//									jen.Op("*").Id("d").Dot(strcase.ToCamel(name)),
+	//								).Op("=").Id("&d").Dot(lName + "Func"))
+	//							}
+	//						},
+	//					),
+	//				)
+	//			}
+	//		}
+	//	})
+	//
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("SetMQTTFields").Params(
+	//		jen.Id("fields").Id("MQTTFields"),
+	//	).BlockFunc(
+	//		func(g *jen.Group) {
+	//			g.Add(
+	//				jen.Op("*").Id("d").Dot("MQTT").Op("=").Id("fields"),
+	//			)
+	//		},
+	//	)
+	//
+	//	external[d.Name].Func().Params(
+	//		jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+	//	).Id("GetMQTTFields").Params().Params(
+	//		jen.Id("fields").Id("MQTTFields"),
+	//	).BlockFunc(
+	//		func(g *jen.Group) {
+	//			g.Add(
+	//				jen.Return(jen.Op("*").Id("d").Dot("MQTT")),
+	//			)
+	//		},
+	//	)
+	//
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////
 

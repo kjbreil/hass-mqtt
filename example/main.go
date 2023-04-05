@@ -68,16 +68,16 @@ func main() {
 		LastSeen: time.Now(),
 	}
 
-	l := &entities.Light{
+	l := &entities.LightRef{
 		Name:     &lightName,
 		UniqueId: &uniqueId,
 		CommandFunc: func(message mqtt.Message, client mqtt.Client) {
 			switch string(message.Payload()) {
 			case "ON":
-				fmt.Println("Light ON")
+				fmt.Println("LightRef ON")
 				ls.State = "ON"
 			case "OFF":
-				fmt.Println("Light OFF")
+				fmt.Println("LightRef OFF")
 				ls.State = "OFF"
 
 			}
