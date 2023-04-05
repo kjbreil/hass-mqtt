@@ -10,7 +10,6 @@ type Entity interface {
 	GetUniqueId() string
 	GetName() string
 	PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string)
-	PopulateTopics()
 	UpdateState()
 	Subscribe()
 	UnSubscribe()

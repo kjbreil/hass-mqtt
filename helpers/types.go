@@ -18,7 +18,6 @@ func generateTypes(external map[string]*jen.File) {
 		jen.Id("GetUniqueId").Params().String(),
 		jen.Id("GetName").Params().String(),
 		jen.Id("PopulateDevice").Params(jen.Id("Manufacturer").String(), jen.Id("SoftwareName").String(), jen.Id("InstanceName").String(), jen.Id("SWVersion").String(), jen.Id("Identifier").String()),
-		jen.Id("PopulateTopics").Params(),
 		jen.Id("UpdateState").Params(),
 		jen.Id("Subscribe").Params(),
 		jen.Id("UnSubscribe").Params(),

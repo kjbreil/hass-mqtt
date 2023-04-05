@@ -27,7 +27,3 @@ type ButtonRefOptions struct {
 func NewButtonRefOptions() *ButtonRefOptions {
 	return &ButtonRefOptions{}
 }
-
-func NewLight(opts *LightRefOptions) {
-
-}

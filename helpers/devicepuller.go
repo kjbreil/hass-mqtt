@@ -118,7 +118,7 @@ func splitDocument(devicename string) (string, error) {
 	if devicename == "vacuum" {
 		dat = dat[strings.Index(dat, "## State Configuration"):]
 	} else if devicename == "light" {
-		dat = between(dat, "## JSON schema - Configuration", "## JSON schema - Examples")
+		dat = between(dat, "## Default schema - Configuration", "## Default schema - Examples")
 	}
 
 	match := between(dat, "{% configuration %}", "{% endconfiguration %}")
@@ -193,47 +193,63 @@ func TypeTranslator(t string, s *jen.Statement) *jen.Statement {
 	v := Unquote(t)
 	switch v {
 	case "string", "template", "icon", "device_class":
-		return s.Op("*").String()
+		return s.String()
 	case "integer":
-		return s.Op("*").Int()
+		return s.Int()
 	case "boolean":
-		return s.Op("*").Bool()
+		return s.Bool()
 	case "list", "[\"list\"]", "[\"string\",\"list\"]":
-		return s.Op("*").Params(jen.Index().String())
+		return s.Params(jen.Index().String())
 	case "map":
-		return s.Op("*").Params(jen.Map(jen.String()).String())
+		return s.Params(jen.Map(jen.String()).String())
 	case "float":
-		return s.Op("*").Float64()
+		return s.Float64()
 	default:
 		log.Fatalln("Unknown type " + t)
 		return nil
 	}
 }
 
-func (dev *Device) FieldAdder(key string) *jen.Statement {
+func (dev *Device) FieldAdder(key string) *statement {
+	snakeName := func(key string) string {
+		var s string
+		if key == "topic" {
+			s = "state_topic"
+		} else {
+			s = key
+		}
+		return s
+	}(key)
+
+	camelName := strcase.ToCamel(snakeName)
+	lowerCamelName := strcase.ToLowerCamel(camelName)
+	stripTopic := strings.TrimSuffix(camelName, "Topic")
 	dat := dev.JSONContainer.ChildrenMap()
 
 	t := Unquote(dat[key].ChildrenMap()["type"].String())
 
-	return TypeTranslator(t, jen.Id(strcase.ToCamel(
-		func(key string) string {
-			var s string
-			if key == "topic" {
-				s = "state_topic"
-			} else {
-				s = key
-			}
-			return s
-		}(key),
-	))).Tag(map[string]string{"json": key + ",omitempty"}).Comment(dev.JSONContainer.Path(key + ".description").String())
+	return &statement{
+		name:           jen.Id(camelName),
+		snakeName:      snakeName,
+		camelName:      camelName,
+		lowerCamelName: lowerCamelName,
+		stripTopic:     stripTopic,
+		topic:          strings.HasSuffix(key, "topic"),
+		command:        IsCommand(key),
+		t:              TypeTranslator(t, jen.Add()),
+		comment:        jen.Comment(dev.JSONContainer.Path(key + ".description").String()),
+		tag:            jen.Tag(map[string]string{"json": key + ",omitempty"}),
+	}
 }
 
-func (dev *Device) FunctionAdder(key string) *jen.Statement {
-
-	retval := jen.Statement{}
+func (dev *Device) FunctionAdder(key string) *statement {
 
 	if strings.HasSuffix(key, "topic") && (key != "availability") {
-
+		retval := &statement{
+			name:    nil,
+			t:       nil,
+			comment: nil,
+		}
 		if key == "topic" {
 			key = "state_topic"
 		}
@@ -241,21 +257,26 @@ func (dev *Device) FunctionAdder(key string) *jen.Statement {
 		nk := strings.TrimSuffix(key, "topic")
 		nk = strings.TrimSuffix(nk, "_")
 
-		retval.Id(strcase.ToCamel(nk) + "Func").Func()
+		retval.camelName = strcase.ToCamel(nk) + "Func"
+		retval.lowerCamelName = strcase.ToLowerCamel(nk) + "Func"
+		retval.snakeName = nk
+		retval.name = jen.Id(retval.camelName)
+		retval.lowerName = jen.Id(retval.lowerCamelName)
+		retval.t = jen.Func()
 
-		if IsCommand(key, *dev) {
-			retval.Params(
+		if IsCommand(key) {
+			retval.t.Params(
 				jen.Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
 				jen.Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
 			)
 		} else {
-			retval.Params().String()
+			retval.t.Params().String()
 		}
 
-		retval.Tag(map[string]string{"json": "-"})
-
+		retval.tag = jen.Tag(map[string]string{"json": "-"})
+		return retval
 	}
 
-	return &retval
+	return nil
 
 }

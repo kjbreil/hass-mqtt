@@ -63,15 +63,10 @@ func main() {
 		LastSeen time.Time `json:"last_seen"`
 	}
 
-	ls := &lightState{
-		State:    "ON",
-		LastSeen: time.Now(),
-	}
-
-	l := &entities.LightRef{
-		Name:     &lightName,
-		UniqueId: &uniqueId,
-		CommandFunc: func(message mqtt.Message, client mqtt.Client) {
+	lo := entities.NewLightOptions().
+		SetName("Test Light").
+		SetUniqueId(uniqueId).
+		SetCommandFunc(func(message mqtt.Message, client mqtt.Client) {
 			switch string(message.Payload()) {
 			case "ON":
 				fmt.Println("LightRef ON")
@@ -81,15 +76,13 @@ func main() {
 				ls.State = "OFF"
 
 			}
-		},
-		StateFunc: func() string {
-			//data, err := json.Marshal(ls)
-			//if err == nil {
-			//	return string(data)
-			//}
-			return "ON"
-		},
-	}
+		}).
+		SetStateFunc(
+			func() string {
+				return ls.State
+			})
+
+	l := entities.NewLight(lo)
 
 	err := client.Get("test_light_mqtt").Add(l)
 
