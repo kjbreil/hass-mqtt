@@ -15,35 +15,35 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-var DeviceNames = []string{
-	//"button",
-	"light",
-}
-
 //var DeviceNames = []string{
-//	"alarm_control_panel",
-//	"binary_sensor",
-//	"button",
-//	"camera",
-//	"climate",
-//	"cover",
-//	"device_tracker",
-//	"device_trigger",
-//	"fan",
-//	"humidifier",
+//	//"button",
 //	"light",
-//	"lock",
-//	"number",
-//	"scene",
-//	"select",
-//	"sensor",
-//	"siren",
-//	"switch",
-//	"tag",
-//	"text",
-//	"update",
-//	"vacuum",
 //}
+
+var DeviceNames = []string{
+	"alarm_control_panel",
+	"binary_sensor",
+	"button",
+	"camera",
+	"climate",
+	//"cover",
+	"device_tracker",
+	"device_trigger",
+	"fan",
+	"humidifier",
+	"light",
+	"lock",
+	"number",
+	"scene",
+	"select",
+	"sensor",
+	"siren",
+	"switch",
+	"tag",
+	"text",
+	"update",
+	"vacuum",
+}
 
 type Device struct {
 	Name          string
@@ -260,6 +260,8 @@ func (dev *Device) FunctionAdder(key string) *statement {
 		retval.camelName = strcase.ToCamel(nk) + "Func"
 		retval.lowerCamelName = strcase.ToLowerCamel(nk) + "Func"
 		retval.snakeName = nk
+		retval.firstLetter = string(retval.lowerCamelName[0])
+		retval.command = IsCommand(key)
 		retval.name = jen.Id(retval.camelName)
 		retval.lowerName = jen.Id(retval.lowerCamelName)
 		retval.t = jen.Func()

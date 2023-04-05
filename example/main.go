@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/iancoleman/strcase"
 	hass_mqtt "github.com/kjbreil/hass-mqtt"
 	"github.com/kjbreil/hass-mqtt/device"
@@ -63,24 +62,13 @@ func main() {
 		LastSeen time.Time `json:"last_seen"`
 	}
 
-	lo := entities.NewLightOptions().
-		SetName("Test Light").
-		SetUniqueId(uniqueId).
-		SetCommandFunc(func(message mqtt.Message, client mqtt.Client) {
-			switch string(message.Payload()) {
-			case "ON":
-				fmt.Println("LightRef ON")
-				ls.State = "ON"
-			case "OFF":
-				fmt.Println("LightRef OFF")
-				ls.State = "OFF"
+	lo := entities.NewLightOptions()
 
-			}
-		}).
-		SetStateFunc(
-			func() string {
-				return ls.State
-			})
+	lo.GetStates().Brightness = "100"
+
+	lo.SetName("Test Light").
+		SetUniqueId(uniqueId).
+		HasBrightness()
 
 	l := entities.NewLight(lo)
 
@@ -98,7 +86,10 @@ func main() {
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		for range ticker.C {
-			l.UpdateState()
+			//l.UpdateState()
+			//i, _ := strconv.Atoi(l.States.Brightness)
+			//i++
+			//l.SetBrightness(fmt.Sprintf("%d", i))
 		}
 	}()
 	l.UpdateState()

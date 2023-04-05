@@ -69,7 +69,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				}
 				g.Id("MQTT").Op("*").Id("MQTTFields").Tag(map[string]string{"json": "-"}).Comment("MQTT configuration parameters")
 				g.Id("states").Id(internalStateTypeName).Comment("Internal Holder of States")
-				g.Id("States").Id(internalStateTypeName).Tag(map[string]string{"json": "-"}).Comment("External state update location")
+				g.Id("States").Op("*").Id(externalStateTypeName).Tag(map[string]string{"json": "-"}).Comment("External state update location")
 			},
 		)
 
@@ -79,6 +79,9 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 			Params(jen.Op("*").Id(camelName)).
 			BlockFunc(func(g *jen.Group) {
 				g.Add(jen.Var().Id(firstLetter).Id(camelName))
+				g.Add(jen.Line())
+
+				g.Add(jen.Id(firstLetter).Dot("States").Op("=").Op("&").Id("o").Dot("States"))
 
 				for _, key := range sortedKeys {
 					if key == "device" {
@@ -93,10 +96,36 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 						)
 					}
 					if v.setter != nil {
+						var el *jen.Statement
+						if v.setter.lowerCamelName == "stateFunc" {
+							el = jen.Else().Block(
+								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params().String().Block(
+									jen.Return(jen.Id(firstLetter).Dot("States").Dot("State")),
+									//jen.Id("l").Dot("UpdateState").Params(),
+								),
+							)
+						}
+
+						if v.setter.lowerCamelName == "commandFunc" {
+							if _, ok := st["state"]; !ok {
+								continue
+							}
+							el = jen.Else().Block(
+								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params(
+									jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
+									jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
+								).Block(
+
+									jen.Id("o").Dot("States").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+
+									//jen.Id("l").Dot("UpdateState").Params(),
+								),
+							)
+						}
 						g.Add(
 							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.camelName)).Dot("IsZero").Params()).Block(
 								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Id("o").Dot(v.setter.camelName),
-							),
+							).Add(el),
 						)
 					}
 
@@ -113,23 +142,52 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				}
 				v := st[key]
 				if v.main != nil && v.main.topic && !v.main.command {
-					g.Add(jen.Id(v.main.stripTopic).Op("*").Add(v.main.t))
+					stateName := strings.TrimSuffix(v.main.stripTopic, "State")
+					if stateName == "" {
+						stateName = v.main.stripTopic
+					}
+					g.Add(jen.Id(stateName).Op("*").Add(v.main.t))
 				}
 
 			}
 		})
 		external[d.Name].Type().Id(externalStateTypeName).StructFunc(func(g *jen.Group) {
 			for _, key := range sortedKeys {
-				if key == "device" {
+				if key == "device" || key == "availability_topic" {
 					continue
 				}
 				v := st[key]
 				if v.main != nil && v.main.topic && !v.main.command {
-					g.Add(jen.Id(v.main.stripTopic).Add(v.main.t))
+					stateName := strings.TrimSuffix(v.main.stripTopic, "State")
+					if stateName == "" {
+						stateName = v.main.stripTopic
+					}
+					g.Add(jen.Id(stateName).Add(v.main.t))
 				}
 
 			}
 		})
+
+		for _, key := range sortedKeys {
+			if key == "device" || key == "availability_topic" {
+				continue
+			}
+			v := st[key]
+			if v.main != nil && v.main.topic && !v.main.command {
+				stateName := strings.TrimSuffix(v.main.stripTopic, "State")
+				if stateName == "" {
+					stateName = v.main.stripTopic
+				}
+				external[d.Name].Func().
+					Params(jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name))).
+					Id(fmt.Sprintf("Set%s", stateName)).Params(jen.Id("s").String()).
+					Block(
+						jen.Id("d").Dot("States").Dot(stateName).Op("=").Id("s"),
+						jen.Id("d").Dot("UpdateState").Params(),
+					)
+			}
+
+		}
 
 		// d.GetRawID()
 		external[d.Name].Func().Params(
@@ -216,7 +274,11 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 							}
 							trimmed := strings.TrimSuffix(strings.TrimSuffix(key, "topic"), "_")
 							cam := strcase.ToCamel(key)
+
 							camTrimmed := strcase.ToCamel(trimmed)
+							if camTrimmed != "State" {
+								camTrimmed = strings.TrimSuffix(camTrimmed, "State")
+							}
 							g.Add(
 								jen.If(
 									jen.Id("d").Dot(cam).Op("!=").Nil(),
@@ -237,13 +299,13 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 												if d.JSONContainer.Exists("qos") {
 													g.Add(jen.Byte().Params(jen.Op("*").Id("d").Dot("Qos")))
 												} else {
-													g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "QoS"))
+													g.Add(jen.Lit(2))
 												}
 
 												if d.JSONContainer.Exists("retain") {
 													g.Add(jen.Op("*").Id("d").Dot("Retain"))
 												} else {
-													g.Add(jen.Qual("github.com/kjbreil/hass-mqtt/common", "Retain"))
+													g.Add(jen.Lit(true))
 												}
 
 												g.Add(jen.Id("state"))
@@ -622,6 +684,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 		sort.Strings(optsSortedKeys)
 
 		external[optionsFileName].Type().Id(optionsCamelName).StructFunc(func(g *jen.Group) {
+			g.Id("States").Id(externalStateTypeName).Comment("External state update location")
 			for _, key := range optsSortedKeys {
 				v := opst[key]
 				if v.main != nil && !v.main.topic {
@@ -641,7 +704,18 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				jen.Return(jen.Op("&").Id(optionsCamelName).Values()),
 			)
 
+		external[optionsFileName].Func().
+			Params(jen.Id("o").Op("*").Id(optionsCamelName)).
+			Id("GetStates").
+			Params().
+			Params(jen.Op("*").Id(externalStateTypeName)).
+			Block(
+
+				jen.Return(jen.Op("&").Id("o").Dot("States")),
+			)
+
 		for _, key := range optsSortedKeys {
+
 			v := opst[key]
 			split := strings.Split(key, "_")
 			name := split[len(split)-1]
@@ -664,6 +738,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 						jen.Return(jen.Id("o")),
 					)
+
 			}
 			if v.setter != nil {
 
@@ -677,6 +752,38 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 						jen.Return(jen.Id("o")),
 					)
+
+				if strings.Contains(v.setter.camelName, "StateFunc") {
+					stateName := strings.TrimSuffix(v.setter.camelName, "StateFunc")
+					if stateName == "" {
+						continue
+					}
+					commandKeyName := strings.ReplaceAll(key, "state", "command")
+					if _, ok := opst[commandKeyName]; !ok {
+						continue
+					}
+
+					commandFuncName := strings.ReplaceAll(v.setter.camelName, "State", "Command")
+
+					external[optionsFileName].Func().
+						Params(jen.Id("o").Op("*").Id(optionsCamelName)).
+						Id(fmt.Sprintf("Has%s", stateName)).
+						Params().
+						Params(jen.Op("*").Id(optionsCamelName)).
+						Block(
+							jen.Id("o").Dot(v.setter.camelName).Op("=").Func().Params().String().Block(
+								jen.Return(jen.Id("o").Dot("States").Dot(stateName)),
+							),
+							jen.Id("o").Dot(commandFuncName).Op("=").Func().Params(
+								jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
+								jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
+							).Block(
+								jen.Id("o").Dot("States").Dot(stateName).Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+							),
+
+							jen.Return(jen.Id("o")),
+						)
+				}
 			}
 		}
 
@@ -703,6 +810,7 @@ type statement struct {
 	t              *jen.Statement
 	tag            *jen.Statement
 	comment        *jen.Statement
+	firstLetter    string
 }
 
 func (s *statement) combine() *jen.Statement {

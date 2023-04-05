@@ -103,11 +103,13 @@ type Light struct {
 	XyValueTemplate           *string     `json:"xy_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the XY value."
 	MQTT                      *MQTTFields `json:"-"`                           // MQTT configuration parameters
 	states                    lightState  // Internal Holder of States
-	States                    lightState  `json:"-"` // External state update location
+	States                    *LightState `json:"-"` // External state update location
 }
 
 func NewLight(o *LightOptions) *Light {
 	var l Light
+
+	l.States = &o.States
 	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
 		l.AvailabilityMode = &o.AvailabilityMode
 	}
@@ -149,9 +151,6 @@ func NewLight(o *LightOptions) *Light {
 	}
 	if !reflect.ValueOf(o.ColorTempValueTemplate).IsZero() {
 		l.ColorTempValueTemplate = &o.ColorTempValueTemplate
-	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		l.commandFunc = o.CommandFunc
 	}
 	if !reflect.ValueOf(o.EffectCommandTemplate).IsZero() {
 		l.EffectCommandTemplate = &o.EffectCommandTemplate
@@ -275,6 +274,10 @@ func NewLight(o *LightOptions) *Light {
 	}
 	if !reflect.ValueOf(o.StateFunc).IsZero() {
 		l.stateFunc = o.StateFunc
+	} else {
+		l.stateFunc = func() string {
+			return l.States.State
+		}
 	}
 	if !reflect.ValueOf(o.StateValueTemplate).IsZero() {
 		l.StateValueTemplate = &o.StateValueTemplate
@@ -304,34 +307,77 @@ func NewLight(o *LightOptions) *Light {
 }
 
 type lightState struct {
-	Availability    *string
-	BrightnessState *string
-	ColorModeState  *string
-	ColorTempState  *string
-	EffectState     *string
-	HsState         *string
-	JsonAttributes  *string
-	RgbState        *string
-	RgbwState       *string
-	RgbwwState      *string
-	State           *string
-	XyState         *string
+	Availability   *string
+	Brightness     *string
+	ColorMode      *string
+	ColorTemp      *string
+	Effect         *string
+	Hs             *string
+	JsonAttributes *string
+	Rgb            *string
+	Rgbw           *string
+	Rgbww          *string
+	State          *string
+	Xy             *string
 }
 type LightState struct {
-	Availability    string
-	BrightnessState string
-	ColorModeState  string
-	ColorTempState  string
-	EffectState     string
-	HsState         string
-	JsonAttributes  string
-	RgbState        string
-	RgbwState       string
-	RgbwwState      string
-	State           string
-	XyState         string
+	Brightness     string
+	ColorMode      string
+	ColorTemp      string
+	Effect         string
+	Hs             string
+	JsonAttributes string
+	Rgb            string
+	Rgbw           string
+	Rgbww          string
+	State          string
+	Xy             string
 }
 
+func (d *Light) SetBrightness(s string) {
+	d.States.Brightness = s
+	d.UpdateState()
+}
+func (d *Light) SetColorMode(s string) {
+	d.States.ColorMode = s
+	d.UpdateState()
+}
+func (d *Light) SetColorTemp(s string) {
+	d.States.ColorTemp = s
+	d.UpdateState()
+}
+func (d *Light) SetEffect(s string) {
+	d.States.Effect = s
+	d.UpdateState()
+}
+func (d *Light) SetHs(s string) {
+	d.States.Hs = s
+	d.UpdateState()
+}
+func (d *Light) SetJsonAttributes(s string) {
+	d.States.JsonAttributes = s
+	d.UpdateState()
+}
+func (d *Light) SetRgb(s string) {
+	d.States.Rgb = s
+	d.UpdateState()
+}
+func (d *Light) SetRgbw(s string) {
+	d.States.Rgbw = s
+	d.UpdateState()
+}
+func (d *Light) SetRgbww(s string) {
+	d.States.Rgbww = s
+	d.UpdateState()
+}
+func (d *Light) SetState(s string) {
+	d.States.State = s
+	d.UpdateState()
+}
+func (d *Light) SetXy(s string) {
+	d.States.Xy = s
+	d.UpdateState()
+}
 func (d *Light) GetRawId() string {
 	return "light"
 }
@@ -362,42 +408,42 @@ func (d *Light) UpdateState() {
 	}
 	if d.BrightnessStateTopic != nil {
 		state := d.brightnessStateFunc()
-		if d.states.BrightnessState == nil || state != *d.states.BrightnessState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Brightness == nil || state != *d.states.Brightness || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.BrightnessStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.BrightnessState = &state
+			d.states.Brightness = &state
 		}
 	}
 	if d.ColorModeStateTopic != nil {
 		state := d.colorModeStateFunc()
-		if d.states.ColorModeState == nil || state != *d.states.ColorModeState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.ColorMode == nil || state != *d.states.ColorMode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.ColorModeStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.ColorModeState = &state
+			d.states.ColorMode = &state
 		}
 	}
 	if d.ColorTempStateTopic != nil {
 		state := d.colorTempStateFunc()
-		if d.states.ColorTempState == nil || state != *d.states.ColorTempState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.ColorTemp == nil || state != *d.states.ColorTemp || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.ColorTempStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.ColorTempState = &state
+			d.states.ColorTemp = &state
 		}
 	}
 	if d.EffectStateTopic != nil {
 		state := d.effectStateFunc()
-		if d.states.EffectState == nil || state != *d.states.EffectState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Effect == nil || state != *d.states.Effect || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.EffectStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.EffectState = &state
+			d.states.Effect = &state
 		}
 	}
 	if d.HsStateTopic != nil {
 		state := d.hsStateFunc()
-		if d.states.HsState == nil || state != *d.states.HsState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Hs == nil || state != *d.states.Hs || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.HsStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.HsState = &state
+			d.states.Hs = &state
 		}
 	}
 	if d.JsonAttributesTopic != nil {
@@ -410,26 +456,26 @@ func (d *Light) UpdateState() {
 	}
 	if d.RgbStateTopic != nil {
 		state := d.rgbStateFunc()
-		if d.states.RgbState == nil || state != *d.states.RgbState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Rgb == nil || state != *d.states.Rgb || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.RgbStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.RgbState = &state
+			d.states.Rgb = &state
 		}
 	}
 	if d.RgbwStateTopic != nil {
 		state := d.rgbwStateFunc()
-		if d.states.RgbwState == nil || state != *d.states.RgbwState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Rgbw == nil || state != *d.states.Rgbw || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.RgbwStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.RgbwState = &state
+			d.states.Rgbw = &state
 		}
 	}
 	if d.RgbwwStateTopic != nil {
 		state := d.rgbwwStateFunc()
-		if d.states.RgbwwState == nil || state != *d.states.RgbwwState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Rgbww == nil || state != *d.states.Rgbww || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.RgbwwStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.RgbwwState = &state
+			d.states.Rgbww = &state
 		}
 	}
 	if d.StateTopic != nil {
@@ -442,10 +488,10 @@ func (d *Light) UpdateState() {
 	}
 	if d.XyStateTopic != nil {
 		state := d.xyStateFunc()
-		if d.states.XyState == nil || state != *d.states.XyState || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+		if d.states.Xy == nil || state != *d.states.Xy || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
 			token := (*d.MQTT.Client).Publish(*d.XyStateTopic, byte(*d.Qos), *d.Retain, state)
 			token.WaitTimeout(common.WaitTimeout)
-			d.states.XyState = &state
+			d.states.Xy = &state
 		}
 	}
 }

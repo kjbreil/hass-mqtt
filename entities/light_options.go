@@ -6,8 +6,9 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type LightOptions struct {
-	AvailabilityMode          string // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate      string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	States                    LightState // External state update location
+	AvailabilityMode          string     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	AvailabilityTemplate      string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityFunc          func() string
 	BrightnessCommandTemplate string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `brightness_command_topic`. Available variables: `value`."
 	BrightnessCommandFunc     func(mqtt.Message, mqtt.Client)
@@ -75,6 +76,9 @@ type LightOptions struct {
 func NewLightOptions() *LightOptions {
 	return &LightOptions{}
 }
+func (o *LightOptions) GetStates() *LightState {
+	return &o.States
+}
 func (o *LightOptions) SetAvailabilityMode(mode string) *LightOptions {
 	o.AvailabilityMode = mode
 	return o
@@ -103,6 +107,15 @@ func (o *LightOptions) SetBrightnessStateFunc(f func() string) *LightOptions {
 	o.BrightnessStateFunc = f
 	return o
 }
+func (o *LightOptions) HasBrightness() *LightOptions {
+	o.BrightnessStateFunc = func() string {
+		return o.States.Brightness
+	}
+	o.BrightnessCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Brightness = string(message.Payload())
+	}
+	return o
+}
 func (o *LightOptions) SetBrightnessValueTemplate(template string) *LightOptions {
 	o.BrightnessValueTemplate = template
 	return o
@@ -127,6 +140,15 @@ func (o *LightOptions) SetColorTempStateFunc(f func() string) *LightOptions {
 	o.ColorTempStateFunc = f
 	return o
 }
+func (o *LightOptions) HasColorTemp() *LightOptions {
+	o.ColorTempStateFunc = func() string {
+		return o.States.ColorTemp
+	}
+	o.ColorTempCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.ColorTemp = string(message.Payload())
+	}
+	return o
+}
 func (o *LightOptions) SetColorTempValueTemplate(template string) *LightOptions {
 	o.ColorTempValueTemplate = template
 	return o
@@ -149,6 +171,15 @@ func (o *LightOptions) SetEffectList(list []string) *LightOptions {
 }
 func (o *LightOptions) SetEffectStateFunc(f func() string) *LightOptions {
 	o.EffectStateFunc = f
+	return o
+}
+func (o *LightOptions) HasEffect() *LightOptions {
+	o.EffectStateFunc = func() string {
+		return o.States.Effect
+	}
+	o.EffectCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Effect = string(message.Payload())
+	}
 	return o
 }
 func (o *LightOptions) SetEffectValueTemplate(template string) *LightOptions {
@@ -177,6 +208,15 @@ func (o *LightOptions) SetHsCommandFunc(f func(mqtt.Message, mqtt.Client)) *Ligh
 }
 func (o *LightOptions) SetHsStateFunc(f func() string) *LightOptions {
 	o.HsStateFunc = f
+	return o
+}
+func (o *LightOptions) HasHs() *LightOptions {
+	o.HsStateFunc = func() string {
+		return o.States.Hs
+	}
+	o.HsCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Hs = string(message.Payload())
+	}
 	return o
 }
 func (o *LightOptions) SetHsValueTemplate(template string) *LightOptions {
@@ -255,6 +295,15 @@ func (o *LightOptions) SetRgbStateFunc(f func() string) *LightOptions {
 	o.RgbStateFunc = f
 	return o
 }
+func (o *LightOptions) HasRgb() *LightOptions {
+	o.RgbStateFunc = func() string {
+		return o.States.Rgb
+	}
+	o.RgbCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Rgb = string(message.Payload())
+	}
+	return o
+}
 func (o *LightOptions) SetRgbValueTemplate(template string) *LightOptions {
 	o.RgbValueTemplate = template
 	return o
@@ -271,6 +320,15 @@ func (o *LightOptions) SetRgbwStateFunc(f func() string) *LightOptions {
 	o.RgbwStateFunc = f
 	return o
 }
+func (o *LightOptions) HasRgbw() *LightOptions {
+	o.RgbwStateFunc = func() string {
+		return o.States.Rgbw
+	}
+	o.RgbwCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Rgbw = string(message.Payload())
+	}
+	return o
+}
 func (o *LightOptions) SetRgbwValueTemplate(template string) *LightOptions {
 	o.RgbwValueTemplate = template
 	return o
@@ -285,6 +343,15 @@ func (o *LightOptions) SetRgbwwCommandFunc(f func(mqtt.Message, mqtt.Client)) *L
 }
 func (o *LightOptions) SetRgbwwStateFunc(f func() string) *LightOptions {
 	o.RgbwwStateFunc = f
+	return o
+}
+func (o *LightOptions) HasRgbww() *LightOptions {
+	o.RgbwwStateFunc = func() string {
+		return o.States.Rgbww
+	}
+	o.RgbwwCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Rgbww = string(message.Payload())
+	}
 	return o
 }
 func (o *LightOptions) SetRgbwwValueTemplate(template string) *LightOptions {
@@ -325,6 +392,15 @@ func (o *LightOptions) SetXyCommandFunc(f func(mqtt.Message, mqtt.Client)) *Ligh
 }
 func (o *LightOptions) SetXyStateFunc(f func() string) *LightOptions {
 	o.XyStateFunc = f
+	return o
+}
+func (o *LightOptions) HasXy() *LightOptions {
+	o.XyStateFunc = func() string {
+		return o.States.Xy
+	}
+	o.XyCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.States.Xy = string(message.Payload())
+	}
 	return o
 }
 func (o *LightOptions) SetXyValueTemplate(template string) *LightOptions {
