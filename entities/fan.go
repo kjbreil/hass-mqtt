@@ -88,6 +88,13 @@ func NewFan(o *FanOptions) *Fan {
 	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
 		f.CommandTemplate = &o.CommandTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		f.commandFunc = o.CommandFunc
+	} else {
+		f.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
 		f.EnabledByDefault = &o.EnabledByDefault
 	}

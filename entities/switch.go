@@ -62,6 +62,13 @@ func NewSwitch(o *SwitchOptions) *Switch {
 	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
 		s.availabilityFunc = o.AvailabilityFunc
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		s.commandFunc = o.CommandFunc
+	} else {
+		s.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.DeviceClass).IsZero() {
 		s.DeviceClass = &o.DeviceClass
 	}

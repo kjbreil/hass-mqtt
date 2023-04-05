@@ -81,6 +81,13 @@ func NewHumidifier(o *HumidifierOptions) *Humidifier {
 	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
 		h.CommandTemplate = &o.CommandTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		h.commandFunc = o.CommandFunc
+	} else {
+		h.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.DeviceClass).IsZero() {
 		h.DeviceClass = &o.DeviceClass
 	}

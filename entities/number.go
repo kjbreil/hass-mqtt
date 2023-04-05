@@ -62,6 +62,13 @@ func NewNumber(o *NumberOptions) *Number {
 	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
 		n.CommandTemplate = &o.CommandTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		n.commandFunc = o.CommandFunc
+	} else {
+		n.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.DeviceClass).IsZero() {
 		n.DeviceClass = &o.DeviceClass
 	}

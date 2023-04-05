@@ -61,6 +61,13 @@ func NewText(o *TextOptions) *Text {
 	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
 		t.CommandTemplate = &o.CommandTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		t.commandFunc = o.CommandFunc
+	} else {
+		t.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
 		t.EnabledByDefault = &o.EnabledByDefault
 	}

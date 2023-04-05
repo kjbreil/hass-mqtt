@@ -152,6 +152,13 @@ func NewLight(o *LightOptions) *Light {
 	if !reflect.ValueOf(o.ColorTempValueTemplate).IsZero() {
 		l.ColorTempValueTemplate = &o.ColorTempValueTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		l.commandFunc = o.CommandFunc
+	} else {
+		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.EffectCommandTemplate).IsZero() {
 		l.EffectCommandTemplate = &o.EffectCommandTemplate
 	}

@@ -60,6 +60,13 @@ func NewSelect(o *SelectOptions) *Select {
 	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
 		s.CommandTemplate = &o.CommandTemplate
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		s.commandFunc = o.CommandFunc
+	} else {
+		s.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
 		s.EnabledByDefault = &o.EnabledByDefault
 	}

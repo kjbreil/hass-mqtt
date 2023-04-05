@@ -65,6 +65,13 @@ func NewVacuum(o *VacuumOptions) *Vacuum {
 	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
 		v.availabilityFunc = o.AvailabilityFunc
 	}
+	if !reflect.ValueOf(o.CommandFunc).IsZero() {
+		v.commandFunc = o.CommandFunc
+	} else {
+		v.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			o.States.State = string(message.Payload())
+		}
+	}
 	if !reflect.ValueOf(o.Encoding).IsZero() {
 		v.Encoding = &o.Encoding
 	}

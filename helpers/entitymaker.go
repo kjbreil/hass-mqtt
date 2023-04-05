@@ -107,7 +107,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 						}
 
 						if v.setter.lowerCamelName == "commandFunc" {
-							if _, ok := st["state"]; !ok {
+							if _, ok := st["state_topic"]; !ok {
 								continue
 							}
 							el = jen.Else().Block(

@@ -86,7 +86,7 @@ func main() {
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		for range ticker.C {
-			//l.UpdateState()
+			l.UpdateState()
 			//i, _ := strconv.Atoi(l.States.Brightness)
 			//i++
 			//l.SetBrightness(fmt.Sprintf("%d", i))
