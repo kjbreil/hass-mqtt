@@ -6,137 +6,137 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type NumberOptions struct {
-	States                 NumberState // External state update location
-	AvailabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityFunc       func() string
-	CommandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
-	CommandFunc            func(mqtt.Message, mqtt.Client)
-	DeviceClass            string // "The [type/class](/integrations/number/#device-class) of the number."
-	EnabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
-	Encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
-	EntityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	Icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
-	JsonAttributesFunc     func() string
-	Max                    float64 // "Maximum value."
-	Min                    float64 // "Minimum value."
-	Mode                   string  // "Control how the number should be displayed in the UI. Can be set to `box` or `slider` to force a display mode."
-	Name                   string  // "The name of the Number."
-	ObjectId               string  // "Used instead of `name` for automatic generation of `entity_id`"
-	Optimistic             bool    // "Flag that defines if number works in optimistic mode."
-	PayloadReset           string  // "A special payload that resets the state to `None` when received on the `state_topic`."
-	Qos                    int     // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
-	Retain                 bool    // "If the published message should have the retain flag on or not."
-	StateFunc              func() string
-	Step                   float64 // "Step value. Smallest value `0.001`."
-	UniqueId               string  // "An ID that uniquely identifies this Number. If two Numbers have the same unique ID Home Assistant will raise an exception."
-	UnitOfMeasurement      string  // "Defines the unit of measurement of the sensor, if any."
-	ValueTemplate          string  // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
+	states                 NumberState // External state update location
+	availabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityFunc       func() string
+	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandFunc            func(mqtt.Message, mqtt.Client)
+	deviceClass            string // "The [type/class](/integrations/number/#device-class) of the number."
+	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
+	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
+	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	jsonAttributesFunc     func() string
+	max                    float64 // "Maximum value."
+	min                    float64 // "Minimum value."
+	mode                   string  // "Control how the number should be displayed in the UI. Can be set to `box` or `slider` to force a display mode."
+	name                   string  // "The name of the Number."
+	objectId               string  // "Used instead of `name` for automatic generation of `entity_id`"
+	optimistic             bool    // "Flag that defines if number works in optimistic mode."
+	payloadReset           string  // "A special payload that resets the state to `None` when received on the `state_topic`."
+	qos                    int     // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	retain                 bool    // "If the published message should have the retain flag on or not."
+	stateFunc              func() string
+	step                   float64 // "Step value. Smallest value `0.001`."
+	uniqueId               string  // "An ID that uniquely identifies this Number. If two Numbers have the same unique ID Home Assistant will raise an exception."
+	unitOfMeasurement      string  // "Defines the unit of measurement of the sensor, if any."
+	valueTemplate          string  // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
 }
 
 func NewNumberOptions() *NumberOptions {
 	return &NumberOptions{}
 }
-func (o *NumberOptions) GetStates() *NumberState {
-	return &o.States
+func (o *NumberOptions) States() *NumberState {
+	return &o.states
 }
-func (o *NumberOptions) SetAvailabilityMode(mode string) *NumberOptions {
-	o.AvailabilityMode = mode
+func (o *NumberOptions) AvailabilityMode(mode string) *NumberOptions {
+	o.availabilityMode = mode
 	return o
 }
-func (o *NumberOptions) SetAvailabilityFunc(f func() string) *NumberOptions {
-	o.AvailabilityFunc = f
+func (o *NumberOptions) AvailabilityFunc(f func() string) *NumberOptions {
+	o.availabilityFunc = f
 	return o
 }
-func (o *NumberOptions) SetCommandTemplate(template string) *NumberOptions {
-	o.CommandTemplate = template
+func (o *NumberOptions) CommandTemplate(template string) *NumberOptions {
+	o.commandTemplate = template
 	return o
 }
-func (o *NumberOptions) SetCommandFunc(f func(mqtt.Message, mqtt.Client)) *NumberOptions {
-	o.CommandFunc = f
+func (o *NumberOptions) CommandFunc(f func(mqtt.Message, mqtt.Client)) *NumberOptions {
+	o.commandFunc = f
 	return o
 }
-func (o *NumberOptions) SetDeviceClass(class string) *NumberOptions {
-	o.DeviceClass = class
+func (o *NumberOptions) DeviceClass(class string) *NumberOptions {
+	o.deviceClass = class
 	return o
 }
-func (o *NumberOptions) SetEnabledByDefault(d bool) *NumberOptions {
-	o.EnabledByDefault = d
+func (o *NumberOptions) EnabledByDefault(d bool) *NumberOptions {
+	o.enabledByDefault = d
 	return o
 }
-func (o *NumberOptions) SetEncoding(encoding string) *NumberOptions {
-	o.Encoding = encoding
+func (o *NumberOptions) Encoding(encoding string) *NumberOptions {
+	o.encoding = encoding
 	return o
 }
-func (o *NumberOptions) SetEntityCategory(category string) *NumberOptions {
-	o.EntityCategory = category
+func (o *NumberOptions) EntityCategory(category string) *NumberOptions {
+	o.entityCategory = category
 	return o
 }
-func (o *NumberOptions) SetIcon(icon string) *NumberOptions {
-	o.Icon = icon
+func (o *NumberOptions) Icon(icon string) *NumberOptions {
+	o.icon = icon
 	return o
 }
-func (o *NumberOptions) SetJsonAttributesTemplate(template string) *NumberOptions {
-	o.JsonAttributesTemplate = template
+func (o *NumberOptions) JsonAttributesTemplate(template string) *NumberOptions {
+	o.jsonAttributesTemplate = template
 	return o
 }
-func (o *NumberOptions) SetJsonAttributesFunc(f func() string) *NumberOptions {
-	o.JsonAttributesFunc = f
+func (o *NumberOptions) JsonAttributesFunc(f func() string) *NumberOptions {
+	o.jsonAttributesFunc = f
 	return o
 }
-func (o *NumberOptions) SetMax(max float64) *NumberOptions {
-	o.Max = max
+func (o *NumberOptions) Max(max float64) *NumberOptions {
+	o.max = max
 	return o
 }
-func (o *NumberOptions) SetMin(min float64) *NumberOptions {
-	o.Min = min
+func (o *NumberOptions) Min(min float64) *NumberOptions {
+	o.min = min
 	return o
 }
-func (o *NumberOptions) SetMode(mode string) *NumberOptions {
-	o.Mode = mode
+func (o *NumberOptions) Mode(mode string) *NumberOptions {
+	o.mode = mode
 	return o
 }
-func (o *NumberOptions) SetName(name string) *NumberOptions {
-	o.Name = name
+func (o *NumberOptions) Name(name string) *NumberOptions {
+	o.name = name
 	return o
 }
-func (o *NumberOptions) SetObjectId(id string) *NumberOptions {
-	o.ObjectId = id
+func (o *NumberOptions) ObjectId(id string) *NumberOptions {
+	o.objectId = id
 	return o
 }
-func (o *NumberOptions) SetOptimistic(optimistic bool) *NumberOptions {
-	o.Optimistic = optimistic
+func (o *NumberOptions) Optimistic(optimistic bool) *NumberOptions {
+	o.optimistic = optimistic
 	return o
 }
-func (o *NumberOptions) SetPayloadReset(reset string) *NumberOptions {
-	o.PayloadReset = reset
+func (o *NumberOptions) PayloadReset(reset string) *NumberOptions {
+	o.payloadReset = reset
 	return o
 }
-func (o *NumberOptions) SetQos(qos int) *NumberOptions {
-	o.Qos = qos
+func (o *NumberOptions) Qos(qos int) *NumberOptions {
+	o.qos = qos
 	return o
 }
-func (o *NumberOptions) SetRetain(retain bool) *NumberOptions {
-	o.Retain = retain
+func (o *NumberOptions) Retain(retain bool) *NumberOptions {
+	o.retain = retain
 	return o
 }
-func (o *NumberOptions) SetStateFunc(f func() string) *NumberOptions {
-	o.StateFunc = f
+func (o *NumberOptions) StateFunc(f func() string) *NumberOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *NumberOptions) SetStep(step float64) *NumberOptions {
-	o.Step = step
+func (o *NumberOptions) Step(step float64) *NumberOptions {
+	o.step = step
 	return o
 }
-func (o *NumberOptions) SetUniqueId(id string) *NumberOptions {
-	o.UniqueId = id
+func (o *NumberOptions) UniqueId(id string) *NumberOptions {
+	o.uniqueId = id
 	return o
 }
-func (o *NumberOptions) SetUnitOfMeasurement(measurement string) *NumberOptions {
-	o.UnitOfMeasurement = measurement
+func (o *NumberOptions) UnitOfMeasurement(measurement string) *NumberOptions {
+	o.unitOfMeasurement = measurement
 	return o
 }
-func (o *NumberOptions) SetValueTemplate(template string) *NumberOptions {
-	o.ValueTemplate = template
+func (o *NumberOptions) ValueTemplate(template string) *NumberOptions {
+	o.valueTemplate = template
 	return o
 }

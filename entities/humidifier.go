@@ -68,125 +68,125 @@ type Humidifier struct {
 func NewHumidifier(o *HumidifierOptions) *Humidifier {
 	var h Humidifier
 
-	h.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		h.AvailabilityMode = &o.AvailabilityMode
+	h.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		h.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		h.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		h.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		h.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		h.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		h.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		h.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		h.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		h.commandFunc = o.commandFunc
 	} else {
 		h.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.DeviceClass).IsZero() {
-		h.DeviceClass = &o.DeviceClass
+	if !reflect.ValueOf(o.deviceClass).IsZero() {
+		h.DeviceClass = &o.deviceClass
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		h.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		h.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		h.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		h.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		h.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		h.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		h.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		h.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		h.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		h.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		h.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		h.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.MaxHumidity).IsZero() {
-		h.MaxHumidity = &o.MaxHumidity
+	if !reflect.ValueOf(o.maxHumidity).IsZero() {
+		h.MaxHumidity = &o.maxHumidity
 	}
-	if !reflect.ValueOf(o.MinHumidity).IsZero() {
-		h.MinHumidity = &o.MinHumidity
+	if !reflect.ValueOf(o.minHumidity).IsZero() {
+		h.MinHumidity = &o.minHumidity
 	}
-	if !reflect.ValueOf(o.ModeCommandTemplate).IsZero() {
-		h.ModeCommandTemplate = &o.ModeCommandTemplate
+	if !reflect.ValueOf(o.modeCommandTemplate).IsZero() {
+		h.ModeCommandTemplate = &o.modeCommandTemplate
 	}
-	if !reflect.ValueOf(o.ModeCommandFunc).IsZero() {
-		h.modeCommandFunc = o.ModeCommandFunc
+	if !reflect.ValueOf(o.modeCommandFunc).IsZero() {
+		h.modeCommandFunc = o.modeCommandFunc
 	}
-	if !reflect.ValueOf(o.ModeStateTemplate).IsZero() {
-		h.ModeStateTemplate = &o.ModeStateTemplate
+	if !reflect.ValueOf(o.modeStateTemplate).IsZero() {
+		h.ModeStateTemplate = &o.modeStateTemplate
 	}
-	if !reflect.ValueOf(o.ModeStateFunc).IsZero() {
-		h.modeStateFunc = o.ModeStateFunc
+	if !reflect.ValueOf(o.modeStateFunc).IsZero() {
+		h.modeStateFunc = o.modeStateFunc
 	}
-	if !reflect.ValueOf(o.Modes).IsZero() {
-		h.Modes = &o.Modes
+	if !reflect.ValueOf(o.modes).IsZero() {
+		h.Modes = &o.modes
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		h.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		h.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		h.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		h.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		h.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		h.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		h.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		h.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		h.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		h.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOff).IsZero() {
-		h.PayloadOff = &o.PayloadOff
+	if !reflect.ValueOf(o.payloadOff).IsZero() {
+		h.PayloadOff = &o.payloadOff
 	}
-	if !reflect.ValueOf(o.PayloadOn).IsZero() {
-		h.PayloadOn = &o.PayloadOn
+	if !reflect.ValueOf(o.payloadOn).IsZero() {
+		h.PayloadOn = &o.payloadOn
 	}
-	if !reflect.ValueOf(o.PayloadResetHumidity).IsZero() {
-		h.PayloadResetHumidity = &o.PayloadResetHumidity
+	if !reflect.ValueOf(o.payloadResetHumidity).IsZero() {
+		h.PayloadResetHumidity = &o.payloadResetHumidity
 	}
-	if !reflect.ValueOf(o.PayloadResetMode).IsZero() {
-		h.PayloadResetMode = &o.PayloadResetMode
+	if !reflect.ValueOf(o.payloadResetMode).IsZero() {
+		h.PayloadResetMode = &o.payloadResetMode
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		h.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		h.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		h.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		h.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		h.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		h.stateFunc = o.stateFunc
 	} else {
 		h.stateFunc = func() string {
 			return h.States.State
 		}
 	}
-	if !reflect.ValueOf(o.StateValueTemplate).IsZero() {
-		h.StateValueTemplate = &o.StateValueTemplate
+	if !reflect.ValueOf(o.stateValueTemplate).IsZero() {
+		h.StateValueTemplate = &o.stateValueTemplate
 	}
-	if !reflect.ValueOf(o.TargetHumidityCommandTemplate).IsZero() {
-		h.TargetHumidityCommandTemplate = &o.TargetHumidityCommandTemplate
+	if !reflect.ValueOf(o.targetHumidityCommandTemplate).IsZero() {
+		h.TargetHumidityCommandTemplate = &o.targetHumidityCommandTemplate
 	}
-	if !reflect.ValueOf(o.TargetHumidityCommandFunc).IsZero() {
-		h.targetHumidityCommandFunc = o.TargetHumidityCommandFunc
+	if !reflect.ValueOf(o.targetHumidityCommandFunc).IsZero() {
+		h.targetHumidityCommandFunc = o.targetHumidityCommandFunc
 	}
-	if !reflect.ValueOf(o.TargetHumidityStateTemplate).IsZero() {
-		h.TargetHumidityStateTemplate = &o.TargetHumidityStateTemplate
+	if !reflect.ValueOf(o.targetHumidityStateTemplate).IsZero() {
+		h.TargetHumidityStateTemplate = &o.targetHumidityStateTemplate
 	}
-	if !reflect.ValueOf(o.TargetHumidityStateFunc).IsZero() {
-		h.targetHumidityStateFunc = o.TargetHumidityStateFunc
+	if !reflect.ValueOf(o.targetHumidityStateFunc).IsZero() {
+		h.targetHumidityStateFunc = o.targetHumidityStateFunc
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		h.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		h.UniqueId = &o.uniqueId
 	}
 	return &h
 }
@@ -205,19 +205,19 @@ type HumidifierState struct {
 	TargetHumidity string
 }
 
-func (d *Humidifier) SetJsonAttributes(s string) {
+func (d *Humidifier) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Humidifier) SetMode(s string) {
+func (d *Humidifier) Mode(s string) {
 	d.States.Mode = s
 	d.UpdateState()
 }
-func (d *Humidifier) SetState(s string) {
+func (d *Humidifier) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }
-func (d *Humidifier) SetTargetHumidity(s string) {
+func (d *Humidifier) TargetHumidity(s string) {
 	d.States.TargetHumidity = s
 	d.UpdateState()
 }

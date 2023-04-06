@@ -55,92 +55,92 @@ type Vacuum struct {
 func NewVacuum(o *VacuumOptions) *Vacuum {
 	var v Vacuum
 
-	v.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		v.AvailabilityMode = &o.AvailabilityMode
+	v.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		v.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		v.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		v.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		v.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		v.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		v.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		v.commandFunc = o.commandFunc
 	} else {
 		v.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		v.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		v.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.FanSpeedList).IsZero() {
-		v.FanSpeedList = &o.FanSpeedList
+	if !reflect.ValueOf(o.fanSpeedList).IsZero() {
+		v.FanSpeedList = &o.fanSpeedList
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		v.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		v.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		v.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		v.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		v.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		v.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		v.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		v.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		v.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		v.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadCleanSpot).IsZero() {
-		v.PayloadCleanSpot = &o.PayloadCleanSpot
+	if !reflect.ValueOf(o.payloadCleanSpot).IsZero() {
+		v.PayloadCleanSpot = &o.payloadCleanSpot
 	}
-	if !reflect.ValueOf(o.PayloadLocate).IsZero() {
-		v.PayloadLocate = &o.PayloadLocate
+	if !reflect.ValueOf(o.payloadLocate).IsZero() {
+		v.PayloadLocate = &o.payloadLocate
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		v.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		v.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadPause).IsZero() {
-		v.PayloadPause = &o.PayloadPause
+	if !reflect.ValueOf(o.payloadPause).IsZero() {
+		v.PayloadPause = &o.payloadPause
 	}
-	if !reflect.ValueOf(o.PayloadReturnToBase).IsZero() {
-		v.PayloadReturnToBase = &o.PayloadReturnToBase
+	if !reflect.ValueOf(o.payloadReturnToBase).IsZero() {
+		v.PayloadReturnToBase = &o.payloadReturnToBase
 	}
-	if !reflect.ValueOf(o.PayloadStart).IsZero() {
-		v.PayloadStart = &o.PayloadStart
+	if !reflect.ValueOf(o.payloadStart).IsZero() {
+		v.PayloadStart = &o.payloadStart
 	}
-	if !reflect.ValueOf(o.PayloadStop).IsZero() {
-		v.PayloadStop = &o.PayloadStop
+	if !reflect.ValueOf(o.payloadStop).IsZero() {
+		v.PayloadStop = &o.payloadStop
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		v.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		v.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		v.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		v.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.Schema).IsZero() {
-		v.Schema = &o.Schema
+	if !reflect.ValueOf(o.schema).IsZero() {
+		v.Schema = &o.schema
 	}
-	if !reflect.ValueOf(o.SendCommandFunc).IsZero() {
-		v.sendCommandFunc = o.SendCommandFunc
+	if !reflect.ValueOf(o.sendCommandFunc).IsZero() {
+		v.sendCommandFunc = o.sendCommandFunc
 	}
-	if !reflect.ValueOf(o.SetFanSpeedFunc).IsZero() {
-		v.setFanSpeedFunc = o.SetFanSpeedFunc
+	if !reflect.ValueOf(o.setFanSpeedFunc).IsZero() {
+		v.setFanSpeedFunc = o.setFanSpeedFunc
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		v.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		v.stateFunc = o.stateFunc
 	} else {
 		v.stateFunc = func() string {
 			return v.States.State
 		}
 	}
-	if !reflect.ValueOf(o.SupportedFeatures).IsZero() {
-		v.SupportedFeatures = &o.SupportedFeatures
+	if !reflect.ValueOf(o.supportedFeatures).IsZero() {
+		v.SupportedFeatures = &o.supportedFeatures
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		v.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		v.UniqueId = &o.uniqueId
 	}
 	return &v
 }
@@ -155,11 +155,11 @@ type VacuumState struct {
 	State          string
 }
 
-func (d *Vacuum) SetJsonAttributes(s string) {
+func (d *Vacuum) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Vacuum) SetState(s string) {
+func (d *Vacuum) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

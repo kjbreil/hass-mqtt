@@ -53,89 +53,89 @@ type Update struct {
 func NewUpdate(o *UpdateOptions) *Update {
 	var u Update
 
-	u.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		u.AvailabilityMode = &o.AvailabilityMode
+	u.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		u.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		u.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		u.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		u.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		u.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		u.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		u.commandFunc = o.commandFunc
 	} else {
 		u.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.DeviceClass).IsZero() {
-		u.DeviceClass = &o.DeviceClass
+	if !reflect.ValueOf(o.deviceClass).IsZero() {
+		u.DeviceClass = &o.deviceClass
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		u.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		u.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		u.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		u.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		u.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		u.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.EntityPicture).IsZero() {
-		u.EntityPicture = &o.EntityPicture
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		u.EntityPicture = &o.entityPicture
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		u.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		u.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		u.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		u.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		u.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		u.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.LatestVersionTemplate).IsZero() {
-		u.LatestVersionTemplate = &o.LatestVersionTemplate
+	if !reflect.ValueOf(o.latestVersionTemplate).IsZero() {
+		u.LatestVersionTemplate = &o.latestVersionTemplate
 	}
-	if !reflect.ValueOf(o.LatestVersionFunc).IsZero() {
-		u.latestVersionFunc = o.LatestVersionFunc
+	if !reflect.ValueOf(o.latestVersionFunc).IsZero() {
+		u.latestVersionFunc = o.latestVersionFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		u.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		u.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		u.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		u.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadInstall).IsZero() {
-		u.PayloadInstall = &o.PayloadInstall
+	if !reflect.ValueOf(o.payloadInstall).IsZero() {
+		u.PayloadInstall = &o.payloadInstall
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		u.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		u.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.ReleaseSummary).IsZero() {
-		u.ReleaseSummary = &o.ReleaseSummary
+	if !reflect.ValueOf(o.releaseSummary).IsZero() {
+		u.ReleaseSummary = &o.releaseSummary
 	}
-	if !reflect.ValueOf(o.ReleaseUrl).IsZero() {
-		u.ReleaseUrl = &o.ReleaseUrl
+	if !reflect.ValueOf(o.releaseUrl).IsZero() {
+		u.ReleaseUrl = &o.releaseUrl
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		u.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		u.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		u.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		u.stateFunc = o.stateFunc
 	} else {
 		u.stateFunc = func() string {
 			return u.States.State
 		}
 	}
-	if !reflect.ValueOf(o.Title).IsZero() {
-		u.Title = &o.Title
+	if !reflect.ValueOf(o.title).IsZero() {
+		u.Title = &o.title
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		u.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		u.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		u.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		u.ValueTemplate = &o.valueTemplate
 	}
 	return &u
 }
@@ -150,11 +150,11 @@ type UpdateState struct {
 	State          string
 }
 
-func (d *Update) SetJsonAttributes(s string) {
+func (d *Update) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Update) SetState(s string) {
+func (d *Update) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

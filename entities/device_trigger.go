@@ -29,31 +29,31 @@ type DeviceTrigger struct {
 func NewDeviceTrigger(o *DeviceTriggerOptions) *DeviceTrigger {
 	var d DeviceTrigger
 
-	d.States = &o.States
-	if !reflect.ValueOf(o.AutomationType).IsZero() {
-		d.AutomationType = &o.AutomationType
+	d.States = &o.states
+	if !reflect.ValueOf(o.automationType).IsZero() {
+		d.AutomationType = &o.automationType
 	}
-	if !reflect.ValueOf(o.Payload).IsZero() {
-		d.Payload = &o.Payload
+	if !reflect.ValueOf(o.payload).IsZero() {
+		d.Payload = &o.payload
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		d.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		d.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Subtype).IsZero() {
-		d.Subtype = &o.Subtype
+	if !reflect.ValueOf(o.subtype).IsZero() {
+		d.Subtype = &o.subtype
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		d.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		d.stateFunc = o.stateFunc
 	} else {
 		d.stateFunc = func() string {
 			return d.States.State
 		}
 	}
-	if !reflect.ValueOf(o.Type).IsZero() {
-		d.Type = &o.Type
+	if !reflect.ValueOf(o.entityType).IsZero() {
+		d.Type = &o.entityType
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		d.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		d.ValueTemplate = &o.valueTemplate
 	}
 	return &d
 }
@@ -65,7 +65,7 @@ type DeviceTriggerState struct {
 	State string
 }
 
-func (d *DeviceTrigger) SetState(s string) {
+func (d *DeviceTrigger) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

@@ -6,112 +6,112 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type SelectOptions struct {
-	States                 SelectState // External state update location
-	AvailabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   string      // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	AvailabilityFunc       func() string
-	CommandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
-	CommandFunc            func(mqtt.Message, mqtt.Client)
-	EnabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
-	Encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
-	EntityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	Icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
-	JsonAttributesFunc     func() string
-	Name                   string     // "The name of the Select."
-	ObjectId               string     // "Used instead of `name` for automatic generation of `entity_id`"
-	Optimistic             bool       // "Flag that defines if the select works in optimistic mode."
-	Options                ([]string) // "List of options that can be selected. An empty list or a list with a single item is allowed."
-	Qos                    int        // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
-	Retain                 bool       // "If the published message should have the retain flag on or not."
-	StateFunc              func() string
-	UniqueId               string // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception."
-	ValueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
+	states                 SelectState // External state update location
+	availabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityTemplate   string      // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityFunc       func() string
+	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandFunc            func(mqtt.Message, mqtt.Client)
+	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
+	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
+	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	jsonAttributesFunc     func() string
+	name                   string     // "The name of the Select."
+	objectId               string     // "Used instead of `name` for automatic generation of `entity_id`"
+	optimistic             bool       // "Flag that defines if the select works in optimistic mode."
+	options                ([]string) // "List of options that can be selected. An empty list or a list with a single item is allowed."
+	qos                    int        // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	retain                 bool       // "If the published message should have the retain flag on or not."
+	stateFunc              func() string
+	uniqueId               string // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception."
+	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
 }
 
 func NewSelectOptions() *SelectOptions {
 	return &SelectOptions{}
 }
-func (o *SelectOptions) GetStates() *SelectState {
-	return &o.States
+func (o *SelectOptions) States() *SelectState {
+	return &o.states
 }
-func (o *SelectOptions) SetAvailabilityMode(mode string) *SelectOptions {
-	o.AvailabilityMode = mode
+func (o *SelectOptions) AvailabilityMode(mode string) *SelectOptions {
+	o.availabilityMode = mode
 	return o
 }
-func (o *SelectOptions) SetAvailabilityTemplate(template string) *SelectOptions {
-	o.AvailabilityTemplate = template
+func (o *SelectOptions) AvailabilityTemplate(template string) *SelectOptions {
+	o.availabilityTemplate = template
 	return o
 }
-func (o *SelectOptions) SetAvailabilityFunc(f func() string) *SelectOptions {
-	o.AvailabilityFunc = f
+func (o *SelectOptions) AvailabilityFunc(f func() string) *SelectOptions {
+	o.availabilityFunc = f
 	return o
 }
-func (o *SelectOptions) SetCommandTemplate(template string) *SelectOptions {
-	o.CommandTemplate = template
+func (o *SelectOptions) CommandTemplate(template string) *SelectOptions {
+	o.commandTemplate = template
 	return o
 }
-func (o *SelectOptions) SetCommandFunc(f func(mqtt.Message, mqtt.Client)) *SelectOptions {
-	o.CommandFunc = f
+func (o *SelectOptions) CommandFunc(f func(mqtt.Message, mqtt.Client)) *SelectOptions {
+	o.commandFunc = f
 	return o
 }
-func (o *SelectOptions) SetEnabledByDefault(d bool) *SelectOptions {
-	o.EnabledByDefault = d
+func (o *SelectOptions) EnabledByDefault(d bool) *SelectOptions {
+	o.enabledByDefault = d
 	return o
 }
-func (o *SelectOptions) SetEncoding(encoding string) *SelectOptions {
-	o.Encoding = encoding
+func (o *SelectOptions) Encoding(encoding string) *SelectOptions {
+	o.encoding = encoding
 	return o
 }
-func (o *SelectOptions) SetEntityCategory(category string) *SelectOptions {
-	o.EntityCategory = category
+func (o *SelectOptions) EntityCategory(category string) *SelectOptions {
+	o.entityCategory = category
 	return o
 }
-func (o *SelectOptions) SetIcon(icon string) *SelectOptions {
-	o.Icon = icon
+func (o *SelectOptions) Icon(icon string) *SelectOptions {
+	o.icon = icon
 	return o
 }
-func (o *SelectOptions) SetJsonAttributesTemplate(template string) *SelectOptions {
-	o.JsonAttributesTemplate = template
+func (o *SelectOptions) JsonAttributesTemplate(template string) *SelectOptions {
+	o.jsonAttributesTemplate = template
 	return o
 }
-func (o *SelectOptions) SetJsonAttributesFunc(f func() string) *SelectOptions {
-	o.JsonAttributesFunc = f
+func (o *SelectOptions) JsonAttributesFunc(f func() string) *SelectOptions {
+	o.jsonAttributesFunc = f
 	return o
 }
-func (o *SelectOptions) SetName(name string) *SelectOptions {
-	o.Name = name
+func (o *SelectOptions) Name(name string) *SelectOptions {
+	o.name = name
 	return o
 }
-func (o *SelectOptions) SetObjectId(id string) *SelectOptions {
-	o.ObjectId = id
+func (o *SelectOptions) ObjectId(id string) *SelectOptions {
+	o.objectId = id
 	return o
 }
-func (o *SelectOptions) SetOptimistic(optimistic bool) *SelectOptions {
-	o.Optimistic = optimistic
+func (o *SelectOptions) Optimistic(optimistic bool) *SelectOptions {
+	o.optimistic = optimistic
 	return o
 }
-func (o *SelectOptions) SetOptions(options []string) *SelectOptions {
-	o.Options = options
+func (o *SelectOptions) Options(options []string) *SelectOptions {
+	o.options = options
 	return o
 }
-func (o *SelectOptions) SetQos(qos int) *SelectOptions {
-	o.Qos = qos
+func (o *SelectOptions) Qos(qos int) *SelectOptions {
+	o.qos = qos
 	return o
 }
-func (o *SelectOptions) SetRetain(retain bool) *SelectOptions {
-	o.Retain = retain
+func (o *SelectOptions) Retain(retain bool) *SelectOptions {
+	o.retain = retain
 	return o
 }
-func (o *SelectOptions) SetStateFunc(f func() string) *SelectOptions {
-	o.StateFunc = f
+func (o *SelectOptions) StateFunc(f func() string) *SelectOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *SelectOptions) SetUniqueId(id string) *SelectOptions {
-	o.UniqueId = id
+func (o *SelectOptions) UniqueId(id string) *SelectOptions {
+	o.uniqueId = id
 	return o
 }
-func (o *SelectOptions) SetValueTemplate(template string) *SelectOptions {
-	o.ValueTemplate = template
+func (o *SelectOptions) ValueTemplate(template string) *SelectOptions {
+	o.valueTemplate = template
 	return o
 }

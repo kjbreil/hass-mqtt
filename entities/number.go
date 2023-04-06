@@ -52,89 +52,89 @@ type Number struct {
 func NewNumber(o *NumberOptions) *Number {
 	var n Number
 
-	n.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		n.AvailabilityMode = &o.AvailabilityMode
+	n.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		n.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		n.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		n.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		n.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		n.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		n.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		n.commandFunc = o.commandFunc
 	} else {
 		n.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.DeviceClass).IsZero() {
-		n.DeviceClass = &o.DeviceClass
+	if !reflect.ValueOf(o.deviceClass).IsZero() {
+		n.DeviceClass = &o.deviceClass
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		n.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		n.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		n.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		n.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		n.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		n.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		n.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		n.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		n.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		n.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		n.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		n.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Max).IsZero() {
-		n.Max = &o.Max
+	if !reflect.ValueOf(o.max).IsZero() {
+		n.Max = &o.max
 	}
-	if !reflect.ValueOf(o.Min).IsZero() {
-		n.Min = &o.Min
+	if !reflect.ValueOf(o.min).IsZero() {
+		n.Min = &o.min
 	}
-	if !reflect.ValueOf(o.Mode).IsZero() {
-		n.Mode = &o.Mode
+	if !reflect.ValueOf(o.mode).IsZero() {
+		n.Mode = &o.mode
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		n.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		n.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		n.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		n.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		n.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		n.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.PayloadReset).IsZero() {
-		n.PayloadReset = &o.PayloadReset
+	if !reflect.ValueOf(o.payloadReset).IsZero() {
+		n.PayloadReset = &o.payloadReset
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		n.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		n.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		n.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		n.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		n.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		n.stateFunc = o.stateFunc
 	} else {
 		n.stateFunc = func() string {
 			return n.States.State
 		}
 	}
-	if !reflect.ValueOf(o.Step).IsZero() {
-		n.Step = &o.Step
+	if !reflect.ValueOf(o.step).IsZero() {
+		n.Step = &o.step
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		n.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		n.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.UnitOfMeasurement).IsZero() {
-		n.UnitOfMeasurement = &o.UnitOfMeasurement
+	if !reflect.ValueOf(o.unitOfMeasurement).IsZero() {
+		n.UnitOfMeasurement = &o.unitOfMeasurement
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		n.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		n.ValueTemplate = &o.valueTemplate
 	}
 	return &n
 }
@@ -149,11 +149,11 @@ type NumberState struct {
 	State          string
 }
 
-func (d *Number) SetJsonAttributes(s string) {
+func (d *Number) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Number) SetState(s string) {
+func (d *Number) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

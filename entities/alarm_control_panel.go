@@ -58,107 +58,107 @@ type AlarmControlPanel struct {
 func NewAlarmControlPanel(o *AlarmControlPanelOptions) *AlarmControlPanel {
 	var a AlarmControlPanel
 
-	a.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		a.AvailabilityMode = &o.AvailabilityMode
+	a.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		a.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		a.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		a.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		a.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		a.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.Code).IsZero() {
-		a.Code = &o.Code
+	if !reflect.ValueOf(o.code).IsZero() {
+		a.Code = &o.code
 	}
-	if !reflect.ValueOf(o.CodeArmRequired).IsZero() {
-		a.CodeArmRequired = &o.CodeArmRequired
+	if !reflect.ValueOf(o.codeArmRequired).IsZero() {
+		a.CodeArmRequired = &o.codeArmRequired
 	}
-	if !reflect.ValueOf(o.CodeDisarmRequired).IsZero() {
-		a.CodeDisarmRequired = &o.CodeDisarmRequired
+	if !reflect.ValueOf(o.codeDisarmRequired).IsZero() {
+		a.CodeDisarmRequired = &o.codeDisarmRequired
 	}
-	if !reflect.ValueOf(o.CodeTriggerRequired).IsZero() {
-		a.CodeTriggerRequired = &o.CodeTriggerRequired
+	if !reflect.ValueOf(o.codeTriggerRequired).IsZero() {
+		a.CodeTriggerRequired = &o.codeTriggerRequired
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		a.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		a.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		a.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		a.commandFunc = o.commandFunc
 	} else {
 		a.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		a.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		a.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		a.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		a.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		a.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		a.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		a.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		a.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		a.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		a.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		a.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		a.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		a.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		a.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		a.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		a.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadArmAway).IsZero() {
-		a.PayloadArmAway = &o.PayloadArmAway
+	if !reflect.ValueOf(o.payloadArmAway).IsZero() {
+		a.PayloadArmAway = &o.payloadArmAway
 	}
-	if !reflect.ValueOf(o.PayloadArmCustomBypass).IsZero() {
-		a.PayloadArmCustomBypass = &o.PayloadArmCustomBypass
+	if !reflect.ValueOf(o.payloadArmCustomBypass).IsZero() {
+		a.PayloadArmCustomBypass = &o.payloadArmCustomBypass
 	}
-	if !reflect.ValueOf(o.PayloadArmHome).IsZero() {
-		a.PayloadArmHome = &o.PayloadArmHome
+	if !reflect.ValueOf(o.payloadArmHome).IsZero() {
+		a.PayloadArmHome = &o.payloadArmHome
 	}
-	if !reflect.ValueOf(o.PayloadArmNight).IsZero() {
-		a.PayloadArmNight = &o.PayloadArmNight
+	if !reflect.ValueOf(o.payloadArmNight).IsZero() {
+		a.PayloadArmNight = &o.payloadArmNight
 	}
-	if !reflect.ValueOf(o.PayloadArmVacation).IsZero() {
-		a.PayloadArmVacation = &o.PayloadArmVacation
+	if !reflect.ValueOf(o.payloadArmVacation).IsZero() {
+		a.PayloadArmVacation = &o.payloadArmVacation
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		a.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		a.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadDisarm).IsZero() {
-		a.PayloadDisarm = &o.PayloadDisarm
+	if !reflect.ValueOf(o.payloadDisarm).IsZero() {
+		a.PayloadDisarm = &o.payloadDisarm
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		a.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		a.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadTrigger).IsZero() {
-		a.PayloadTrigger = &o.PayloadTrigger
+	if !reflect.ValueOf(o.payloadTrigger).IsZero() {
+		a.PayloadTrigger = &o.payloadTrigger
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		a.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		a.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		a.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		a.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		a.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		a.stateFunc = o.stateFunc
 	} else {
 		a.stateFunc = func() string {
 			return a.States.State
 		}
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		a.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		a.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		a.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		a.ValueTemplate = &o.valueTemplate
 	}
 	return &a
 }
@@ -173,11 +173,11 @@ type AlarmControlPanelState struct {
 	State          string
 }
 
-func (d *AlarmControlPanel) SetJsonAttributes(s string) {
+func (d *AlarmControlPanel) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *AlarmControlPanel) SetState(s string) {
+func (d *AlarmControlPanel) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

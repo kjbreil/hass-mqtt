@@ -4,102 +4,102 @@ package entities
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type DeviceTrackerOptions struct {
-	States                 DeviceTrackerState // External state update location
-	AvailabilityMode       string             // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   string             // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	AvailabilityFunc       func() string
-	Icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
-	JsonAttributesFunc     func() string
-	Name                   string // "The name of the MQTT device_tracker."
-	ObjectId               string // "Used instead of `name` for automatic generation of `entity_id`"
-	PayloadAvailable       string // "The payload that represents the available state."
-	PayloadHome            string // "The payload value that represents the 'home' state for the device."
-	PayloadNotAvailable    string // "The payload that represents the unavailable state."
-	PayloadNotHome         string // "The payload value that represents the 'not_home' state for the device."
-	PayloadReset           string // "The payload value that will have the device's location automatically derived from Home Assistant's zones."
-	Qos                    int    // "The maximum QoS level of the state topic."
-	SourceType             string // "Attribute of a device tracker that affects state when being used to track a [person](/integrations/person/). Valid options are `gps`, `router`, `bluetooth`, or `bluetooth_le`."
-	StateFunc              func() string
-	UniqueId               string // "An ID that uniquely identifies this device_tracker. If two device_trackers have the same unique ID, Home Assistant will raise an exception."
-	ValueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a device tracker state."
+	states                 DeviceTrackerState // External state update location
+	availabilityMode       string             // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityTemplate   string             // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityFunc       func() string
+	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesFunc     func() string
+	name                   string // "The name of the MQTT device_tracker."
+	objectId               string // "Used instead of `name` for automatic generation of `entity_id`"
+	payloadAvailable       string // "The payload that represents the available state."
+	payloadHome            string // "The payload value that represents the 'home' state for the device."
+	payloadNotAvailable    string // "The payload that represents the unavailable state."
+	payloadNotHome         string // "The payload value that represents the 'not_home' state for the device."
+	payloadReset           string // "The payload value that will have the device's location automatically derived from Home Assistant's zones."
+	qos                    int    // "The maximum QoS level of the state topic."
+	sourceType             string // "Attribute of a device tracker that affects state when being used to track a [person](/integrations/person/). Valid options are `gps`, `router`, `bluetooth`, or `bluetooth_le`."
+	stateFunc              func() string
+	uniqueId               string // "An ID that uniquely identifies this device_tracker. If two device_trackers have the same unique ID, Home Assistant will raise an exception."
+	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a device tracker state."
 }
 
 func NewDeviceTrackerOptions() *DeviceTrackerOptions {
 	return &DeviceTrackerOptions{}
 }
-func (o *DeviceTrackerOptions) GetStates() *DeviceTrackerState {
-	return &o.States
+func (o *DeviceTrackerOptions) States() *DeviceTrackerState {
+	return &o.states
 }
-func (o *DeviceTrackerOptions) SetAvailabilityMode(mode string) *DeviceTrackerOptions {
-	o.AvailabilityMode = mode
+func (o *DeviceTrackerOptions) AvailabilityMode(mode string) *DeviceTrackerOptions {
+	o.availabilityMode = mode
 	return o
 }
-func (o *DeviceTrackerOptions) SetAvailabilityTemplate(template string) *DeviceTrackerOptions {
-	o.AvailabilityTemplate = template
+func (o *DeviceTrackerOptions) AvailabilityTemplate(template string) *DeviceTrackerOptions {
+	o.availabilityTemplate = template
 	return o
 }
-func (o *DeviceTrackerOptions) SetAvailabilityFunc(f func() string) *DeviceTrackerOptions {
-	o.AvailabilityFunc = f
+func (o *DeviceTrackerOptions) AvailabilityFunc(f func() string) *DeviceTrackerOptions {
+	o.availabilityFunc = f
 	return o
 }
-func (o *DeviceTrackerOptions) SetIcon(icon string) *DeviceTrackerOptions {
-	o.Icon = icon
+func (o *DeviceTrackerOptions) Icon(icon string) *DeviceTrackerOptions {
+	o.icon = icon
 	return o
 }
-func (o *DeviceTrackerOptions) SetJsonAttributesTemplate(template string) *DeviceTrackerOptions {
-	o.JsonAttributesTemplate = template
+func (o *DeviceTrackerOptions) JsonAttributesTemplate(template string) *DeviceTrackerOptions {
+	o.jsonAttributesTemplate = template
 	return o
 }
-func (o *DeviceTrackerOptions) SetJsonAttributesFunc(f func() string) *DeviceTrackerOptions {
-	o.JsonAttributesFunc = f
+func (o *DeviceTrackerOptions) JsonAttributesFunc(f func() string) *DeviceTrackerOptions {
+	o.jsonAttributesFunc = f
 	return o
 }
-func (o *DeviceTrackerOptions) SetName(name string) *DeviceTrackerOptions {
-	o.Name = name
+func (o *DeviceTrackerOptions) Name(name string) *DeviceTrackerOptions {
+	o.name = name
 	return o
 }
-func (o *DeviceTrackerOptions) SetObjectId(id string) *DeviceTrackerOptions {
-	o.ObjectId = id
+func (o *DeviceTrackerOptions) ObjectId(id string) *DeviceTrackerOptions {
+	o.objectId = id
 	return o
 }
-func (o *DeviceTrackerOptions) SetPayloadAvailable(available string) *DeviceTrackerOptions {
-	o.PayloadAvailable = available
+func (o *DeviceTrackerOptions) PayloadAvailable(available string) *DeviceTrackerOptions {
+	o.payloadAvailable = available
 	return o
 }
-func (o *DeviceTrackerOptions) SetPayloadHome(home string) *DeviceTrackerOptions {
-	o.PayloadHome = home
+func (o *DeviceTrackerOptions) PayloadHome(home string) *DeviceTrackerOptions {
+	o.payloadHome = home
 	return o
 }
-func (o *DeviceTrackerOptions) SetPayloadNotAvailable(available string) *DeviceTrackerOptions {
-	o.PayloadNotAvailable = available
+func (o *DeviceTrackerOptions) PayloadNotAvailable(available string) *DeviceTrackerOptions {
+	o.payloadNotAvailable = available
 	return o
 }
-func (o *DeviceTrackerOptions) SetPayloadNotHome(home string) *DeviceTrackerOptions {
-	o.PayloadNotHome = home
+func (o *DeviceTrackerOptions) PayloadNotHome(home string) *DeviceTrackerOptions {
+	o.payloadNotHome = home
 	return o
 }
-func (o *DeviceTrackerOptions) SetPayloadReset(reset string) *DeviceTrackerOptions {
-	o.PayloadReset = reset
+func (o *DeviceTrackerOptions) PayloadReset(reset string) *DeviceTrackerOptions {
+	o.payloadReset = reset
 	return o
 }
-func (o *DeviceTrackerOptions) SetQos(qos int) *DeviceTrackerOptions {
-	o.Qos = qos
+func (o *DeviceTrackerOptions) Qos(qos int) *DeviceTrackerOptions {
+	o.qos = qos
 	return o
 }
-func (o *DeviceTrackerOptions) SetSourceType(t string) *DeviceTrackerOptions {
-	o.SourceType = t
+func (o *DeviceTrackerOptions) SourceType(t string) *DeviceTrackerOptions {
+	o.sourceType = t
 	return o
 }
-func (o *DeviceTrackerOptions) SetStateFunc(f func() string) *DeviceTrackerOptions {
-	o.StateFunc = f
+func (o *DeviceTrackerOptions) StateFunc(f func() string) *DeviceTrackerOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *DeviceTrackerOptions) SetUniqueId(id string) *DeviceTrackerOptions {
-	o.UniqueId = id
+func (o *DeviceTrackerOptions) UniqueId(id string) *DeviceTrackerOptions {
+	o.uniqueId = id
 	return o
 }
-func (o *DeviceTrackerOptions) SetValueTemplate(template string) *DeviceTrackerOptions {
-	o.ValueTemplate = template
+func (o *DeviceTrackerOptions) ValueTemplate(template string) *DeviceTrackerOptions {
+	o.valueTemplate = template
 	return o
 }

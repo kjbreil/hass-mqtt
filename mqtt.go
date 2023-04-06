@@ -65,7 +65,7 @@ func (c *Client) Connect() error {
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", c.config.MQTT.Host, c.config.MQTT.Port))
 	opts.SetClientID(c.NodeID)
 	opts.SetOrderMatters(false)
-	opts.SetKeepAlive(10 * time.Second)
+	opts.SetKeepAlive(30 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		log.Printf("Received message on Default Handler: %s from topic: %s\n", msg.Payload(), filepath.Base(msg.Topic()))
 	})

@@ -75,140 +75,140 @@ type Fan struct {
 func NewFan(o *FanOptions) *Fan {
 	var f Fan
 
-	f.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		f.AvailabilityMode = &o.AvailabilityMode
+	f.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		f.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		f.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		f.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		f.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		f.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		f.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		f.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		f.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		f.commandFunc = o.commandFunc
 	} else {
 		f.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		f.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		f.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		f.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		f.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		f.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		f.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		f.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		f.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		f.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		f.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		f.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		f.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		f.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		f.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		f.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		f.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		f.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		f.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.OscillationCommandTemplate).IsZero() {
-		f.OscillationCommandTemplate = &o.OscillationCommandTemplate
+	if !reflect.ValueOf(o.oscillationCommandTemplate).IsZero() {
+		f.OscillationCommandTemplate = &o.oscillationCommandTemplate
 	}
-	if !reflect.ValueOf(o.OscillationCommandFunc).IsZero() {
-		f.oscillationCommandFunc = o.OscillationCommandFunc
+	if !reflect.ValueOf(o.oscillationCommandFunc).IsZero() {
+		f.oscillationCommandFunc = o.oscillationCommandFunc
 	}
-	if !reflect.ValueOf(o.OscillationStateFunc).IsZero() {
-		f.oscillationStateFunc = o.OscillationStateFunc
+	if !reflect.ValueOf(o.oscillationStateFunc).IsZero() {
+		f.oscillationStateFunc = o.oscillationStateFunc
 	}
-	if !reflect.ValueOf(o.OscillationValueTemplate).IsZero() {
-		f.OscillationValueTemplate = &o.OscillationValueTemplate
+	if !reflect.ValueOf(o.oscillationValueTemplate).IsZero() {
+		f.OscillationValueTemplate = &o.oscillationValueTemplate
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		f.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		f.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		f.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		f.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOff).IsZero() {
-		f.PayloadOff = &o.PayloadOff
+	if !reflect.ValueOf(o.payloadOff).IsZero() {
+		f.PayloadOff = &o.payloadOff
 	}
-	if !reflect.ValueOf(o.PayloadOn).IsZero() {
-		f.PayloadOn = &o.PayloadOn
+	if !reflect.ValueOf(o.payloadOn).IsZero() {
+		f.PayloadOn = &o.payloadOn
 	}
-	if !reflect.ValueOf(o.PayloadOscillationOff).IsZero() {
-		f.PayloadOscillationOff = &o.PayloadOscillationOff
+	if !reflect.ValueOf(o.payloadOscillationOff).IsZero() {
+		f.PayloadOscillationOff = &o.payloadOscillationOff
 	}
-	if !reflect.ValueOf(o.PayloadOscillationOn).IsZero() {
-		f.PayloadOscillationOn = &o.PayloadOscillationOn
+	if !reflect.ValueOf(o.payloadOscillationOn).IsZero() {
+		f.PayloadOscillationOn = &o.payloadOscillationOn
 	}
-	if !reflect.ValueOf(o.PayloadResetPercentage).IsZero() {
-		f.PayloadResetPercentage = &o.PayloadResetPercentage
+	if !reflect.ValueOf(o.payloadResetPercentage).IsZero() {
+		f.PayloadResetPercentage = &o.payloadResetPercentage
 	}
-	if !reflect.ValueOf(o.PayloadResetPresetMode).IsZero() {
-		f.PayloadResetPresetMode = &o.PayloadResetPresetMode
+	if !reflect.ValueOf(o.payloadResetPresetMode).IsZero() {
+		f.PayloadResetPresetMode = &o.payloadResetPresetMode
 	}
-	if !reflect.ValueOf(o.PercentageCommandTemplate).IsZero() {
-		f.PercentageCommandTemplate = &o.PercentageCommandTemplate
+	if !reflect.ValueOf(o.percentageCommandTemplate).IsZero() {
+		f.PercentageCommandTemplate = &o.percentageCommandTemplate
 	}
-	if !reflect.ValueOf(o.PercentageCommandFunc).IsZero() {
-		f.percentageCommandFunc = o.PercentageCommandFunc
+	if !reflect.ValueOf(o.percentageCommandFunc).IsZero() {
+		f.percentageCommandFunc = o.percentageCommandFunc
 	}
-	if !reflect.ValueOf(o.PercentageStateFunc).IsZero() {
-		f.percentageStateFunc = o.PercentageStateFunc
+	if !reflect.ValueOf(o.percentageStateFunc).IsZero() {
+		f.percentageStateFunc = o.percentageStateFunc
 	}
-	if !reflect.ValueOf(o.PercentageValueTemplate).IsZero() {
-		f.PercentageValueTemplate = &o.PercentageValueTemplate
+	if !reflect.ValueOf(o.percentageValueTemplate).IsZero() {
+		f.PercentageValueTemplate = &o.percentageValueTemplate
 	}
-	if !reflect.ValueOf(o.PresetModeCommandTemplate).IsZero() {
-		f.PresetModeCommandTemplate = &o.PresetModeCommandTemplate
+	if !reflect.ValueOf(o.presetModeCommandTemplate).IsZero() {
+		f.PresetModeCommandTemplate = &o.presetModeCommandTemplate
 	}
-	if !reflect.ValueOf(o.PresetModeCommandFunc).IsZero() {
-		f.presetModeCommandFunc = o.PresetModeCommandFunc
+	if !reflect.ValueOf(o.presetModeCommandFunc).IsZero() {
+		f.presetModeCommandFunc = o.presetModeCommandFunc
 	}
-	if !reflect.ValueOf(o.PresetModeStateFunc).IsZero() {
-		f.presetModeStateFunc = o.PresetModeStateFunc
+	if !reflect.ValueOf(o.presetModeStateFunc).IsZero() {
+		f.presetModeStateFunc = o.presetModeStateFunc
 	}
-	if !reflect.ValueOf(o.PresetModeValueTemplate).IsZero() {
-		f.PresetModeValueTemplate = &o.PresetModeValueTemplate
+	if !reflect.ValueOf(o.presetModeValueTemplate).IsZero() {
+		f.PresetModeValueTemplate = &o.presetModeValueTemplate
 	}
-	if !reflect.ValueOf(o.PresetModes).IsZero() {
-		f.PresetModes = &o.PresetModes
+	if !reflect.ValueOf(o.presetModes).IsZero() {
+		f.PresetModes = &o.presetModes
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		f.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		f.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		f.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		f.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.SpeedRangeMax).IsZero() {
-		f.SpeedRangeMax = &o.SpeedRangeMax
+	if !reflect.ValueOf(o.speedRangeMax).IsZero() {
+		f.SpeedRangeMax = &o.speedRangeMax
 	}
-	if !reflect.ValueOf(o.SpeedRangeMin).IsZero() {
-		f.SpeedRangeMin = &o.SpeedRangeMin
+	if !reflect.ValueOf(o.speedRangeMin).IsZero() {
+		f.SpeedRangeMin = &o.speedRangeMin
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		f.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		f.stateFunc = o.stateFunc
 	} else {
 		f.stateFunc = func() string {
 			return f.States.State
 		}
 	}
-	if !reflect.ValueOf(o.StateValueTemplate).IsZero() {
-		f.StateValueTemplate = &o.StateValueTemplate
+	if !reflect.ValueOf(o.stateValueTemplate).IsZero() {
+		f.StateValueTemplate = &o.stateValueTemplate
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		f.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		f.UniqueId = &o.uniqueId
 	}
 	return &f
 }
@@ -229,23 +229,23 @@ type FanState struct {
 	State          string
 }
 
-func (d *Fan) SetJsonAttributes(s string) {
+func (d *Fan) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Fan) SetOscillation(s string) {
+func (d *Fan) Oscillation(s string) {
 	d.States.Oscillation = s
 	d.UpdateState()
 }
-func (d *Fan) SetPercentage(s string) {
+func (d *Fan) Percentage(s string) {
 	d.States.Percentage = s
 	d.UpdateState()
 }
-func (d *Fan) SetPresetMode(s string) {
+func (d *Fan) PresetMode(s string) {
 	d.States.PresetMode = s
 	d.UpdateState()
 }
-func (d *Fan) SetState(s string) {
+func (d *Fan) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

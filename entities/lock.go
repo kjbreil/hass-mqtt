@@ -57,104 +57,104 @@ type Lock struct {
 func NewLock(o *LockOptions) *Lock {
 	var l Lock
 
-	l.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		l.AvailabilityMode = &o.AvailabilityMode
+	l.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		l.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		l.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		l.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		l.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		l.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CodeFormat).IsZero() {
-		l.CodeFormat = &o.CodeFormat
+	if !reflect.ValueOf(o.codeFormat).IsZero() {
+		l.CodeFormat = &o.codeFormat
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		l.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		l.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		l.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		l.commandFunc = o.commandFunc
 	} else {
 		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		l.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		l.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		l.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		l.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		l.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		l.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		l.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		l.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		l.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		l.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		l.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		l.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		l.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		l.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		l.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		l.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		l.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		l.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		l.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		l.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadLock).IsZero() {
-		l.PayloadLock = &o.PayloadLock
+	if !reflect.ValueOf(o.payloadLock).IsZero() {
+		l.PayloadLock = &o.payloadLock
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		l.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		l.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOpen).IsZero() {
-		l.PayloadOpen = &o.PayloadOpen
+	if !reflect.ValueOf(o.payloadOpen).IsZero() {
+		l.PayloadOpen = &o.payloadOpen
 	}
-	if !reflect.ValueOf(o.PayloadUnlock).IsZero() {
-		l.PayloadUnlock = &o.PayloadUnlock
+	if !reflect.ValueOf(o.payloadUnlock).IsZero() {
+		l.PayloadUnlock = &o.payloadUnlock
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		l.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		l.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		l.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		l.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateJammed).IsZero() {
-		l.StateJammed = &o.StateJammed
+	if !reflect.ValueOf(o.stateJammed).IsZero() {
+		l.StateJammed = &o.stateJammed
 	}
-	if !reflect.ValueOf(o.StateLocked).IsZero() {
-		l.StateLocked = &o.StateLocked
+	if !reflect.ValueOf(o.stateLocked).IsZero() {
+		l.StateLocked = &o.stateLocked
 	}
-	if !reflect.ValueOf(o.StateLocking).IsZero() {
-		l.StateLocking = &o.StateLocking
+	if !reflect.ValueOf(o.stateLocking).IsZero() {
+		l.StateLocking = &o.stateLocking
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		l.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		l.stateFunc = o.stateFunc
 	} else {
 		l.stateFunc = func() string {
 			return l.States.State
 		}
 	}
-	if !reflect.ValueOf(o.StateUnlocked).IsZero() {
-		l.StateUnlocked = &o.StateUnlocked
+	if !reflect.ValueOf(o.stateUnlocked).IsZero() {
+		l.StateUnlocked = &o.stateUnlocked
 	}
-	if !reflect.ValueOf(o.StateUnlocking).IsZero() {
-		l.StateUnlocking = &o.StateUnlocking
+	if !reflect.ValueOf(o.stateUnlocking).IsZero() {
+		l.StateUnlocking = &o.stateUnlocking
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		l.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		l.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		l.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		l.ValueTemplate = &o.valueTemplate
 	}
 	return &l
 }
@@ -169,11 +169,11 @@ type LockState struct {
 	State          string
 }
 
-func (d *Lock) SetJsonAttributes(s string) {
+func (d *Lock) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Lock) SetState(s string) {
+func (d *Lock) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

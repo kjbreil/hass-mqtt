@@ -6,137 +6,137 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type SwitchOptions struct {
-	States                 SwitchState // External state update location
-	AvailabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   string      // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	AvailabilityFunc       func() string
-	CommandFunc            func(mqtt.Message, mqtt.Client)
-	DeviceClass            string // "The [type/class](/integrations/switch/#device-class) of the switch to set the icon in the frontend."
-	EnabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
-	Encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
-	EntityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	Icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
-	JsonAttributesFunc     func() string
-	Name                   string // "The name to use when displaying this switch."
-	ObjectId               string // "Used instead of `name` for automatic generation of `entity_id`"
-	Optimistic             bool   // "Flag that defines if switch works in optimistic mode."
-	PayloadAvailable       string // "The payload that represents the available state."
-	PayloadNotAvailable    string // "The payload that represents the unavailable state."
-	PayloadOff             string // "The payload that represents `off` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_off` for details) and sending as `off` command to the `command_topic`."
-	PayloadOn              string // "The payload that represents `on` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_on`  for details) and sending as `on` command to the `command_topic`."
-	Qos                    int    // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
-	Retain                 bool   // "If the published message should have the retain flag on or not."
-	StateOff               string // "The payload that represents the `off` state. Used when value that represents `off` state in the `state_topic` is different from value that should be sent to the `command_topic` to turn the device `off`."
-	StateOn                string // "The payload that represents the `on` state. Used when value that represents `on` state in the `state_topic` is different from value that should be sent to the `command_topic` to turn the device `on`."
-	StateFunc              func() string
-	UniqueId               string // "An ID that uniquely identifies this switch device. If two switches have the same unique ID, Home Assistant will raise an exception."
-	ValueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's state from the `state_topic`. To determine the switches's state result of this template will be compared to `state_on` and `state_off`."
+	states                 SwitchState // External state update location
+	availabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityTemplate   string      // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityFunc       func() string
+	commandFunc            func(mqtt.Message, mqtt.Client)
+	deviceClass            string // "The [type/class](/integrations/switch/#device-class) of the switch to set the icon in the frontend."
+	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
+	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
+	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesFunc     func() string
+	name                   string // "The name to use when displaying this switch."
+	objectId               string // "Used instead of `name` for automatic generation of `entity_id`"
+	optimistic             bool   // "Flag that defines if switch works in optimistic mode."
+	payloadAvailable       string // "The payload that represents the available state."
+	payloadNotAvailable    string // "The payload that represents the unavailable state."
+	payloadOff             string // "The payload that represents `off` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_off` for details) and sending as `off` command to the `command_topic`."
+	payloadOn              string // "The payload that represents `on` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_on`  for details) and sending as `on` command to the `command_topic`."
+	qos                    int    // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	retain                 bool   // "If the published message should have the retain flag on or not."
+	stateOff               string // "The payload that represents the `off` state. Used when value that represents `off` state in the `state_topic` is different from value that should be sent to the `command_topic` to turn the device `off`."
+	stateOn                string // "The payload that represents the `on` state. Used when value that represents `on` state in the `state_topic` is different from value that should be sent to the `command_topic` to turn the device `on`."
+	stateFunc              func() string
+	uniqueId               string // "An ID that uniquely identifies this switch device. If two switches have the same unique ID, Home Assistant will raise an exception."
+	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's state from the `state_topic`. To determine the switches's state result of this template will be compared to `state_on` and `state_off`."
 }
 
 func NewSwitchOptions() *SwitchOptions {
 	return &SwitchOptions{}
 }
-func (o *SwitchOptions) GetStates() *SwitchState {
-	return &o.States
+func (o *SwitchOptions) States() *SwitchState {
+	return &o.states
 }
-func (o *SwitchOptions) SetAvailabilityMode(mode string) *SwitchOptions {
-	o.AvailabilityMode = mode
+func (o *SwitchOptions) AvailabilityMode(mode string) *SwitchOptions {
+	o.availabilityMode = mode
 	return o
 }
-func (o *SwitchOptions) SetAvailabilityTemplate(template string) *SwitchOptions {
-	o.AvailabilityTemplate = template
+func (o *SwitchOptions) AvailabilityTemplate(template string) *SwitchOptions {
+	o.availabilityTemplate = template
 	return o
 }
-func (o *SwitchOptions) SetAvailabilityFunc(f func() string) *SwitchOptions {
-	o.AvailabilityFunc = f
+func (o *SwitchOptions) AvailabilityFunc(f func() string) *SwitchOptions {
+	o.availabilityFunc = f
 	return o
 }
-func (o *SwitchOptions) SetCommandFunc(f func(mqtt.Message, mqtt.Client)) *SwitchOptions {
-	o.CommandFunc = f
+func (o *SwitchOptions) CommandFunc(f func(mqtt.Message, mqtt.Client)) *SwitchOptions {
+	o.commandFunc = f
 	return o
 }
-func (o *SwitchOptions) SetDeviceClass(class string) *SwitchOptions {
-	o.DeviceClass = class
+func (o *SwitchOptions) DeviceClass(class string) *SwitchOptions {
+	o.deviceClass = class
 	return o
 }
-func (o *SwitchOptions) SetEnabledByDefault(d bool) *SwitchOptions {
-	o.EnabledByDefault = d
+func (o *SwitchOptions) EnabledByDefault(d bool) *SwitchOptions {
+	o.enabledByDefault = d
 	return o
 }
-func (o *SwitchOptions) SetEncoding(encoding string) *SwitchOptions {
-	o.Encoding = encoding
+func (o *SwitchOptions) Encoding(encoding string) *SwitchOptions {
+	o.encoding = encoding
 	return o
 }
-func (o *SwitchOptions) SetEntityCategory(category string) *SwitchOptions {
-	o.EntityCategory = category
+func (o *SwitchOptions) EntityCategory(category string) *SwitchOptions {
+	o.entityCategory = category
 	return o
 }
-func (o *SwitchOptions) SetIcon(icon string) *SwitchOptions {
-	o.Icon = icon
+func (o *SwitchOptions) Icon(icon string) *SwitchOptions {
+	o.icon = icon
 	return o
 }
-func (o *SwitchOptions) SetJsonAttributesTemplate(template string) *SwitchOptions {
-	o.JsonAttributesTemplate = template
+func (o *SwitchOptions) JsonAttributesTemplate(template string) *SwitchOptions {
+	o.jsonAttributesTemplate = template
 	return o
 }
-func (o *SwitchOptions) SetJsonAttributesFunc(f func() string) *SwitchOptions {
-	o.JsonAttributesFunc = f
+func (o *SwitchOptions) JsonAttributesFunc(f func() string) *SwitchOptions {
+	o.jsonAttributesFunc = f
 	return o
 }
-func (o *SwitchOptions) SetName(name string) *SwitchOptions {
-	o.Name = name
+func (o *SwitchOptions) Name(name string) *SwitchOptions {
+	o.name = name
 	return o
 }
-func (o *SwitchOptions) SetObjectId(id string) *SwitchOptions {
-	o.ObjectId = id
+func (o *SwitchOptions) ObjectId(id string) *SwitchOptions {
+	o.objectId = id
 	return o
 }
-func (o *SwitchOptions) SetOptimistic(optimistic bool) *SwitchOptions {
-	o.Optimistic = optimistic
+func (o *SwitchOptions) Optimistic(optimistic bool) *SwitchOptions {
+	o.optimistic = optimistic
 	return o
 }
-func (o *SwitchOptions) SetPayloadAvailable(available string) *SwitchOptions {
-	o.PayloadAvailable = available
+func (o *SwitchOptions) PayloadAvailable(available string) *SwitchOptions {
+	o.payloadAvailable = available
 	return o
 }
-func (o *SwitchOptions) SetPayloadNotAvailable(available string) *SwitchOptions {
-	o.PayloadNotAvailable = available
+func (o *SwitchOptions) PayloadNotAvailable(available string) *SwitchOptions {
+	o.payloadNotAvailable = available
 	return o
 }
-func (o *SwitchOptions) SetPayloadOff(off string) *SwitchOptions {
-	o.PayloadOff = off
+func (o *SwitchOptions) PayloadOff(off string) *SwitchOptions {
+	o.payloadOff = off
 	return o
 }
-func (o *SwitchOptions) SetPayloadOn(on string) *SwitchOptions {
-	o.PayloadOn = on
+func (o *SwitchOptions) PayloadOn(on string) *SwitchOptions {
+	o.payloadOn = on
 	return o
 }
-func (o *SwitchOptions) SetQos(qos int) *SwitchOptions {
-	o.Qos = qos
+func (o *SwitchOptions) Qos(qos int) *SwitchOptions {
+	o.qos = qos
 	return o
 }
-func (o *SwitchOptions) SetRetain(retain bool) *SwitchOptions {
-	o.Retain = retain
+func (o *SwitchOptions) Retain(retain bool) *SwitchOptions {
+	o.retain = retain
 	return o
 }
-func (o *SwitchOptions) SetStateOff(off string) *SwitchOptions {
-	o.StateOff = off
+func (o *SwitchOptions) StateOff(off string) *SwitchOptions {
+	o.stateOff = off
 	return o
 }
-func (o *SwitchOptions) SetStateOn(on string) *SwitchOptions {
-	o.StateOn = on
+func (o *SwitchOptions) StateOn(on string) *SwitchOptions {
+	o.stateOn = on
 	return o
 }
-func (o *SwitchOptions) SetStateFunc(f func() string) *SwitchOptions {
-	o.StateFunc = f
+func (o *SwitchOptions) StateFunc(f func() string) *SwitchOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *SwitchOptions) SetUniqueId(id string) *SwitchOptions {
-	o.UniqueId = id
+func (o *SwitchOptions) UniqueId(id string) *SwitchOptions {
+	o.uniqueId = id
 	return o
 }
-func (o *SwitchOptions) SetValueTemplate(template string) *SwitchOptions {
-	o.ValueTemplate = template
+func (o *SwitchOptions) ValueTemplate(template string) *SwitchOptions {
+	o.valueTemplate = template
 	return o
 }

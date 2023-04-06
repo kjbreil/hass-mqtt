@@ -81,7 +81,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				g.Add(jen.Var().Id(firstLetter).Id(camelName))
 				g.Add(jen.Line())
 
-				g.Add(jen.Id(firstLetter).Dot("States").Op("=").Op("&").Id("o").Dot("States"))
+				g.Add(jen.Id(firstLetter).Dot("States").Op("=").Op("&").Id("o").Dot("states"))
 
 				for _, key := range sortedKeys {
 					if key == "device" {
@@ -90,8 +90,8 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 					v := st[key]
 					if v.main != nil && !v.main.topic {
 						g.Add(
-							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.main.camelName)).Dot("IsZero").Params()).Block(
-								jen.Id(firstLetter).Dot(v.main.camelName).Op("=").Op("&").Id("o").Dot(v.main.camelName),
+							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.main.lowerCamelName)).Dot("IsZero").Params()).Block(
+								jen.Id(firstLetter).Dot(v.main.camelName).Op("=").Op("&").Id("o").Dot(v.main.lowerCamelName),
 							),
 						)
 					}
@@ -116,15 +116,15 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 									jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
 								).Block(
 
-									jen.Id("o").Dot("States").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+									jen.Id("o").Dot("states").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
 
 									//jen.Id("l").Dot("UpdateState").Params(),
 								),
 							)
 						}
 						g.Add(
-							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.camelName)).Dot("IsZero").Params()).Block(
-								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Id("o").Dot(v.setter.camelName),
+							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.lowerCamelName)).Dot("IsZero").Params()).Block(
+								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Id("o").Dot(v.setter.lowerCamelName),
 							).Add(el),
 						)
 					}
@@ -180,7 +180,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				}
 				external[d.Name].Func().
 					Params(jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name))).
-					Id(fmt.Sprintf("Set%s", stateName)).Params(jen.Id("s").String()).
+					Id(fmt.Sprintf("%s", stateName)).Params(jen.Id("s").String()).
 					Block(
 						jen.Id("d").Dot("States").Dot(stateName).Op("=").Id("s"),
 						jen.Id("d").Dot("UpdateState").Params(),
@@ -684,14 +684,14 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 		sort.Strings(optsSortedKeys)
 
 		external[optionsFileName].Type().Id(optionsCamelName).StructFunc(func(g *jen.Group) {
-			g.Id("States").Id(externalStateTypeName).Comment("External state update location")
+			g.Id("states").Id(externalStateTypeName).Comment("External state update location")
 			for _, key := range optsSortedKeys {
 				v := opst[key]
 				if v.main != nil && !v.main.topic {
-					g.Add(v.main.combineNoTag())
+					g.Add(v.main.combineLowerNoTag())
 				}
 				if v.setter != nil {
-					g.Add(v.setter.combineNoTag())
+					g.Add(v.setter.combineLowerNoTag())
 				}
 			}
 		},
@@ -706,12 +706,12 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 		external[optionsFileName].Func().
 			Params(jen.Id("o").Op("*").Id(optionsCamelName)).
-			Id("GetStates").
+			Id("States").
 			Params().
 			Params(jen.Op("*").Id(externalStateTypeName)).
 			Block(
 
-				jen.Return(jen.Op("&").Id("o").Dot("States")),
+				jen.Return(jen.Op("&").Id("o").Dot("states")),
 			)
 
 		for _, key := range optsSortedKeys {
@@ -730,11 +730,11 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 				external[optionsFileName].Func().
 					Params(jen.Id("o").Op("*").Id(optionsCamelName)).
-					Id(fmt.Sprintf("Set%s", v.main.camelName)).
+					Id(fmt.Sprintf("%s", v.main.camelName)).
 					Params(jen.Id(name).Add(v.main.t)).
 					Params(jen.Op("*").Id(optionsCamelName)).
 					Block(
-						jen.Id("o").Dot(v.main.camelName).Op("=").Id(name),
+						jen.Id("o").Dot(v.main.lowerCamelName).Op("=").Id(name),
 
 						jen.Return(jen.Id("o")),
 					)
@@ -744,11 +744,11 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 				external[optionsFileName].Func().
 					Params(jen.Id("o").Op("*").Id(optionsCamelName)).
-					Id(fmt.Sprintf("Set%s", v.setter.camelName)).
+					Id(fmt.Sprintf("%s", v.setter.camelName)).
 					Params(jen.Id("f").Add(v.setter.t)).
 					Params(jen.Op("*").Id(optionsCamelName)).
 					Block(
-						jen.Id("o").Dot(v.setter.camelName).Op("=").Id("f"),
+						jen.Id("o").Dot(v.setter.lowerCamelName).Op("=").Id("f"),
 
 						jen.Return(jen.Id("o")),
 					)
@@ -763,22 +763,22 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 						continue
 					}
 
-					commandFuncName := strings.ReplaceAll(v.setter.camelName, "State", "Command")
+					commandFuncName := strings.ReplaceAll(v.setter.lowerCamelName, "State", "Command")
 
 					external[optionsFileName].Func().
 						Params(jen.Id("o").Op("*").Id(optionsCamelName)).
-						Id(fmt.Sprintf("Has%s", stateName)).
+						Id(fmt.Sprintf("Enable%s", stateName)).
 						Params().
 						Params(jen.Op("*").Id(optionsCamelName)).
 						Block(
-							jen.Id("o").Dot(v.setter.camelName).Op("=").Func().Params().String().Block(
-								jen.Return(jen.Id("o").Dot("States").Dot(stateName)),
+							jen.Id("o").Dot(v.setter.lowerCamelName).Op("=").Func().Params().String().Block(
+								jen.Return(jen.Id("o").Dot("states").Dot(stateName)),
 							),
 							jen.Id("o").Dot(commandFuncName).Op("=").Func().Params(
 								jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
 								jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
 							).Block(
-								jen.Id("o").Dot("States").Dot(stateName).Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+								jen.Id("o").Dot("states").Dot(stateName).Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
 							),
 
 							jen.Return(jen.Id("o")),
@@ -829,4 +829,7 @@ func (s *statement) combinePointer() *jen.Statement {
 
 func (s *statement) combineNoTag() *jen.Statement {
 	return jen.Add(s.name, s.t, s.comment)
+}
+func (s *statement) combineLowerNoTag() *jen.Statement {
+	return jen.Add(s.lowerName, s.t, s.comment)
 }

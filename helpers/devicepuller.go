@@ -227,6 +227,9 @@ func (dev *Device) FieldAdder(key string) *statement {
 	dat := dev.JSONContainer.ChildrenMap()
 
 	t := Unquote(dat[key].ChildrenMap()["type"].String())
+	if lowerCamelName == "type" {
+		lowerCamelName = "entityType"
+	}
 
 	return &statement{
 		name:           jen.Id(camelName),
@@ -234,6 +237,7 @@ func (dev *Device) FieldAdder(key string) *statement {
 		camelName:      camelName,
 		lowerCamelName: lowerCamelName,
 		stripTopic:     stripTopic,
+		lowerName:      jen.Id(lowerCamelName),
 		topic:          strings.HasSuffix(key, "topic"),
 		command:        IsCommand(key),
 		t:              TypeTranslator(t, jen.Add()),

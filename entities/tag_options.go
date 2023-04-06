@@ -4,22 +4,22 @@ package entities
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type TagOptions struct {
-	States        TagState // External state update location
-	StateFunc     func() string
-	ValueTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a tag ID."
+	states        TagState // External state update location
+	stateFunc     func() string
+	valueTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a tag ID."
 }
 
 func NewTagOptions() *TagOptions {
 	return &TagOptions{}
 }
-func (o *TagOptions) GetStates() *TagState {
-	return &o.States
+func (o *TagOptions) States() *TagState {
+	return &o.states
 }
-func (o *TagOptions) SetStateFunc(f func() string) *TagOptions {
-	o.StateFunc = f
+func (o *TagOptions) StateFunc(f func() string) *TagOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *TagOptions) SetValueTemplate(template string) *TagOptions {
-	o.ValueTemplate = template
+func (o *TagOptions) ValueTemplate(template string) *TagOptions {
+	o.valueTemplate = template
 	return o
 }

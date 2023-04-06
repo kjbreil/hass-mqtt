@@ -109,206 +109,206 @@ type Light struct {
 func NewLight(o *LightOptions) *Light {
 	var l Light
 
-	l.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		l.AvailabilityMode = &o.AvailabilityMode
+	l.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		l.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		l.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		l.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		l.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		l.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.BrightnessCommandTemplate).IsZero() {
-		l.BrightnessCommandTemplate = &o.BrightnessCommandTemplate
+	if !reflect.ValueOf(o.brightnessCommandTemplate).IsZero() {
+		l.BrightnessCommandTemplate = &o.brightnessCommandTemplate
 	}
-	if !reflect.ValueOf(o.BrightnessCommandFunc).IsZero() {
-		l.brightnessCommandFunc = o.BrightnessCommandFunc
+	if !reflect.ValueOf(o.brightnessCommandFunc).IsZero() {
+		l.brightnessCommandFunc = o.brightnessCommandFunc
 	}
-	if !reflect.ValueOf(o.BrightnessScale).IsZero() {
-		l.BrightnessScale = &o.BrightnessScale
+	if !reflect.ValueOf(o.brightnessScale).IsZero() {
+		l.BrightnessScale = &o.brightnessScale
 	}
-	if !reflect.ValueOf(o.BrightnessStateFunc).IsZero() {
-		l.brightnessStateFunc = o.BrightnessStateFunc
+	if !reflect.ValueOf(o.brightnessStateFunc).IsZero() {
+		l.brightnessStateFunc = o.brightnessStateFunc
 	}
-	if !reflect.ValueOf(o.BrightnessValueTemplate).IsZero() {
-		l.BrightnessValueTemplate = &o.BrightnessValueTemplate
+	if !reflect.ValueOf(o.brightnessValueTemplate).IsZero() {
+		l.BrightnessValueTemplate = &o.brightnessValueTemplate
 	}
-	if !reflect.ValueOf(o.ColorModeStateFunc).IsZero() {
-		l.colorModeStateFunc = o.ColorModeStateFunc
+	if !reflect.ValueOf(o.colorModeStateFunc).IsZero() {
+		l.colorModeStateFunc = o.colorModeStateFunc
 	}
-	if !reflect.ValueOf(o.ColorModeValueTemplate).IsZero() {
-		l.ColorModeValueTemplate = &o.ColorModeValueTemplate
+	if !reflect.ValueOf(o.colorModeValueTemplate).IsZero() {
+		l.ColorModeValueTemplate = &o.colorModeValueTemplate
 	}
-	if !reflect.ValueOf(o.ColorTempCommandTemplate).IsZero() {
-		l.ColorTempCommandTemplate = &o.ColorTempCommandTemplate
+	if !reflect.ValueOf(o.colorTempCommandTemplate).IsZero() {
+		l.ColorTempCommandTemplate = &o.colorTempCommandTemplate
 	}
-	if !reflect.ValueOf(o.ColorTempCommandFunc).IsZero() {
-		l.colorTempCommandFunc = o.ColorTempCommandFunc
+	if !reflect.ValueOf(o.colorTempCommandFunc).IsZero() {
+		l.colorTempCommandFunc = o.colorTempCommandFunc
 	}
-	if !reflect.ValueOf(o.ColorTempStateFunc).IsZero() {
-		l.colorTempStateFunc = o.ColorTempStateFunc
+	if !reflect.ValueOf(o.colorTempStateFunc).IsZero() {
+		l.colorTempStateFunc = o.colorTempStateFunc
 	}
-	if !reflect.ValueOf(o.ColorTempValueTemplate).IsZero() {
-		l.ColorTempValueTemplate = &o.ColorTempValueTemplate
+	if !reflect.ValueOf(o.colorTempValueTemplate).IsZero() {
+		l.ColorTempValueTemplate = &o.colorTempValueTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		l.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		l.commandFunc = o.commandFunc
 	} else {
 		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EffectCommandTemplate).IsZero() {
-		l.EffectCommandTemplate = &o.EffectCommandTemplate
+	if !reflect.ValueOf(o.effectCommandTemplate).IsZero() {
+		l.EffectCommandTemplate = &o.effectCommandTemplate
 	}
-	if !reflect.ValueOf(o.EffectCommandFunc).IsZero() {
-		l.effectCommandFunc = o.EffectCommandFunc
+	if !reflect.ValueOf(o.effectCommandFunc).IsZero() {
+		l.effectCommandFunc = o.effectCommandFunc
 	}
-	if !reflect.ValueOf(o.EffectList).IsZero() {
-		l.EffectList = &o.EffectList
+	if !reflect.ValueOf(o.effectList).IsZero() {
+		l.EffectList = &o.effectList
 	}
-	if !reflect.ValueOf(o.EffectStateFunc).IsZero() {
-		l.effectStateFunc = o.EffectStateFunc
+	if !reflect.ValueOf(o.effectStateFunc).IsZero() {
+		l.effectStateFunc = o.effectStateFunc
 	}
-	if !reflect.ValueOf(o.EffectValueTemplate).IsZero() {
-		l.EffectValueTemplate = &o.EffectValueTemplate
+	if !reflect.ValueOf(o.effectValueTemplate).IsZero() {
+		l.EffectValueTemplate = &o.effectValueTemplate
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		l.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		l.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		l.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		l.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		l.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		l.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.HsCommandTemplate).IsZero() {
-		l.HsCommandTemplate = &o.HsCommandTemplate
+	if !reflect.ValueOf(o.hsCommandTemplate).IsZero() {
+		l.HsCommandTemplate = &o.hsCommandTemplate
 	}
-	if !reflect.ValueOf(o.HsCommandFunc).IsZero() {
-		l.hsCommandFunc = o.HsCommandFunc
+	if !reflect.ValueOf(o.hsCommandFunc).IsZero() {
+		l.hsCommandFunc = o.hsCommandFunc
 	}
-	if !reflect.ValueOf(o.HsStateFunc).IsZero() {
-		l.hsStateFunc = o.HsStateFunc
+	if !reflect.ValueOf(o.hsStateFunc).IsZero() {
+		l.hsStateFunc = o.hsStateFunc
 	}
-	if !reflect.ValueOf(o.HsValueTemplate).IsZero() {
-		l.HsValueTemplate = &o.HsValueTemplate
+	if !reflect.ValueOf(o.hsValueTemplate).IsZero() {
+		l.HsValueTemplate = &o.hsValueTemplate
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		l.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		l.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		l.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		l.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		l.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		l.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.MaxMireds).IsZero() {
-		l.MaxMireds = &o.MaxMireds
+	if !reflect.ValueOf(o.maxMireds).IsZero() {
+		l.MaxMireds = &o.maxMireds
 	}
-	if !reflect.ValueOf(o.MinMireds).IsZero() {
-		l.MinMireds = &o.MinMireds
+	if !reflect.ValueOf(o.minMireds).IsZero() {
+		l.MinMireds = &o.minMireds
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		l.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		l.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		l.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		l.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.OnCommandType).IsZero() {
-		l.OnCommandType = &o.OnCommandType
+	if !reflect.ValueOf(o.onCommandType).IsZero() {
+		l.OnCommandType = &o.onCommandType
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		l.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		l.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		l.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		l.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		l.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		l.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOff).IsZero() {
-		l.PayloadOff = &o.PayloadOff
+	if !reflect.ValueOf(o.payloadOff).IsZero() {
+		l.PayloadOff = &o.payloadOff
 	}
-	if !reflect.ValueOf(o.PayloadOn).IsZero() {
-		l.PayloadOn = &o.PayloadOn
+	if !reflect.ValueOf(o.payloadOn).IsZero() {
+		l.PayloadOn = &o.payloadOn
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		l.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		l.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		l.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		l.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.RgbCommandTemplate).IsZero() {
-		l.RgbCommandTemplate = &o.RgbCommandTemplate
+	if !reflect.ValueOf(o.rgbCommandTemplate).IsZero() {
+		l.RgbCommandTemplate = &o.rgbCommandTemplate
 	}
-	if !reflect.ValueOf(o.RgbCommandFunc).IsZero() {
-		l.rgbCommandFunc = o.RgbCommandFunc
+	if !reflect.ValueOf(o.rgbCommandFunc).IsZero() {
+		l.rgbCommandFunc = o.rgbCommandFunc
 	}
-	if !reflect.ValueOf(o.RgbStateFunc).IsZero() {
-		l.rgbStateFunc = o.RgbStateFunc
+	if !reflect.ValueOf(o.rgbStateFunc).IsZero() {
+		l.rgbStateFunc = o.rgbStateFunc
 	}
-	if !reflect.ValueOf(o.RgbValueTemplate).IsZero() {
-		l.RgbValueTemplate = &o.RgbValueTemplate
+	if !reflect.ValueOf(o.rgbValueTemplate).IsZero() {
+		l.RgbValueTemplate = &o.rgbValueTemplate
 	}
-	if !reflect.ValueOf(o.RgbwCommandTemplate).IsZero() {
-		l.RgbwCommandTemplate = &o.RgbwCommandTemplate
+	if !reflect.ValueOf(o.rgbwCommandTemplate).IsZero() {
+		l.RgbwCommandTemplate = &o.rgbwCommandTemplate
 	}
-	if !reflect.ValueOf(o.RgbwCommandFunc).IsZero() {
-		l.rgbwCommandFunc = o.RgbwCommandFunc
+	if !reflect.ValueOf(o.rgbwCommandFunc).IsZero() {
+		l.rgbwCommandFunc = o.rgbwCommandFunc
 	}
-	if !reflect.ValueOf(o.RgbwStateFunc).IsZero() {
-		l.rgbwStateFunc = o.RgbwStateFunc
+	if !reflect.ValueOf(o.rgbwStateFunc).IsZero() {
+		l.rgbwStateFunc = o.rgbwStateFunc
 	}
-	if !reflect.ValueOf(o.RgbwValueTemplate).IsZero() {
-		l.RgbwValueTemplate = &o.RgbwValueTemplate
+	if !reflect.ValueOf(o.rgbwValueTemplate).IsZero() {
+		l.RgbwValueTemplate = &o.rgbwValueTemplate
 	}
-	if !reflect.ValueOf(o.RgbwwCommandTemplate).IsZero() {
-		l.RgbwwCommandTemplate = &o.RgbwwCommandTemplate
+	if !reflect.ValueOf(o.rgbwwCommandTemplate).IsZero() {
+		l.RgbwwCommandTemplate = &o.rgbwwCommandTemplate
 	}
-	if !reflect.ValueOf(o.RgbwwCommandFunc).IsZero() {
-		l.rgbwwCommandFunc = o.RgbwwCommandFunc
+	if !reflect.ValueOf(o.rgbwwCommandFunc).IsZero() {
+		l.rgbwwCommandFunc = o.rgbwwCommandFunc
 	}
-	if !reflect.ValueOf(o.RgbwwStateFunc).IsZero() {
-		l.rgbwwStateFunc = o.RgbwwStateFunc
+	if !reflect.ValueOf(o.rgbwwStateFunc).IsZero() {
+		l.rgbwwStateFunc = o.rgbwwStateFunc
 	}
-	if !reflect.ValueOf(o.RgbwwValueTemplate).IsZero() {
-		l.RgbwwValueTemplate = &o.RgbwwValueTemplate
+	if !reflect.ValueOf(o.rgbwwValueTemplate).IsZero() {
+		l.RgbwwValueTemplate = &o.rgbwwValueTemplate
 	}
-	if !reflect.ValueOf(o.Schema).IsZero() {
-		l.Schema = &o.Schema
+	if !reflect.ValueOf(o.schema).IsZero() {
+		l.Schema = &o.schema
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		l.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		l.stateFunc = o.stateFunc
 	} else {
 		l.stateFunc = func() string {
 			return l.States.State
 		}
 	}
-	if !reflect.ValueOf(o.StateValueTemplate).IsZero() {
-		l.StateValueTemplate = &o.StateValueTemplate
+	if !reflect.ValueOf(o.stateValueTemplate).IsZero() {
+		l.StateValueTemplate = &o.stateValueTemplate
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		l.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		l.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.WhiteCommandFunc).IsZero() {
-		l.whiteCommandFunc = o.WhiteCommandFunc
+	if !reflect.ValueOf(o.whiteCommandFunc).IsZero() {
+		l.whiteCommandFunc = o.whiteCommandFunc
 	}
-	if !reflect.ValueOf(o.WhiteScale).IsZero() {
-		l.WhiteScale = &o.WhiteScale
+	if !reflect.ValueOf(o.whiteScale).IsZero() {
+		l.WhiteScale = &o.whiteScale
 	}
-	if !reflect.ValueOf(o.XyCommandTemplate).IsZero() {
-		l.XyCommandTemplate = &o.XyCommandTemplate
+	if !reflect.ValueOf(o.xyCommandTemplate).IsZero() {
+		l.XyCommandTemplate = &o.xyCommandTemplate
 	}
-	if !reflect.ValueOf(o.XyCommandFunc).IsZero() {
-		l.xyCommandFunc = o.XyCommandFunc
+	if !reflect.ValueOf(o.xyCommandFunc).IsZero() {
+		l.xyCommandFunc = o.xyCommandFunc
 	}
-	if !reflect.ValueOf(o.XyStateFunc).IsZero() {
-		l.xyStateFunc = o.XyStateFunc
+	if !reflect.ValueOf(o.xyStateFunc).IsZero() {
+		l.xyStateFunc = o.xyStateFunc
 	}
-	if !reflect.ValueOf(o.XyValueTemplate).IsZero() {
-		l.XyValueTemplate = &o.XyValueTemplate
+	if !reflect.ValueOf(o.xyValueTemplate).IsZero() {
+		l.XyValueTemplate = &o.xyValueTemplate
 	}
 	return &l
 }
@@ -341,47 +341,47 @@ type LightState struct {
 	Xy             string
 }
 
-func (d *Light) SetBrightness(s string) {
+func (d *Light) Brightness(s string) {
 	d.States.Brightness = s
 	d.UpdateState()
 }
-func (d *Light) SetColorMode(s string) {
+func (d *Light) ColorMode(s string) {
 	d.States.ColorMode = s
 	d.UpdateState()
 }
-func (d *Light) SetColorTemp(s string) {
+func (d *Light) ColorTemp(s string) {
 	d.States.ColorTemp = s
 	d.UpdateState()
 }
-func (d *Light) SetEffect(s string) {
+func (d *Light) Effect(s string) {
 	d.States.Effect = s
 	d.UpdateState()
 }
-func (d *Light) SetHs(s string) {
+func (d *Light) Hs(s string) {
 	d.States.Hs = s
 	d.UpdateState()
 }
-func (d *Light) SetJsonAttributes(s string) {
+func (d *Light) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Light) SetRgb(s string) {
+func (d *Light) Rgb(s string) {
 	d.States.Rgb = s
 	d.UpdateState()
 }
-func (d *Light) SetRgbw(s string) {
+func (d *Light) Rgbw(s string) {
 	d.States.Rgbw = s
 	d.UpdateState()
 }
-func (d *Light) SetRgbww(s string) {
+func (d *Light) Rgbww(s string) {
 	d.States.Rgbww = s
 	d.UpdateState()
 }
-func (d *Light) SetState(s string) {
+func (d *Light) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }
-func (d *Light) SetXy(s string) {
+func (d *Light) Xy(s string) {
 	d.States.Xy = s
 	d.UpdateState()
 }

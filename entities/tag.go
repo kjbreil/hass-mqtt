@@ -24,16 +24,16 @@ type Tag struct {
 func NewTag(o *TagOptions) *Tag {
 	var t Tag
 
-	t.States = &o.States
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		t.stateFunc = o.StateFunc
+	t.States = &o.states
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		t.stateFunc = o.stateFunc
 	} else {
 		t.stateFunc = func() string {
 			return t.States.State
 		}
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		t.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		t.ValueTemplate = &o.valueTemplate
 	}
 	return &t
 }
@@ -45,7 +45,7 @@ type TagState struct {
 	State string
 }
 
-func (d *Tag) SetState(s string) {
+func (d *Tag) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

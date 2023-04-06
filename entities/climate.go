@@ -119,225 +119,225 @@ type Climate struct {
 func NewClimate(o *ClimateOptions) *Climate {
 	var c Climate
 
-	c.States = &o.States
-	if !reflect.ValueOf(o.ActionTemplate).IsZero() {
-		c.ActionTemplate = &o.ActionTemplate
+	c.States = &o.states
+	if !reflect.ValueOf(o.actionTemplate).IsZero() {
+		c.ActionTemplate = &o.actionTemplate
 	}
-	if !reflect.ValueOf(o.ActionFunc).IsZero() {
-		c.actionFunc = o.ActionFunc
+	if !reflect.ValueOf(o.actionFunc).IsZero() {
+		c.actionFunc = o.actionFunc
 	}
-	if !reflect.ValueOf(o.AuxCommandFunc).IsZero() {
-		c.auxCommandFunc = o.AuxCommandFunc
+	if !reflect.ValueOf(o.auxCommandFunc).IsZero() {
+		c.auxCommandFunc = o.auxCommandFunc
 	}
-	if !reflect.ValueOf(o.AuxStateTemplate).IsZero() {
-		c.AuxStateTemplate = &o.AuxStateTemplate
+	if !reflect.ValueOf(o.auxStateTemplate).IsZero() {
+		c.AuxStateTemplate = &o.auxStateTemplate
 	}
-	if !reflect.ValueOf(o.AuxStateFunc).IsZero() {
-		c.auxStateFunc = o.AuxStateFunc
+	if !reflect.ValueOf(o.auxStateFunc).IsZero() {
+		c.auxStateFunc = o.auxStateFunc
 	}
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		c.AvailabilityMode = &o.AvailabilityMode
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		c.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		c.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		c.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		c.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		c.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CurrentHumidityTemplate).IsZero() {
-		c.CurrentHumidityTemplate = &o.CurrentHumidityTemplate
+	if !reflect.ValueOf(o.currentHumidityTemplate).IsZero() {
+		c.CurrentHumidityTemplate = &o.currentHumidityTemplate
 	}
-	if !reflect.ValueOf(o.CurrentHumidityFunc).IsZero() {
-		c.currentHumidityFunc = o.CurrentHumidityFunc
+	if !reflect.ValueOf(o.currentHumidityFunc).IsZero() {
+		c.currentHumidityFunc = o.currentHumidityFunc
 	}
-	if !reflect.ValueOf(o.CurrentTemperatureTemplate).IsZero() {
-		c.CurrentTemperatureTemplate = &o.CurrentTemperatureTemplate
+	if !reflect.ValueOf(o.currentTemperatureTemplate).IsZero() {
+		c.CurrentTemperatureTemplate = &o.currentTemperatureTemplate
 	}
-	if !reflect.ValueOf(o.CurrentTemperatureFunc).IsZero() {
-		c.currentTemperatureFunc = o.CurrentTemperatureFunc
+	if !reflect.ValueOf(o.currentTemperatureFunc).IsZero() {
+		c.currentTemperatureFunc = o.currentTemperatureFunc
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		c.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		c.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		c.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		c.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		c.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		c.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.FanModeCommandTemplate).IsZero() {
-		c.FanModeCommandTemplate = &o.FanModeCommandTemplate
+	if !reflect.ValueOf(o.fanModeCommandTemplate).IsZero() {
+		c.FanModeCommandTemplate = &o.fanModeCommandTemplate
 	}
-	if !reflect.ValueOf(o.FanModeCommandFunc).IsZero() {
-		c.fanModeCommandFunc = o.FanModeCommandFunc
+	if !reflect.ValueOf(o.fanModeCommandFunc).IsZero() {
+		c.fanModeCommandFunc = o.fanModeCommandFunc
 	}
-	if !reflect.ValueOf(o.FanModeStateTemplate).IsZero() {
-		c.FanModeStateTemplate = &o.FanModeStateTemplate
+	if !reflect.ValueOf(o.fanModeStateTemplate).IsZero() {
+		c.FanModeStateTemplate = &o.fanModeStateTemplate
 	}
-	if !reflect.ValueOf(o.FanModeStateFunc).IsZero() {
-		c.fanModeStateFunc = o.FanModeStateFunc
+	if !reflect.ValueOf(o.fanModeStateFunc).IsZero() {
+		c.fanModeStateFunc = o.fanModeStateFunc
 	}
-	if !reflect.ValueOf(o.FanModes).IsZero() {
-		c.FanModes = &o.FanModes
+	if !reflect.ValueOf(o.fanModes).IsZero() {
+		c.FanModes = &o.fanModes
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		c.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		c.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.Initial).IsZero() {
-		c.Initial = &o.Initial
+	if !reflect.ValueOf(o.initial).IsZero() {
+		c.Initial = &o.initial
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		c.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		c.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		c.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		c.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.MaxHumidity).IsZero() {
-		c.MaxHumidity = &o.MaxHumidity
+	if !reflect.ValueOf(o.maxHumidity).IsZero() {
+		c.MaxHumidity = &o.maxHumidity
 	}
-	if !reflect.ValueOf(o.MaxTemp).IsZero() {
-		c.MaxTemp = &o.MaxTemp
+	if !reflect.ValueOf(o.maxTemp).IsZero() {
+		c.MaxTemp = &o.maxTemp
 	}
-	if !reflect.ValueOf(o.MinHumidity).IsZero() {
-		c.MinHumidity = &o.MinHumidity
+	if !reflect.ValueOf(o.minHumidity).IsZero() {
+		c.MinHumidity = &o.minHumidity
 	}
-	if !reflect.ValueOf(o.MinTemp).IsZero() {
-		c.MinTemp = &o.MinTemp
+	if !reflect.ValueOf(o.minTemp).IsZero() {
+		c.MinTemp = &o.minTemp
 	}
-	if !reflect.ValueOf(o.ModeCommandTemplate).IsZero() {
-		c.ModeCommandTemplate = &o.ModeCommandTemplate
+	if !reflect.ValueOf(o.modeCommandTemplate).IsZero() {
+		c.ModeCommandTemplate = &o.modeCommandTemplate
 	}
-	if !reflect.ValueOf(o.ModeCommandFunc).IsZero() {
-		c.modeCommandFunc = o.ModeCommandFunc
+	if !reflect.ValueOf(o.modeCommandFunc).IsZero() {
+		c.modeCommandFunc = o.modeCommandFunc
 	}
-	if !reflect.ValueOf(o.ModeStateTemplate).IsZero() {
-		c.ModeStateTemplate = &o.ModeStateTemplate
+	if !reflect.ValueOf(o.modeStateTemplate).IsZero() {
+		c.ModeStateTemplate = &o.modeStateTemplate
 	}
-	if !reflect.ValueOf(o.ModeStateFunc).IsZero() {
-		c.modeStateFunc = o.ModeStateFunc
+	if !reflect.ValueOf(o.modeStateFunc).IsZero() {
+		c.modeStateFunc = o.modeStateFunc
 	}
-	if !reflect.ValueOf(o.Modes).IsZero() {
-		c.Modes = &o.Modes
+	if !reflect.ValueOf(o.modes).IsZero() {
+		c.Modes = &o.modes
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		c.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		c.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		c.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		c.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		c.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		c.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		c.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		c.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		c.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		c.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOff).IsZero() {
-		c.PayloadOff = &o.PayloadOff
+	if !reflect.ValueOf(o.payloadOff).IsZero() {
+		c.PayloadOff = &o.payloadOff
 	}
-	if !reflect.ValueOf(o.PayloadOn).IsZero() {
-		c.PayloadOn = &o.PayloadOn
+	if !reflect.ValueOf(o.payloadOn).IsZero() {
+		c.PayloadOn = &o.payloadOn
 	}
-	if !reflect.ValueOf(o.Precision).IsZero() {
-		c.Precision = &o.Precision
+	if !reflect.ValueOf(o.precision).IsZero() {
+		c.Precision = &o.precision
 	}
-	if !reflect.ValueOf(o.PresetModeCommandTemplate).IsZero() {
-		c.PresetModeCommandTemplate = &o.PresetModeCommandTemplate
+	if !reflect.ValueOf(o.presetModeCommandTemplate).IsZero() {
+		c.PresetModeCommandTemplate = &o.presetModeCommandTemplate
 	}
-	if !reflect.ValueOf(o.PresetModeCommandFunc).IsZero() {
-		c.presetModeCommandFunc = o.PresetModeCommandFunc
+	if !reflect.ValueOf(o.presetModeCommandFunc).IsZero() {
+		c.presetModeCommandFunc = o.presetModeCommandFunc
 	}
-	if !reflect.ValueOf(o.PresetModeStateFunc).IsZero() {
-		c.presetModeStateFunc = o.PresetModeStateFunc
+	if !reflect.ValueOf(o.presetModeStateFunc).IsZero() {
+		c.presetModeStateFunc = o.presetModeStateFunc
 	}
-	if !reflect.ValueOf(o.PresetModeValueTemplate).IsZero() {
-		c.PresetModeValueTemplate = &o.PresetModeValueTemplate
+	if !reflect.ValueOf(o.presetModeValueTemplate).IsZero() {
+		c.PresetModeValueTemplate = &o.presetModeValueTemplate
 	}
-	if !reflect.ValueOf(o.PresetModes).IsZero() {
-		c.PresetModes = &o.PresetModes
+	if !reflect.ValueOf(o.presetModes).IsZero() {
+		c.PresetModes = &o.presetModes
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		c.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		c.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		c.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		c.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.SwingModeCommandTemplate).IsZero() {
-		c.SwingModeCommandTemplate = &o.SwingModeCommandTemplate
+	if !reflect.ValueOf(o.swingModeCommandTemplate).IsZero() {
+		c.SwingModeCommandTemplate = &o.swingModeCommandTemplate
 	}
-	if !reflect.ValueOf(o.SwingModeCommandFunc).IsZero() {
-		c.swingModeCommandFunc = o.SwingModeCommandFunc
+	if !reflect.ValueOf(o.swingModeCommandFunc).IsZero() {
+		c.swingModeCommandFunc = o.swingModeCommandFunc
 	}
-	if !reflect.ValueOf(o.SwingModeStateTemplate).IsZero() {
-		c.SwingModeStateTemplate = &o.SwingModeStateTemplate
+	if !reflect.ValueOf(o.swingModeStateTemplate).IsZero() {
+		c.SwingModeStateTemplate = &o.swingModeStateTemplate
 	}
-	if !reflect.ValueOf(o.SwingModeStateFunc).IsZero() {
-		c.swingModeStateFunc = o.SwingModeStateFunc
+	if !reflect.ValueOf(o.swingModeStateFunc).IsZero() {
+		c.swingModeStateFunc = o.swingModeStateFunc
 	}
-	if !reflect.ValueOf(o.SwingModes).IsZero() {
-		c.SwingModes = &o.SwingModes
+	if !reflect.ValueOf(o.swingModes).IsZero() {
+		c.SwingModes = &o.swingModes
 	}
-	if !reflect.ValueOf(o.TargetHumidityCommandTemplate).IsZero() {
-		c.TargetHumidityCommandTemplate = &o.TargetHumidityCommandTemplate
+	if !reflect.ValueOf(o.targetHumidityCommandTemplate).IsZero() {
+		c.TargetHumidityCommandTemplate = &o.targetHumidityCommandTemplate
 	}
-	if !reflect.ValueOf(o.TargetHumidityCommandFunc).IsZero() {
-		c.targetHumidityCommandFunc = o.TargetHumidityCommandFunc
+	if !reflect.ValueOf(o.targetHumidityCommandFunc).IsZero() {
+		c.targetHumidityCommandFunc = o.targetHumidityCommandFunc
 	}
-	if !reflect.ValueOf(o.TargetHumidityStateTemplate).IsZero() {
-		c.TargetHumidityStateTemplate = &o.TargetHumidityStateTemplate
+	if !reflect.ValueOf(o.targetHumidityStateTemplate).IsZero() {
+		c.TargetHumidityStateTemplate = &o.targetHumidityStateTemplate
 	}
-	if !reflect.ValueOf(o.TargetHumidityStateFunc).IsZero() {
-		c.targetHumidityStateFunc = o.TargetHumidityStateFunc
+	if !reflect.ValueOf(o.targetHumidityStateFunc).IsZero() {
+		c.targetHumidityStateFunc = o.targetHumidityStateFunc
 	}
-	if !reflect.ValueOf(o.TempStep).IsZero() {
-		c.TempStep = &o.TempStep
+	if !reflect.ValueOf(o.tempStep).IsZero() {
+		c.TempStep = &o.tempStep
 	}
-	if !reflect.ValueOf(o.TemperatureCommandTemplate).IsZero() {
-		c.TemperatureCommandTemplate = &o.TemperatureCommandTemplate
+	if !reflect.ValueOf(o.temperatureCommandTemplate).IsZero() {
+		c.TemperatureCommandTemplate = &o.temperatureCommandTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureCommandFunc).IsZero() {
-		c.temperatureCommandFunc = o.TemperatureCommandFunc
+	if !reflect.ValueOf(o.temperatureCommandFunc).IsZero() {
+		c.temperatureCommandFunc = o.temperatureCommandFunc
 	}
-	if !reflect.ValueOf(o.TemperatureHighCommandTemplate).IsZero() {
-		c.TemperatureHighCommandTemplate = &o.TemperatureHighCommandTemplate
+	if !reflect.ValueOf(o.temperatureHighCommandTemplate).IsZero() {
+		c.TemperatureHighCommandTemplate = &o.temperatureHighCommandTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureHighCommandFunc).IsZero() {
-		c.temperatureHighCommandFunc = o.TemperatureHighCommandFunc
+	if !reflect.ValueOf(o.temperatureHighCommandFunc).IsZero() {
+		c.temperatureHighCommandFunc = o.temperatureHighCommandFunc
 	}
-	if !reflect.ValueOf(o.TemperatureHighStateTemplate).IsZero() {
-		c.TemperatureHighStateTemplate = &o.TemperatureHighStateTemplate
+	if !reflect.ValueOf(o.temperatureHighStateTemplate).IsZero() {
+		c.TemperatureHighStateTemplate = &o.temperatureHighStateTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureHighStateFunc).IsZero() {
-		c.temperatureHighStateFunc = o.TemperatureHighStateFunc
+	if !reflect.ValueOf(o.temperatureHighStateFunc).IsZero() {
+		c.temperatureHighStateFunc = o.temperatureHighStateFunc
 	}
-	if !reflect.ValueOf(o.TemperatureLowCommandTemplate).IsZero() {
-		c.TemperatureLowCommandTemplate = &o.TemperatureLowCommandTemplate
+	if !reflect.ValueOf(o.temperatureLowCommandTemplate).IsZero() {
+		c.TemperatureLowCommandTemplate = &o.temperatureLowCommandTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureLowCommandFunc).IsZero() {
-		c.temperatureLowCommandFunc = o.TemperatureLowCommandFunc
+	if !reflect.ValueOf(o.temperatureLowCommandFunc).IsZero() {
+		c.temperatureLowCommandFunc = o.temperatureLowCommandFunc
 	}
-	if !reflect.ValueOf(o.TemperatureLowStateTemplate).IsZero() {
-		c.TemperatureLowStateTemplate = &o.TemperatureLowStateTemplate
+	if !reflect.ValueOf(o.temperatureLowStateTemplate).IsZero() {
+		c.TemperatureLowStateTemplate = &o.temperatureLowStateTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureLowStateFunc).IsZero() {
-		c.temperatureLowStateFunc = o.TemperatureLowStateFunc
+	if !reflect.ValueOf(o.temperatureLowStateFunc).IsZero() {
+		c.temperatureLowStateFunc = o.temperatureLowStateFunc
 	}
-	if !reflect.ValueOf(o.TemperatureStateTemplate).IsZero() {
-		c.TemperatureStateTemplate = &o.TemperatureStateTemplate
+	if !reflect.ValueOf(o.temperatureStateTemplate).IsZero() {
+		c.TemperatureStateTemplate = &o.temperatureStateTemplate
 	}
-	if !reflect.ValueOf(o.TemperatureStateFunc).IsZero() {
-		c.temperatureStateFunc = o.TemperatureStateFunc
+	if !reflect.ValueOf(o.temperatureStateFunc).IsZero() {
+		c.temperatureStateFunc = o.temperatureStateFunc
 	}
-	if !reflect.ValueOf(o.TemperatureUnit).IsZero() {
-		c.TemperatureUnit = &o.TemperatureUnit
+	if !reflect.ValueOf(o.temperatureUnit).IsZero() {
+		c.TemperatureUnit = &o.temperatureUnit
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		c.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		c.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		c.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		c.ValueTemplate = &o.valueTemplate
 	}
 	return &c
 }
@@ -372,51 +372,51 @@ type ClimateState struct {
 	Temperature        string
 }
 
-func (d *Climate) SetAux(s string) {
+func (d *Climate) Aux(s string) {
 	d.States.Aux = s
 	d.UpdateState()
 }
-func (d *Climate) SetCurrentHumidity(s string) {
+func (d *Climate) CurrentHumidity(s string) {
 	d.States.CurrentHumidity = s
 	d.UpdateState()
 }
-func (d *Climate) SetCurrentTemperature(s string) {
+func (d *Climate) CurrentTemperature(s string) {
 	d.States.CurrentTemperature = s
 	d.UpdateState()
 }
-func (d *Climate) SetFanMode(s string) {
+func (d *Climate) FanMode(s string) {
 	d.States.FanMode = s
 	d.UpdateState()
 }
-func (d *Climate) SetJsonAttributes(s string) {
+func (d *Climate) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Climate) SetMode(s string) {
+func (d *Climate) Mode(s string) {
 	d.States.Mode = s
 	d.UpdateState()
 }
-func (d *Climate) SetPresetMode(s string) {
+func (d *Climate) PresetMode(s string) {
 	d.States.PresetMode = s
 	d.UpdateState()
 }
-func (d *Climate) SetSwingMode(s string) {
+func (d *Climate) SwingMode(s string) {
 	d.States.SwingMode = s
 	d.UpdateState()
 }
-func (d *Climate) SetTargetHumidity(s string) {
+func (d *Climate) TargetHumidity(s string) {
 	d.States.TargetHumidity = s
 	d.UpdateState()
 }
-func (d *Climate) SetTemperatureHigh(s string) {
+func (d *Climate) TemperatureHigh(s string) {
 	d.States.TemperatureHigh = s
 	d.UpdateState()
 }
-func (d *Climate) SetTemperatureLow(s string) {
+func (d *Climate) TemperatureLow(s string) {
 	d.States.TemperatureLow = s
 	d.UpdateState()
 }
-func (d *Climate) SetTemperature(s string) {
+func (d *Climate) Temperature(s string) {
 	d.States.Temperature = s
 	d.UpdateState()
 }

@@ -43,64 +43,64 @@ type DeviceTracker struct {
 func NewDeviceTracker(o *DeviceTrackerOptions) *DeviceTracker {
 	var d DeviceTracker
 
-	d.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		d.AvailabilityMode = &o.AvailabilityMode
+	d.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		d.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		d.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		d.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		d.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		d.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		d.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		d.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		d.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		d.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		d.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		d.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		d.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		d.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		d.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		d.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		d.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		d.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadHome).IsZero() {
-		d.PayloadHome = &o.PayloadHome
+	if !reflect.ValueOf(o.payloadHome).IsZero() {
+		d.PayloadHome = &o.payloadHome
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		d.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		d.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotHome).IsZero() {
-		d.PayloadNotHome = &o.PayloadNotHome
+	if !reflect.ValueOf(o.payloadNotHome).IsZero() {
+		d.PayloadNotHome = &o.payloadNotHome
 	}
-	if !reflect.ValueOf(o.PayloadReset).IsZero() {
-		d.PayloadReset = &o.PayloadReset
+	if !reflect.ValueOf(o.payloadReset).IsZero() {
+		d.PayloadReset = &o.payloadReset
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		d.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		d.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.SourceType).IsZero() {
-		d.SourceType = &o.SourceType
+	if !reflect.ValueOf(o.sourceType).IsZero() {
+		d.SourceType = &o.sourceType
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		d.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		d.stateFunc = o.stateFunc
 	} else {
 		d.stateFunc = func() string {
 			return d.States.State
 		}
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		d.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		d.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		d.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		d.ValueTemplate = &o.valueTemplate
 	}
 	return &d
 }
@@ -115,11 +115,11 @@ type DeviceTrackerState struct {
 	State          string
 }
 
-func (d *DeviceTracker) SetJsonAttributes(s string) {
+func (d *DeviceTracker) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *DeviceTracker) SetState(s string) {
+func (d *DeviceTracker) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

@@ -64,11 +64,11 @@ func main() {
 
 	lo := entities.NewLightOptions()
 
-	lo.GetStates().Brightness = "100"
+	lo.States().Brightness = "100"
 
-	lo.SetName("Test Light").
-		SetUniqueId(uniqueId).
-		HasBrightness()
+	lo.Name("Test Light").
+		UniqueId(uniqueId).
+		EnableBrightness()
 
 	l := entities.NewLight(lo)
 

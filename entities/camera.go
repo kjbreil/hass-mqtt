@@ -39,52 +39,52 @@ type Camera struct {
 func NewCamera(o *CameraOptions) *Camera {
 	var c Camera
 
-	c.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		c.AvailabilityMode = &o.AvailabilityMode
+	c.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		c.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		c.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		c.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		c.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		c.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		c.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		c.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		c.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		c.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		c.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		c.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		c.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		c.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.ImageEncoding).IsZero() {
-		c.ImageEncoding = &o.ImageEncoding
+	if !reflect.ValueOf(o.imageEncoding).IsZero() {
+		c.ImageEncoding = &o.imageEncoding
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		c.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		c.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		c.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		c.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		c.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		c.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		c.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		c.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		c.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		c.stateFunc = o.stateFunc
 	} else {
 		c.stateFunc = func() string {
 			return c.States.State
 		}
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		c.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		c.UniqueId = &o.uniqueId
 	}
 	return &c
 }
@@ -99,11 +99,11 @@ type CameraState struct {
 	State          string
 }
 
-func (d *Camera) SetJsonAttributes(s string) {
+func (d *Camera) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Camera) SetState(s string) {
+func (d *Camera) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

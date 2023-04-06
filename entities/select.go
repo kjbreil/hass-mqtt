@@ -47,74 +47,74 @@ type Select struct {
 func NewSelect(o *SelectOptions) *Select {
 	var s Select
 
-	s.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		s.AvailabilityMode = &o.AvailabilityMode
+	s.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		s.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		s.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		s.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		s.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		s.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		s.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		s.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		s.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		s.commandFunc = o.commandFunc
 	} else {
 		s.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		s.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		s.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		s.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		s.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		s.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		s.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		s.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		s.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		s.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		s.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		s.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		s.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		s.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		s.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		s.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		s.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Optimistic).IsZero() {
-		s.Optimistic = &o.Optimistic
+	if !reflect.ValueOf(o.optimistic).IsZero() {
+		s.Optimistic = &o.optimistic
 	}
-	if !reflect.ValueOf(o.Options).IsZero() {
-		s.Options = &o.Options
+	if !reflect.ValueOf(o.options).IsZero() {
+		s.Options = &o.options
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		s.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		s.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		s.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		s.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		s.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		s.stateFunc = o.stateFunc
 	} else {
 		s.stateFunc = func() string {
 			return s.States.State
 		}
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		s.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		s.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		s.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		s.ValueTemplate = &o.valueTemplate
 	}
 	return &s
 }
@@ -129,11 +129,11 @@ type SelectState struct {
 	State          string
 }
 
-func (d *Select) SetJsonAttributes(s string) {
+func (d *Select) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Select) SetState(s string) {
+func (d *Select) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

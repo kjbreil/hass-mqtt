@@ -39,48 +39,48 @@ type Scene struct {
 func NewScene(o *SceneOptions) *Scene {
 	var s Scene
 
-	s.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		s.AvailabilityMode = &o.AvailabilityMode
+	s.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		s.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		s.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		s.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		s.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		s.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		s.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		s.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		s.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		s.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		s.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		s.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		s.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		s.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		s.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		s.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		s.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		s.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		s.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		s.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadOn).IsZero() {
-		s.PayloadOn = &o.PayloadOn
+	if !reflect.ValueOf(o.payloadOn).IsZero() {
+		s.PayloadOn = &o.payloadOn
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		s.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		s.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		s.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		s.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		s.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		s.UniqueId = &o.uniqueId
 	}
 	return &s
 }

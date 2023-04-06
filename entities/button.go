@@ -46,63 +46,63 @@ type Button struct {
 func NewButton(o *ButtonOptions) *Button {
 	var b Button
 
-	b.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		b.AvailabilityMode = &o.AvailabilityMode
+	b.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		b.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		b.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		b.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		b.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		b.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		b.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		b.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.DeviceClass).IsZero() {
-		b.DeviceClass = &o.DeviceClass
+	if !reflect.ValueOf(o.deviceClass).IsZero() {
+		b.DeviceClass = &o.deviceClass
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		b.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		b.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		b.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		b.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		b.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		b.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		b.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		b.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		b.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		b.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		b.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		b.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		b.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		b.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		b.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		b.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		b.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		b.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		b.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		b.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.PayloadPress).IsZero() {
-		b.PayloadPress = &o.PayloadPress
+	if !reflect.ValueOf(o.payloadPress).IsZero() {
+		b.PayloadPress = &o.payloadPress
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		b.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		b.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		b.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		b.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		b.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		b.UniqueId = &o.uniqueId
 	}
 	return &b
 }
@@ -115,7 +115,7 @@ type ButtonState struct {
 	JsonAttributes string
 }
 
-func (d *Button) SetJsonAttributes(s string) {
+func (d *Button) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }

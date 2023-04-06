@@ -48,77 +48,77 @@ type Text struct {
 func NewText(o *TextOptions) *Text {
 	var t Text
 
-	t.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		t.AvailabilityMode = &o.AvailabilityMode
+	t.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		t.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		t.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		t.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		t.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		t.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.CommandTemplate).IsZero() {
-		t.CommandTemplate = &o.CommandTemplate
+	if !reflect.ValueOf(o.commandTemplate).IsZero() {
+		t.CommandTemplate = &o.commandTemplate
 	}
-	if !reflect.ValueOf(o.CommandFunc).IsZero() {
-		t.commandFunc = o.CommandFunc
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		t.commandFunc = o.commandFunc
 	} else {
 		t.commandFunc = func(message mqtt.Message, client mqtt.Client) {
-			o.States.State = string(message.Payload())
+			o.states.State = string(message.Payload())
 		}
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		t.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		t.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		t.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		t.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		t.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		t.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		t.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		t.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		t.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		t.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.Max).IsZero() {
-		t.Max = &o.Max
+	if !reflect.ValueOf(o.max).IsZero() {
+		t.Max = &o.max
 	}
-	if !reflect.ValueOf(o.Min).IsZero() {
-		t.Min = &o.Min
+	if !reflect.ValueOf(o.min).IsZero() {
+		t.Min = &o.min
 	}
-	if !reflect.ValueOf(o.Mode).IsZero() {
-		t.Mode = &o.Mode
+	if !reflect.ValueOf(o.mode).IsZero() {
+		t.Mode = &o.mode
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		t.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		t.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		t.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		t.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.Pattern).IsZero() {
-		t.Pattern = &o.Pattern
+	if !reflect.ValueOf(o.pattern).IsZero() {
+		t.Pattern = &o.pattern
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		t.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		t.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.Retain).IsZero() {
-		t.Retain = &o.Retain
+	if !reflect.ValueOf(o.retain).IsZero() {
+		t.Retain = &o.retain
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		t.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		t.stateFunc = o.stateFunc
 	} else {
 		t.stateFunc = func() string {
 			return t.States.State
 		}
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		t.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		t.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		t.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		t.ValueTemplate = &o.valueTemplate
 	}
 	return &t
 }
@@ -133,11 +133,11 @@ type TextState struct {
 	State          string
 }
 
-func (d *Text) SetJsonAttributes(s string) {
+func (d *Text) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Text) SetState(s string) {
+func (d *Text) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }

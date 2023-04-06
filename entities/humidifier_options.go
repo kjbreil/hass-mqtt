@@ -6,215 +6,215 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type HumidifierOptions struct {
-	States                        HumidifierState // External state update location
-	AvailabilityMode              string          // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate          string          // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	AvailabilityFunc              func() string
-	CommandTemplate               string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
-	CommandFunc                   func(mqtt.Message, mqtt.Client)
-	DeviceClass                   string // "The device class of the MQTT device. Must be either `humidifier` or `dehumidifier`."
-	EnabledByDefault              bool   // "Flag which defines if the entity should be enabled when first added."
-	Encoding                      string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
-	EntityCategory                string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	Icon                          string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
-	JsonAttributesFunc            func() string
-	MaxHumidity                   int    // "The minimum target humidity percentage that can be set."
-	MinHumidity                   int    // "The maximum target humidity percentage that can be set."
-	ModeCommandTemplate           string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `mode_command_topic`."
-	ModeCommandFunc               func(mqtt.Message, mqtt.Client)
-	ModeStateTemplate             string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value for the humidifier `mode` state."
-	ModeStateFunc                 func() string
-	Modes                         ([]string) // "List of available modes this humidifier is capable of running at. Common examples include `normal`, `eco`, `away`, `boost`, `comfort`, `home`, `sleep`, `auto` and `baby`. These examples offer built-in translations but other custom modes are allowed as well.  This attribute ust be configured together with the `mode_command_topic` attribute."
-	Name                          string     // "The name of the humidifier."
-	ObjectId                      string     // "Used instead of `name` for automatic generation of `entity_id`"
-	Optimistic                    bool       // "Flag that defines if humidifier works in optimistic mode"
-	PayloadAvailable              string     // "The payload that represents the available state."
-	PayloadNotAvailable           string     // "The payload that represents the unavailable state."
-	PayloadOff                    string     // "The payload that represents the stop state."
-	PayloadOn                     string     // "The payload that represents the running state."
-	PayloadResetHumidity          string     // "A special payload that resets the `target_humidity` state attribute to `None` when received at the `target_humidity_state_topic`."
-	PayloadResetMode              string     // "A special payload that resets the `mode` state attribute to `None` when received at the `mode_state_topic`."
-	Qos                           int        // "The maximum QoS level of the state topic."
-	Retain                        bool       // "If the published message should have the retain flag on or not."
-	StateFunc                     func() string
-	StateValueTemplate            string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the state."
-	TargetHumidityCommandTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `target_humidity_command_topic`."
-	TargetHumidityCommandFunc     func(mqtt.Message, mqtt.Client)
-	TargetHumidityStateTemplate   string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value for the humidifier `target_humidity` state."
-	TargetHumidityStateFunc       func() string
-	UniqueId                      string // "An ID that uniquely identifies this humidifier. If two humidifiers have the same unique ID, Home Assistant will raise an exception."
+	states                        HumidifierState // External state update location
+	availabilityMode              string          // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityTemplate          string          // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityFunc              func() string
+	commandTemplate               string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandFunc                   func(mqtt.Message, mqtt.Client)
+	deviceClass                   string // "The device class of the MQTT device. Must be either `humidifier` or `dehumidifier`."
+	enabledByDefault              bool   // "Flag which defines if the entity should be enabled when first added."
+	encoding                      string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
+	entityCategory                string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	icon                          string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	jsonAttributesTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesFunc            func() string
+	maxHumidity                   int    // "The minimum target humidity percentage that can be set."
+	minHumidity                   int    // "The maximum target humidity percentage that can be set."
+	modeCommandTemplate           string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `mode_command_topic`."
+	modeCommandFunc               func(mqtt.Message, mqtt.Client)
+	modeStateTemplate             string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value for the humidifier `mode` state."
+	modeStateFunc                 func() string
+	modes                         ([]string) // "List of available modes this humidifier is capable of running at. Common examples include `normal`, `eco`, `away`, `boost`, `comfort`, `home`, `sleep`, `auto` and `baby`. These examples offer built-in translations but other custom modes are allowed as well.  This attribute ust be configured together with the `mode_command_topic` attribute."
+	name                          string     // "The name of the humidifier."
+	objectId                      string     // "Used instead of `name` for automatic generation of `entity_id`"
+	optimistic                    bool       // "Flag that defines if humidifier works in optimistic mode"
+	payloadAvailable              string     // "The payload that represents the available state."
+	payloadNotAvailable           string     // "The payload that represents the unavailable state."
+	payloadOff                    string     // "The payload that represents the stop state."
+	payloadOn                     string     // "The payload that represents the running state."
+	payloadResetHumidity          string     // "A special payload that resets the `target_humidity` state attribute to `None` when received at the `target_humidity_state_topic`."
+	payloadResetMode              string     // "A special payload that resets the `mode` state attribute to `None` when received at the `mode_state_topic`."
+	qos                           int        // "The maximum QoS level of the state topic."
+	retain                        bool       // "If the published message should have the retain flag on or not."
+	stateFunc                     func() string
+	stateValueTemplate            string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the state."
+	targetHumidityCommandTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `target_humidity_command_topic`."
+	targetHumidityCommandFunc     func(mqtt.Message, mqtt.Client)
+	targetHumidityStateTemplate   string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value for the humidifier `target_humidity` state."
+	targetHumidityStateFunc       func() string
+	uniqueId                      string // "An ID that uniquely identifies this humidifier. If two humidifiers have the same unique ID, Home Assistant will raise an exception."
 }
 
 func NewHumidifierOptions() *HumidifierOptions {
 	return &HumidifierOptions{}
 }
-func (o *HumidifierOptions) GetStates() *HumidifierState {
-	return &o.States
+func (o *HumidifierOptions) States() *HumidifierState {
+	return &o.states
 }
-func (o *HumidifierOptions) SetAvailabilityMode(mode string) *HumidifierOptions {
-	o.AvailabilityMode = mode
+func (o *HumidifierOptions) AvailabilityMode(mode string) *HumidifierOptions {
+	o.availabilityMode = mode
 	return o
 }
-func (o *HumidifierOptions) SetAvailabilityTemplate(template string) *HumidifierOptions {
-	o.AvailabilityTemplate = template
+func (o *HumidifierOptions) AvailabilityTemplate(template string) *HumidifierOptions {
+	o.availabilityTemplate = template
 	return o
 }
-func (o *HumidifierOptions) SetAvailabilityFunc(f func() string) *HumidifierOptions {
-	o.AvailabilityFunc = f
+func (o *HumidifierOptions) AvailabilityFunc(f func() string) *HumidifierOptions {
+	o.availabilityFunc = f
 	return o
 }
-func (o *HumidifierOptions) SetCommandTemplate(template string) *HumidifierOptions {
-	o.CommandTemplate = template
+func (o *HumidifierOptions) CommandTemplate(template string) *HumidifierOptions {
+	o.commandTemplate = template
 	return o
 }
-func (o *HumidifierOptions) SetCommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
-	o.CommandFunc = f
+func (o *HumidifierOptions) CommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
+	o.commandFunc = f
 	return o
 }
-func (o *HumidifierOptions) SetDeviceClass(class string) *HumidifierOptions {
-	o.DeviceClass = class
+func (o *HumidifierOptions) DeviceClass(class string) *HumidifierOptions {
+	o.deviceClass = class
 	return o
 }
-func (o *HumidifierOptions) SetEnabledByDefault(d bool) *HumidifierOptions {
-	o.EnabledByDefault = d
+func (o *HumidifierOptions) EnabledByDefault(d bool) *HumidifierOptions {
+	o.enabledByDefault = d
 	return o
 }
-func (o *HumidifierOptions) SetEncoding(encoding string) *HumidifierOptions {
-	o.Encoding = encoding
+func (o *HumidifierOptions) Encoding(encoding string) *HumidifierOptions {
+	o.encoding = encoding
 	return o
 }
-func (o *HumidifierOptions) SetEntityCategory(category string) *HumidifierOptions {
-	o.EntityCategory = category
+func (o *HumidifierOptions) EntityCategory(category string) *HumidifierOptions {
+	o.entityCategory = category
 	return o
 }
-func (o *HumidifierOptions) SetIcon(icon string) *HumidifierOptions {
-	o.Icon = icon
+func (o *HumidifierOptions) Icon(icon string) *HumidifierOptions {
+	o.icon = icon
 	return o
 }
-func (o *HumidifierOptions) SetJsonAttributesTemplate(template string) *HumidifierOptions {
-	o.JsonAttributesTemplate = template
+func (o *HumidifierOptions) JsonAttributesTemplate(template string) *HumidifierOptions {
+	o.jsonAttributesTemplate = template
 	return o
 }
-func (o *HumidifierOptions) SetJsonAttributesFunc(f func() string) *HumidifierOptions {
-	o.JsonAttributesFunc = f
+func (o *HumidifierOptions) JsonAttributesFunc(f func() string) *HumidifierOptions {
+	o.jsonAttributesFunc = f
 	return o
 }
-func (o *HumidifierOptions) SetMaxHumidity(humidity int) *HumidifierOptions {
-	o.MaxHumidity = humidity
+func (o *HumidifierOptions) MaxHumidity(humidity int) *HumidifierOptions {
+	o.maxHumidity = humidity
 	return o
 }
-func (o *HumidifierOptions) SetMinHumidity(humidity int) *HumidifierOptions {
-	o.MinHumidity = humidity
+func (o *HumidifierOptions) MinHumidity(humidity int) *HumidifierOptions {
+	o.minHumidity = humidity
 	return o
 }
-func (o *HumidifierOptions) SetModeCommandTemplate(template string) *HumidifierOptions {
-	o.ModeCommandTemplate = template
+func (o *HumidifierOptions) ModeCommandTemplate(template string) *HumidifierOptions {
+	o.modeCommandTemplate = template
 	return o
 }
-func (o *HumidifierOptions) SetModeCommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
-	o.ModeCommandFunc = f
+func (o *HumidifierOptions) ModeCommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
+	o.modeCommandFunc = f
 	return o
 }
-func (o *HumidifierOptions) SetModeStateTemplate(template string) *HumidifierOptions {
-	o.ModeStateTemplate = template
+func (o *HumidifierOptions) ModeStateTemplate(template string) *HumidifierOptions {
+	o.modeStateTemplate = template
 	return o
 }
-func (o *HumidifierOptions) SetModeStateFunc(f func() string) *HumidifierOptions {
-	o.ModeStateFunc = f
+func (o *HumidifierOptions) ModeStateFunc(f func() string) *HumidifierOptions {
+	o.modeStateFunc = f
 	return o
 }
-func (o *HumidifierOptions) HasMode() *HumidifierOptions {
-	o.ModeStateFunc = func() string {
-		return o.States.Mode
+func (o *HumidifierOptions) EnableMode() *HumidifierOptions {
+	o.modeStateFunc = func() string {
+		return o.states.Mode
 	}
-	o.ModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
-		o.States.Mode = string(message.Payload())
-	}
-	return o
-}
-func (o *HumidifierOptions) SetModes(modes []string) *HumidifierOptions {
-	o.Modes = modes
-	return o
-}
-func (o *HumidifierOptions) SetName(name string) *HumidifierOptions {
-	o.Name = name
-	return o
-}
-func (o *HumidifierOptions) SetObjectId(id string) *HumidifierOptions {
-	o.ObjectId = id
-	return o
-}
-func (o *HumidifierOptions) SetOptimistic(optimistic bool) *HumidifierOptions {
-	o.Optimistic = optimistic
-	return o
-}
-func (o *HumidifierOptions) SetPayloadAvailable(available string) *HumidifierOptions {
-	o.PayloadAvailable = available
-	return o
-}
-func (o *HumidifierOptions) SetPayloadNotAvailable(available string) *HumidifierOptions {
-	o.PayloadNotAvailable = available
-	return o
-}
-func (o *HumidifierOptions) SetPayloadOff(off string) *HumidifierOptions {
-	o.PayloadOff = off
-	return o
-}
-func (o *HumidifierOptions) SetPayloadOn(on string) *HumidifierOptions {
-	o.PayloadOn = on
-	return o
-}
-func (o *HumidifierOptions) SetPayloadResetHumidity(humidity string) *HumidifierOptions {
-	o.PayloadResetHumidity = humidity
-	return o
-}
-func (o *HumidifierOptions) SetPayloadResetMode(mode string) *HumidifierOptions {
-	o.PayloadResetMode = mode
-	return o
-}
-func (o *HumidifierOptions) SetQos(qos int) *HumidifierOptions {
-	o.Qos = qos
-	return o
-}
-func (o *HumidifierOptions) SetRetain(retain bool) *HumidifierOptions {
-	o.Retain = retain
-	return o
-}
-func (o *HumidifierOptions) SetStateFunc(f func() string) *HumidifierOptions {
-	o.StateFunc = f
-	return o
-}
-func (o *HumidifierOptions) SetStateValueTemplate(template string) *HumidifierOptions {
-	o.StateValueTemplate = template
-	return o
-}
-func (o *HumidifierOptions) SetTargetHumidityCommandTemplate(template string) *HumidifierOptions {
-	o.TargetHumidityCommandTemplate = template
-	return o
-}
-func (o *HumidifierOptions) SetTargetHumidityCommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
-	o.TargetHumidityCommandFunc = f
-	return o
-}
-func (o *HumidifierOptions) SetTargetHumidityStateTemplate(template string) *HumidifierOptions {
-	o.TargetHumidityStateTemplate = template
-	return o
-}
-func (o *HumidifierOptions) SetTargetHumidityStateFunc(f func() string) *HumidifierOptions {
-	o.TargetHumidityStateFunc = f
-	return o
-}
-func (o *HumidifierOptions) HasTargetHumidity() *HumidifierOptions {
-	o.TargetHumidityStateFunc = func() string {
-		return o.States.TargetHumidity
-	}
-	o.TargetHumidityCommandFunc = func(message mqtt.Message, client mqtt.Client) {
-		o.States.TargetHumidity = string(message.Payload())
+	o.modeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.states.Mode = string(message.Payload())
 	}
 	return o
 }
-func (o *HumidifierOptions) SetUniqueId(id string) *HumidifierOptions {
-	o.UniqueId = id
+func (o *HumidifierOptions) Modes(modes []string) *HumidifierOptions {
+	o.modes = modes
+	return o
+}
+func (o *HumidifierOptions) Name(name string) *HumidifierOptions {
+	o.name = name
+	return o
+}
+func (o *HumidifierOptions) ObjectId(id string) *HumidifierOptions {
+	o.objectId = id
+	return o
+}
+func (o *HumidifierOptions) Optimistic(optimistic bool) *HumidifierOptions {
+	o.optimistic = optimistic
+	return o
+}
+func (o *HumidifierOptions) PayloadAvailable(available string) *HumidifierOptions {
+	o.payloadAvailable = available
+	return o
+}
+func (o *HumidifierOptions) PayloadNotAvailable(available string) *HumidifierOptions {
+	o.payloadNotAvailable = available
+	return o
+}
+func (o *HumidifierOptions) PayloadOff(off string) *HumidifierOptions {
+	o.payloadOff = off
+	return o
+}
+func (o *HumidifierOptions) PayloadOn(on string) *HumidifierOptions {
+	o.payloadOn = on
+	return o
+}
+func (o *HumidifierOptions) PayloadResetHumidity(humidity string) *HumidifierOptions {
+	o.payloadResetHumidity = humidity
+	return o
+}
+func (o *HumidifierOptions) PayloadResetMode(mode string) *HumidifierOptions {
+	o.payloadResetMode = mode
+	return o
+}
+func (o *HumidifierOptions) Qos(qos int) *HumidifierOptions {
+	o.qos = qos
+	return o
+}
+func (o *HumidifierOptions) Retain(retain bool) *HumidifierOptions {
+	o.retain = retain
+	return o
+}
+func (o *HumidifierOptions) StateFunc(f func() string) *HumidifierOptions {
+	o.stateFunc = f
+	return o
+}
+func (o *HumidifierOptions) StateValueTemplate(template string) *HumidifierOptions {
+	o.stateValueTemplate = template
+	return o
+}
+func (o *HumidifierOptions) TargetHumidityCommandTemplate(template string) *HumidifierOptions {
+	o.targetHumidityCommandTemplate = template
+	return o
+}
+func (o *HumidifierOptions) TargetHumidityCommandFunc(f func(mqtt.Message, mqtt.Client)) *HumidifierOptions {
+	o.targetHumidityCommandFunc = f
+	return o
+}
+func (o *HumidifierOptions) TargetHumidityStateTemplate(template string) *HumidifierOptions {
+	o.targetHumidityStateTemplate = template
+	return o
+}
+func (o *HumidifierOptions) TargetHumidityStateFunc(f func() string) *HumidifierOptions {
+	o.targetHumidityStateFunc = f
+	return o
+}
+func (o *HumidifierOptions) EnableTargetHumidity() *HumidifierOptions {
+	o.targetHumidityStateFunc = func() string {
+		return o.states.TargetHumidity
+	}
+	o.targetHumidityCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.states.TargetHumidity = string(message.Payload())
+	}
+	return o
+}
+func (o *HumidifierOptions) UniqueId(id string) *HumidifierOptions {
+	o.uniqueId = id
 	return o
 }

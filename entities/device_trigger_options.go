@@ -4,47 +4,47 @@ package entities
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type DeviceTriggerOptions struct {
-	States         DeviceTriggerState // External state update location
-	AutomationType string             // "The type of automation, must be 'trigger'."
-	Payload        string             // "Optional payload to match the payload being sent over the topic."
-	Qos            int                // "The maximum QoS level to be used when receiving messages."
-	Subtype        string             // "The subtype of the trigger, e.g. `button_1`. Entries supported by the frontend: `turn_on`, `turn_off`, `button_1`, `button_2`, `button_3`, `button_4`, `button_5`, `button_6`. If set to an unsupported value, will render as `subtype type`, e.g. `left_button pressed` with `type` set to `button_short_press` and `subtype` set to `left_button`"
-	StateFunc      func() string
-	Type           string // "The type of the trigger, e.g. `button_short_press`. Entries supported by the frontend: `button_short_press`, `button_short_release`, `button_long_press`, `button_long_release`, `button_double_press`, `button_triple_press`, `button_quadruple_press`, `button_quintuple_press`. If set to an unsupported value, will render as `subtype type`, e.g. `button_1 spammed` with `type` set to `spammed` and `subtype` set to `button_1`"
-	ValueTemplate  string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
+	states         DeviceTriggerState // External state update location
+	automationType string             // "The type of automation, must be 'trigger'."
+	payload        string             // "Optional payload to match the payload being sent over the topic."
+	qos            int                // "The maximum QoS level to be used when receiving messages."
+	subtype        string             // "The subtype of the trigger, e.g. `button_1`. Entries supported by the frontend: `turn_on`, `turn_off`, `button_1`, `button_2`, `button_3`, `button_4`, `button_5`, `button_6`. If set to an unsupported value, will render as `subtype type`, e.g. `left_button pressed` with `type` set to `button_short_press` and `subtype` set to `left_button`"
+	stateFunc      func() string
+	entityType     string // "The type of the trigger, e.g. `button_short_press`. Entries supported by the frontend: `button_short_press`, `button_short_release`, `button_long_press`, `button_long_release`, `button_double_press`, `button_triple_press`, `button_quadruple_press`, `button_quintuple_press`. If set to an unsupported value, will render as `subtype type`, e.g. `button_1 spammed` with `type` set to `spammed` and `subtype` set to `button_1`"
+	valueTemplate  string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
 }
 
 func NewDeviceTriggerOptions() *DeviceTriggerOptions {
 	return &DeviceTriggerOptions{}
 }
-func (o *DeviceTriggerOptions) GetStates() *DeviceTriggerState {
-	return &o.States
+func (o *DeviceTriggerOptions) States() *DeviceTriggerState {
+	return &o.states
 }
-func (o *DeviceTriggerOptions) SetAutomationType(t string) *DeviceTriggerOptions {
-	o.AutomationType = t
+func (o *DeviceTriggerOptions) AutomationType(t string) *DeviceTriggerOptions {
+	o.automationType = t
 	return o
 }
-func (o *DeviceTriggerOptions) SetPayload(payload string) *DeviceTriggerOptions {
-	o.Payload = payload
+func (o *DeviceTriggerOptions) Payload(payload string) *DeviceTriggerOptions {
+	o.payload = payload
 	return o
 }
-func (o *DeviceTriggerOptions) SetQos(qos int) *DeviceTriggerOptions {
-	o.Qos = qos
+func (o *DeviceTriggerOptions) Qos(qos int) *DeviceTriggerOptions {
+	o.qos = qos
 	return o
 }
-func (o *DeviceTriggerOptions) SetSubtype(subtype string) *DeviceTriggerOptions {
-	o.Subtype = subtype
+func (o *DeviceTriggerOptions) Subtype(subtype string) *DeviceTriggerOptions {
+	o.subtype = subtype
 	return o
 }
-func (o *DeviceTriggerOptions) SetStateFunc(f func() string) *DeviceTriggerOptions {
-	o.StateFunc = f
+func (o *DeviceTriggerOptions) StateFunc(f func() string) *DeviceTriggerOptions {
+	o.stateFunc = f
 	return o
 }
-func (o *DeviceTriggerOptions) SetType(t string) *DeviceTriggerOptions {
-	o.Type = t
+func (o *DeviceTriggerOptions) Type(t string) *DeviceTriggerOptions {
+	o.entityType = t
 	return o
 }
-func (o *DeviceTriggerOptions) SetValueTemplate(template string) *DeviceTriggerOptions {
-	o.ValueTemplate = template
+func (o *DeviceTriggerOptions) ValueTemplate(template string) *DeviceTriggerOptions {
+	o.valueTemplate = template
 	return o
 }

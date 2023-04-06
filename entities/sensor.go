@@ -49,82 +49,82 @@ type Sensor struct {
 func NewSensor(o *SensorOptions) *Sensor {
 	var s Sensor
 
-	s.States = &o.States
-	if !reflect.ValueOf(o.AvailabilityMode).IsZero() {
-		s.AvailabilityMode = &o.AvailabilityMode
+	s.States = &o.states
+	if !reflect.ValueOf(o.availabilityMode).IsZero() {
+		s.AvailabilityMode = &o.availabilityMode
 	}
-	if !reflect.ValueOf(o.AvailabilityTemplate).IsZero() {
-		s.AvailabilityTemplate = &o.AvailabilityTemplate
+	if !reflect.ValueOf(o.availabilityTemplate).IsZero() {
+		s.AvailabilityTemplate = &o.availabilityTemplate
 	}
-	if !reflect.ValueOf(o.AvailabilityFunc).IsZero() {
-		s.availabilityFunc = o.AvailabilityFunc
+	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
+		s.availabilityFunc = o.availabilityFunc
 	}
-	if !reflect.ValueOf(o.DeviceClass).IsZero() {
-		s.DeviceClass = &o.DeviceClass
+	if !reflect.ValueOf(o.deviceClass).IsZero() {
+		s.DeviceClass = &o.deviceClass
 	}
-	if !reflect.ValueOf(o.EnabledByDefault).IsZero() {
-		s.EnabledByDefault = &o.EnabledByDefault
+	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
+		s.EnabledByDefault = &o.enabledByDefault
 	}
-	if !reflect.ValueOf(o.Encoding).IsZero() {
-		s.Encoding = &o.Encoding
+	if !reflect.ValueOf(o.encoding).IsZero() {
+		s.Encoding = &o.encoding
 	}
-	if !reflect.ValueOf(o.EntityCategory).IsZero() {
-		s.EntityCategory = &o.EntityCategory
+	if !reflect.ValueOf(o.entityCategory).IsZero() {
+		s.EntityCategory = &o.entityCategory
 	}
-	if !reflect.ValueOf(o.ExpireAfter).IsZero() {
-		s.ExpireAfter = &o.ExpireAfter
+	if !reflect.ValueOf(o.expireAfter).IsZero() {
+		s.ExpireAfter = &o.expireAfter
 	}
-	if !reflect.ValueOf(o.ForceUpdate).IsZero() {
-		s.ForceUpdate = &o.ForceUpdate
+	if !reflect.ValueOf(o.forceUpdate).IsZero() {
+		s.ForceUpdate = &o.forceUpdate
 	}
-	if !reflect.ValueOf(o.Icon).IsZero() {
-		s.Icon = &o.Icon
+	if !reflect.ValueOf(o.icon).IsZero() {
+		s.Icon = &o.icon
 	}
-	if !reflect.ValueOf(o.JsonAttributesTemplate).IsZero() {
-		s.JsonAttributesTemplate = &o.JsonAttributesTemplate
+	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
+		s.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
-	if !reflect.ValueOf(o.JsonAttributesFunc).IsZero() {
-		s.jsonAttributesFunc = o.JsonAttributesFunc
+	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
+		s.jsonAttributesFunc = o.jsonAttributesFunc
 	}
-	if !reflect.ValueOf(o.LastResetValueTemplate).IsZero() {
-		s.LastResetValueTemplate = &o.LastResetValueTemplate
+	if !reflect.ValueOf(o.lastResetValueTemplate).IsZero() {
+		s.LastResetValueTemplate = &o.lastResetValueTemplate
 	}
-	if !reflect.ValueOf(o.Name).IsZero() {
-		s.Name = &o.Name
+	if !reflect.ValueOf(o.name).IsZero() {
+		s.Name = &o.name
 	}
-	if !reflect.ValueOf(o.ObjectId).IsZero() {
-		s.ObjectId = &o.ObjectId
+	if !reflect.ValueOf(o.objectId).IsZero() {
+		s.ObjectId = &o.objectId
 	}
-	if !reflect.ValueOf(o.PayloadAvailable).IsZero() {
-		s.PayloadAvailable = &o.PayloadAvailable
+	if !reflect.ValueOf(o.payloadAvailable).IsZero() {
+		s.PayloadAvailable = &o.payloadAvailable
 	}
-	if !reflect.ValueOf(o.PayloadNotAvailable).IsZero() {
-		s.PayloadNotAvailable = &o.PayloadNotAvailable
+	if !reflect.ValueOf(o.payloadNotAvailable).IsZero() {
+		s.PayloadNotAvailable = &o.payloadNotAvailable
 	}
-	if !reflect.ValueOf(o.Qos).IsZero() {
-		s.Qos = &o.Qos
+	if !reflect.ValueOf(o.qos).IsZero() {
+		s.Qos = &o.qos
 	}
-	if !reflect.ValueOf(o.StateClass).IsZero() {
-		s.StateClass = &o.StateClass
+	if !reflect.ValueOf(o.stateClass).IsZero() {
+		s.StateClass = &o.stateClass
 	}
-	if !reflect.ValueOf(o.StateFunc).IsZero() {
-		s.stateFunc = o.StateFunc
+	if !reflect.ValueOf(o.stateFunc).IsZero() {
+		s.stateFunc = o.stateFunc
 	} else {
 		s.stateFunc = func() string {
 			return s.States.State
 		}
 	}
-	if !reflect.ValueOf(o.SuggestedDisplayPrecision).IsZero() {
-		s.SuggestedDisplayPrecision = &o.SuggestedDisplayPrecision
+	if !reflect.ValueOf(o.suggestedDisplayPrecision).IsZero() {
+		s.SuggestedDisplayPrecision = &o.suggestedDisplayPrecision
 	}
-	if !reflect.ValueOf(o.UniqueId).IsZero() {
-		s.UniqueId = &o.UniqueId
+	if !reflect.ValueOf(o.uniqueId).IsZero() {
+		s.UniqueId = &o.uniqueId
 	}
-	if !reflect.ValueOf(o.UnitOfMeasurement).IsZero() {
-		s.UnitOfMeasurement = &o.UnitOfMeasurement
+	if !reflect.ValueOf(o.unitOfMeasurement).IsZero() {
+		s.UnitOfMeasurement = &o.unitOfMeasurement
 	}
-	if !reflect.ValueOf(o.ValueTemplate).IsZero() {
-		s.ValueTemplate = &o.ValueTemplate
+	if !reflect.ValueOf(o.valueTemplate).IsZero() {
+		s.ValueTemplate = &o.valueTemplate
 	}
 	return &s
 }
@@ -139,11 +139,11 @@ type SensorState struct {
 	State          string
 }
 
-func (d *Sensor) SetJsonAttributes(s string) {
+func (d *Sensor) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
 }
-func (d *Sensor) SetState(s string) {
+func (d *Sensor) State(s string) {
 	d.States.State = s
 	d.UpdateState()
 }
