@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"github.com/iancoleman/strcase"
 	hass_mqtt "github.com/kjbreil/hass-mqtt"
 	"github.com/kjbreil/hass-mqtt/device"
 	"github.com/kjbreil/hass-mqtt/entities"
@@ -10,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func main() {
@@ -54,23 +51,14 @@ func main() {
 
 	_ = client.Add(d)
 
-	lightName := "TEST LIGHT"
-	uniqueId := strcase.ToDelimited(fmt.Sprintf("%s", lightName), uint8(0x2d))
-
-	type lightState struct {
-		State    string    `json:"state"`
-		LastSeen time.Time `json:"last_seen"`
-	}
-
 	lo := entities.NewLightOptions()
 
 	lo.States().Brightness = "100"
 
 	lo.Name("Test Light").
-		UniqueId(uniqueId).
 		EnableBrightness()
 
-	l := entities.NewLight(lo)
+	l, _ := entities.NewLight(lo)
 
 	err := client.Get("test_light_mqtt").Add(l)
 
@@ -83,21 +71,13 @@ func main() {
 		log.Panicln(err)
 
 	}
-	go func() {
-		ticker := time.NewTicker(time.Second)
-		for range ticker.C {
-			l.UpdateState()
-			//i, _ := strconv.Atoi(l.States.Brightness)
-			//i++
-			//l.SetBrightness(fmt.Sprintf("%d", i))
-		}
-	}()
+
 	l.UpdateState()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	log.Println("Everything is set up")
+	client.Logger().Info("Everything is set up")
 	<-done
 
 	client.Disconnect()

@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -65,7 +66,7 @@ type Humidifier struct {
 	States                        *HumidifierState `json:"-"` // External state update location
 }
 
-func NewHumidifier(o *HumidifierOptions) *Humidifier {
+func NewHumidifier(o *HumidifierOptions) (*Humidifier, error) {
 	var h Humidifier
 
 	h.States = &o.states
@@ -132,6 +133,8 @@ func NewHumidifier(o *HumidifierOptions) *Humidifier {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		h.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		h.ObjectId = &o.objectId
@@ -187,8 +190,11 @@ func NewHumidifier(o *HumidifierOptions) *Humidifier {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		h.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		h.UniqueId = &uniqueId
 	}
-	return &h
+	return &h, nil
 }
 
 type humidifierState struct {
@@ -244,7 +250,7 @@ func (d *Humidifier) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}
@@ -252,7 +258,7 @@ func (d *Humidifier) UpdateState() {
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.JsonAttributes = &state
 		}
@@ -260,7 +266,7 @@ func (d *Humidifier) UpdateState() {
 	if d.ModeStateTopic != nil {
 		state := d.modeStateFunc()
 		if d.states.Mode == nil || state != *d.states.Mode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.ModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.ModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Mode = &state
 		}
@@ -268,7 +274,7 @@ func (d *Humidifier) UpdateState() {
 	if d.StateTopic != nil {
 		state := d.stateFunc()
 		if d.states.State == nil || state != *d.states.State || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.State = &state
 		}
@@ -276,7 +282,7 @@ func (d *Humidifier) UpdateState() {
 	if d.TargetHumidityStateTopic != nil {
 		state := d.targetHumidityStateFunc()
 		if d.states.TargetHumidity == nil || state != *d.states.TargetHumidity || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.TargetHumidityStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.TargetHumidityStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.TargetHumidity = &state
 		}

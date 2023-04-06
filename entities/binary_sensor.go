@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
@@ -45,7 +46,7 @@ type BinarySensor struct {
 	States                 *BinarySensorState `json:"-"` // External state update location
 }
 
-func NewBinarySensor(o *BinarySensorOptions) *BinarySensor {
+func NewBinarySensor(o *BinarySensorOptions) (*BinarySensor, error) {
 	var b BinarySensor
 
 	b.States = &o.states
@@ -87,6 +88,8 @@ func NewBinarySensor(o *BinarySensorOptions) *BinarySensor {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		b.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		b.ObjectId = &o.objectId
@@ -118,11 +121,14 @@ func NewBinarySensor(o *BinarySensorOptions) *BinarySensor {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		b.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		b.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		b.ValueTemplate = &o.valueTemplate
 	}
-	return &b
+	return &b, nil
 }
 
 type binarySensorState struct {

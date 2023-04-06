@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect

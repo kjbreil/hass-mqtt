@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -50,7 +51,7 @@ type Update struct {
 	States                 *UpdateState `json:"-"` // External state update location
 }
 
-func NewUpdate(o *UpdateOptions) *Update {
+func NewUpdate(o *UpdateOptions) (*Update, error) {
 	var u Update
 
 	u.States = &o.states
@@ -102,6 +103,8 @@ func NewUpdate(o *UpdateOptions) *Update {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		u.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		u.ObjectId = &o.objectId
@@ -133,11 +136,14 @@ func NewUpdate(o *UpdateOptions) *Update {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		u.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		u.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		u.ValueTemplate = &o.valueTemplate
 	}
-	return &u
+	return &u, nil
 }
 
 type updateState struct {
@@ -181,7 +187,7 @@ func (d *Update) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}
@@ -189,7 +195,7 @@ func (d *Update) UpdateState() {
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.JsonAttributes = &state
 		}
@@ -197,7 +203,7 @@ func (d *Update) UpdateState() {
 	if d.StateTopic != nil {
 		state := d.stateFunc()
 		if d.states.State == nil || state != *d.states.State || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.State = &state
 		}

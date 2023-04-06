@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
@@ -40,7 +41,7 @@ type DeviceTracker struct {
 	States                 *DeviceTrackerState `json:"-"` // External state update location
 }
 
-func NewDeviceTracker(o *DeviceTrackerOptions) *DeviceTracker {
+func NewDeviceTracker(o *DeviceTrackerOptions) (*DeviceTracker, error) {
 	var d DeviceTracker
 
 	d.States = &o.states
@@ -64,6 +65,8 @@ func NewDeviceTracker(o *DeviceTrackerOptions) *DeviceTracker {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		d.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		d.ObjectId = &o.objectId
@@ -98,11 +101,14 @@ func NewDeviceTracker(o *DeviceTrackerOptions) *DeviceTracker {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		d.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		d.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		d.ValueTemplate = &o.valueTemplate
 	}
-	return &d
+	return &d, nil
 }
 
 type deviceTrackerState struct {

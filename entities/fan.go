@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -72,7 +73,7 @@ type Fan struct {
 	States                     *FanState   `json:"-"` // External state update location
 }
 
-func NewFan(o *FanOptions) *Fan {
+func NewFan(o *FanOptions) (*Fan, error) {
 	var f Fan
 
 	f.States = &o.states
@@ -115,6 +116,8 @@ func NewFan(o *FanOptions) *Fan {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		f.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		f.ObjectId = &o.objectId
@@ -209,8 +212,11 @@ func NewFan(o *FanOptions) *Fan {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		f.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		f.UniqueId = &uniqueId
 	}
-	return &f
+	return &f, nil
 }
 
 type fanState struct {
@@ -272,7 +278,7 @@ func (d *Fan) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}
@@ -280,7 +286,7 @@ func (d *Fan) UpdateState() {
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.JsonAttributes = &state
 		}
@@ -288,7 +294,7 @@ func (d *Fan) UpdateState() {
 	if d.OscillationStateTopic != nil {
 		state := d.oscillationStateFunc()
 		if d.states.Oscillation == nil || state != *d.states.Oscillation || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.OscillationStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.OscillationStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Oscillation = &state
 		}
@@ -296,7 +302,7 @@ func (d *Fan) UpdateState() {
 	if d.PercentageStateTopic != nil {
 		state := d.percentageStateFunc()
 		if d.states.Percentage == nil || state != *d.states.Percentage || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.PercentageStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.PercentageStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Percentage = &state
 		}
@@ -304,7 +310,7 @@ func (d *Fan) UpdateState() {
 	if d.PresetModeStateTopic != nil {
 		state := d.presetModeStateFunc()
 		if d.states.PresetMode == nil || state != *d.states.PresetMode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.PresetModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.PresetModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.PresetMode = &state
 		}
@@ -312,7 +318,7 @@ func (d *Fan) UpdateState() {
 	if d.StateTopic != nil {
 		state := d.stateFunc()
 		if d.states.State == nil || state != *d.states.State || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.StateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.State = &state
 		}

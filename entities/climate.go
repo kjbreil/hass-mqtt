@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -116,7 +117,7 @@ type Climate struct {
 	States                         *ClimateState `json:"-"` // External state update location
 }
 
-func NewClimate(o *ClimateOptions) *Climate {
+func NewClimate(o *ClimateOptions) (*Climate, error) {
 	var c Climate
 
 	c.States = &o.states
@@ -221,6 +222,8 @@ func NewClimate(o *ClimateOptions) *Climate {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		c.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		c.ObjectId = &o.objectId
@@ -335,11 +338,14 @@ func NewClimate(o *ClimateOptions) *Climate {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		c.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		c.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		c.ValueTemplate = &o.valueTemplate
 	}
-	return &c
+	return &c, nil
 }
 
 type climateState struct {
@@ -443,7 +449,7 @@ func (d *Climate) UpdateState() {
 	if d.AuxStateTopic != nil {
 		state := d.auxStateFunc()
 		if d.states.Aux == nil || state != *d.states.Aux || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AuxStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AuxStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Aux = &state
 		}
@@ -451,7 +457,7 @@ func (d *Climate) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}
@@ -459,7 +465,7 @@ func (d *Climate) UpdateState() {
 	if d.CurrentHumidityTopic != nil {
 		state := d.currentHumidityFunc()
 		if d.states.CurrentHumidity == nil || state != *d.states.CurrentHumidity || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.CurrentHumidityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.CurrentHumidityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.CurrentHumidity = &state
 		}
@@ -467,7 +473,7 @@ func (d *Climate) UpdateState() {
 	if d.CurrentTemperatureTopic != nil {
 		state := d.currentTemperatureFunc()
 		if d.states.CurrentTemperature == nil || state != *d.states.CurrentTemperature || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.CurrentTemperatureTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.CurrentTemperatureTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.CurrentTemperature = &state
 		}
@@ -475,7 +481,7 @@ func (d *Climate) UpdateState() {
 	if d.FanModeStateTopic != nil {
 		state := d.fanModeStateFunc()
 		if d.states.FanMode == nil || state != *d.states.FanMode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.FanModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.FanModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.FanMode = &state
 		}
@@ -483,7 +489,7 @@ func (d *Climate) UpdateState() {
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.JsonAttributes = &state
 		}
@@ -491,7 +497,7 @@ func (d *Climate) UpdateState() {
 	if d.ModeStateTopic != nil {
 		state := d.modeStateFunc()
 		if d.states.Mode == nil || state != *d.states.Mode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.ModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.ModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Mode = &state
 		}
@@ -499,7 +505,7 @@ func (d *Climate) UpdateState() {
 	if d.PresetModeStateTopic != nil {
 		state := d.presetModeStateFunc()
 		if d.states.PresetMode == nil || state != *d.states.PresetMode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.PresetModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.PresetModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.PresetMode = &state
 		}
@@ -507,7 +513,7 @@ func (d *Climate) UpdateState() {
 	if d.SwingModeStateTopic != nil {
 		state := d.swingModeStateFunc()
 		if d.states.SwingMode == nil || state != *d.states.SwingMode || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.SwingModeStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.SwingModeStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.SwingMode = &state
 		}
@@ -515,7 +521,7 @@ func (d *Climate) UpdateState() {
 	if d.TargetHumidityStateTopic != nil {
 		state := d.targetHumidityStateFunc()
 		if d.states.TargetHumidity == nil || state != *d.states.TargetHumidity || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.TargetHumidityStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.TargetHumidityStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.TargetHumidity = &state
 		}
@@ -523,7 +529,7 @@ func (d *Climate) UpdateState() {
 	if d.TemperatureHighStateTopic != nil {
 		state := d.temperatureHighStateFunc()
 		if d.states.TemperatureHigh == nil || state != *d.states.TemperatureHigh || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.TemperatureHighStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.TemperatureHighStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.TemperatureHigh = &state
 		}
@@ -531,7 +537,7 @@ func (d *Climate) UpdateState() {
 	if d.TemperatureLowStateTopic != nil {
 		state := d.temperatureLowStateFunc()
 		if d.states.TemperatureLow == nil || state != *d.states.TemperatureLow || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.TemperatureLowStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.TemperatureLowStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.TemperatureLow = &state
 		}
@@ -539,7 +545,7 @@ func (d *Climate) UpdateState() {
 	if d.TemperatureStateTopic != nil {
 		state := d.temperatureStateFunc()
 		if d.states.Temperature == nil || state != *d.states.Temperature || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.TemperatureStateTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.TemperatureStateTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Temperature = &state
 		}

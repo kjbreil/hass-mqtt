@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
@@ -46,7 +47,7 @@ type Sensor struct {
 	States                    *SensorState `json:"-"` // External state update location
 }
 
-func NewSensor(o *SensorOptions) *Sensor {
+func NewSensor(o *SensorOptions) (*Sensor, error) {
 	var s Sensor
 
 	s.States = &o.states
@@ -91,6 +92,8 @@ func NewSensor(o *SensorOptions) *Sensor {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		s.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		s.ObjectId = &o.objectId
@@ -119,6 +122,9 @@ func NewSensor(o *SensorOptions) *Sensor {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		s.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		s.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.unitOfMeasurement).IsZero() {
 		s.UnitOfMeasurement = &o.unitOfMeasurement
@@ -126,7 +132,7 @@ func NewSensor(o *SensorOptions) *Sensor {
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		s.ValueTemplate = &o.valueTemplate
 	}
-	return &s
+	return &s, nil
 }
 
 type sensorState struct {

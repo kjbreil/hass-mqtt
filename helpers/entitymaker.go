@@ -76,7 +76,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 		external[d.Name].Func().
 			Id(fmt.Sprintf("New%s", camelName)).
 			Params(jen.Id("o").Op("*").Id(optionsCamelName)).
-			Params(jen.Op("*").Id(camelName)).
+			Params(jen.Op("*").Id(camelName), jen.Error()).
 			BlockFunc(func(g *jen.Group) {
 				g.Add(jen.Var().Id(firstLetter).Id(camelName))
 				g.Add(jen.Line())
@@ -89,10 +89,23 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 					}
 					v := st[key]
 					if v.main != nil && !v.main.topic {
+						var el *jen.Statement
+						switch v.main.lowerCamelName {
+						case "name":
+							el = jen.Else().Block(
+								jen.Return(jen.Id("nil"), jen.Qual("fmt", "Errorf").Params(jen.Lit("name not defined"))),
+							)
+						case "uniqueId":
+							el = jen.Else().Block(
+								jen.Id("uniqueId").Op(":=").Qual("github.com/iancoleman/strcase", "ToDelimited").Params(jen.Id("o").Dot("name"), jen.Id("uint8(0x2d)")),
+								jen.Id(firstLetter).Dot(v.main.camelName).Op("=").Op("&").Id("uniqueId"),
+							)
+						}
+
 						g.Add(
 							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.main.lowerCamelName)).Dot("IsZero").Params()).Block(
 								jen.Id(firstLetter).Dot(v.main.camelName).Op("=").Op("&").Id("o").Dot(v.main.lowerCamelName),
-							),
+							).Add(el),
 						)
 					}
 					if v.setter != nil {
@@ -132,7 +145,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				}
 				// setup the state
 
-				g.Add(jen.Return(jen.Op("&").Id(firstLetter)))
+				g.Add(jen.Return(jen.Op("&").Id(firstLetter), jen.Id("nil")))
 			})
 
 		external[d.Name].Type().Id(internalStateTypeName).StructFunc(func(g *jen.Group) {
@@ -302,11 +315,11 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 													g.Add(jen.Lit(2))
 												}
 
-												if d.JSONContainer.Exists("retain") {
-													g.Add(jen.Op("*").Id("d").Dot("Retain"))
-												} else {
-													g.Add(jen.Lit(true))
-												}
+												//if d.JSONContainer.Exists("retain") && cam != "AvailabilityTopic" {
+												//	g.Add(jen.Op("*").Id("d").Dot("Retain"))
+												//} else {
+												g.Add(jen.Lit(true))
+												//}
 
 												g.Add(jen.Id("state"))
 											},

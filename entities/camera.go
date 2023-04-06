@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
@@ -36,7 +37,7 @@ type Camera struct {
 	States                 *CameraState `json:"-"` // External state update location
 }
 
-func NewCamera(o *CameraOptions) *Camera {
+func NewCamera(o *CameraOptions) (*Camera, error) {
 	var c Camera
 
 	c.States = &o.states
@@ -72,6 +73,8 @@ func NewCamera(o *CameraOptions) *Camera {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		c.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		c.ObjectId = &o.objectId
@@ -85,8 +88,11 @@ func NewCamera(o *CameraOptions) *Camera {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		c.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		c.UniqueId = &uniqueId
 	}
-	return &c
+	return &c, nil
 }
 
 type cameraState struct {

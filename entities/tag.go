@@ -21,7 +21,7 @@ type Tag struct {
 	States        *TagState   `json:"-"` // External state update location
 }
 
-func NewTag(o *TagOptions) *Tag {
+func NewTag(o *TagOptions) (*Tag, error) {
 	var t Tag
 
 	t.States = &o.states
@@ -35,7 +35,7 @@ func NewTag(o *TagOptions) *Tag {
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		t.ValueTemplate = &o.valueTemplate
 	}
-	return &t
+	return &t, nil
 }
 
 type tagState struct {

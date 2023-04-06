@@ -26,7 +26,7 @@ type DeviceTrigger struct {
 	States         *DeviceTriggerState `json:"-"` // External state update location
 }
 
-func NewDeviceTrigger(o *DeviceTriggerOptions) *DeviceTrigger {
+func NewDeviceTrigger(o *DeviceTriggerOptions) (*DeviceTrigger, error) {
 	var d DeviceTrigger
 
 	d.States = &o.states
@@ -55,7 +55,7 @@ func NewDeviceTrigger(o *DeviceTriggerOptions) *DeviceTrigger {
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
 		d.ValueTemplate = &o.valueTemplate
 	}
-	return &d
+	return &d, nil
 }
 
 type deviceTriggerState struct {

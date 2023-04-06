@@ -5,10 +5,11 @@ package hass_mqtt
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/logr/funcr"
 	"github.com/iancoleman/strcase"
 	"github.com/kjbreil/hass-mqtt/device"
 	"github.com/kjbreil/hass-mqtt/entities"
-	"log"
 	"path/filepath"
 	"time"
 )
@@ -19,6 +20,7 @@ type Client struct {
 	OnConnect func(client mqtt.Client)
 	devices   map[string]*device.Device // Device Identifiers map to devices
 	mqtt      mqtt.Client
+	logger    logr.Logger
 }
 
 type Config struct {
@@ -33,13 +35,21 @@ type Config struct {
 }
 
 func NewClient(c Config) (*Client, error) {
-
+	return NewClientWithLogger(c, defaultLogger())
+}
+func NewClientWithLogger(c Config, logger logr.Logger) (*Client, error) {
+	// TODO: Validate Config
 	client := &Client{
 		NodeID:  strcase.ToDelimited(c.NodeID, uint8(0x2d)),
 		config:  c,
 		devices: make(map[string]*device.Device),
+		logger:  logger,
 	}
 	return client, nil
+}
+
+func (c *Client) Logger() *logr.Logger {
+	return &c.logger
 }
 
 var (
@@ -60,15 +70,19 @@ func (c *Client) Connect() error {
 			return err
 		}
 	}
-
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", c.config.MQTT.Host, c.config.MQTT.Port))
 	opts.SetClientID(c.NodeID)
 	opts.SetOrderMatters(false)
 	opts.SetKeepAlive(30 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		log.Printf("Received message on Default Handler: %s from topic: %s\n", msg.Payload(), filepath.Base(msg.Topic()))
+		c.logger.Info(fmt.Sprintf("Received message on Default Handler: %s from topic: %s", msg.Payload(), filepath.Base(msg.Topic())))
 	})
+
+	mqtt.ERROR = newLogError(c.logger, 0)
+	mqtt.CRITICAL = newLogError(c.logger, 2)
+	mqtt.WARN = newLogInfo(c.logger, 2)
+	mqtt.DEBUG = newLogInfo(c.logger, 10)
 
 	opts.SetOnConnectHandler(
 		func(client mqtt.Client) {
@@ -81,7 +95,7 @@ func (c *Client) Connect() error {
 		},
 	)
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
-		log.Println("MQTT connection lost")
+		c.logger.V(0).Info("MQTT connection lost")
 	}
 
 	c.mqtt = mqtt.NewClient(opts)
@@ -115,4 +129,15 @@ func (c *Client) Disconnect() {
 	for _, d := range c.devices {
 		d.UnSubscribe()
 	}
+}
+
+func defaultLogger() logr.Logger {
+	log := funcr.New(
+		func(pfx, args string) { fmt.Println(pfx, args) },
+		funcr.Options{
+			LogCaller:    funcr.None,
+			LogTimestamp: true,
+			Verbosity:    1,
+		})
+	return log.WithName("hass-ws")
 }

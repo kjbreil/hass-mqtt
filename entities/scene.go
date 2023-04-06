@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -36,7 +37,7 @@ type Scene struct {
 	States               *SceneState `json:"-"` // External state update location
 }
 
-func NewScene(o *SceneOptions) *Scene {
+func NewScene(o *SceneOptions) (*Scene, error) {
 	var s Scene
 
 	s.States = &o.states
@@ -60,6 +61,8 @@ func NewScene(o *SceneOptions) *Scene {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		s.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		s.ObjectId = &o.objectId
@@ -81,8 +84,11 @@ func NewScene(o *SceneOptions) *Scene {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		s.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		s.UniqueId = &uniqueId
 	}
-	return &s
+	return &s, nil
 }
 
 type sceneState struct {
@@ -107,7 +113,7 @@ func (d *Scene) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}

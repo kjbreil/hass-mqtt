@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	strcase "github.com/iancoleman/strcase"
 	common "github.com/kjbreil/hass-mqtt/common"
@@ -43,7 +44,7 @@ type Button struct {
 	States                 *ButtonState `json:"-"` // External state update location
 }
 
-func NewButton(o *ButtonOptions) *Button {
+func NewButton(o *ButtonOptions) (*Button, error) {
 	var b Button
 
 	b.States = &o.states
@@ -82,6 +83,8 @@ func NewButton(o *ButtonOptions) *Button {
 	}
 	if !reflect.ValueOf(o.name).IsZero() {
 		b.Name = &o.name
+	} else {
+		return nil, fmt.Errorf("name not defined")
 	}
 	if !reflect.ValueOf(o.objectId).IsZero() {
 		b.ObjectId = &o.objectId
@@ -103,8 +106,11 @@ func NewButton(o *ButtonOptions) *Button {
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		b.UniqueId = &o.uniqueId
+	} else {
+		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		b.UniqueId = &uniqueId
 	}
-	return &b
+	return &b, nil
 }
 
 type buttonState struct {
@@ -142,7 +148,7 @@ func (d *Button) UpdateState() {
 	if d.AvailabilityTopic != nil {
 		state := d.availabilityFunc()
 		if d.states.Availability == nil || state != *d.states.Availability || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.AvailabilityTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.Availability = &state
 		}
@@ -150,7 +156,7 @@ func (d *Button) UpdateState() {
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
-			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), *d.Retain, state)
+			token := (*d.MQTT.Client).Publish(*d.JsonAttributesTopic, byte(*d.Qos), true, state)
 			token.WaitTimeout(common.WaitTimeout)
 			d.states.JsonAttributes = &state
 		}
