@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -296,6 +297,7 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		l.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.whiteCommandFunc).IsZero() {
@@ -399,6 +401,9 @@ func (d *Light) AddMessageHandler() {
 }
 func (d *Light) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Light) GetDomainEntity() string {
+	return fmt.Sprintf("light.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Light) GetName() string {
 	return *d.Name

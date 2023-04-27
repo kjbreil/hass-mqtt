@@ -79,9 +79,9 @@ func (c *Client) Connect() error {
 		c.logger.Info(fmt.Sprintf("Received message on Default Handler: %s from topic: %s", msg.Payload(), filepath.Base(msg.Topic())))
 	})
 
-	mqtt.ERROR = newLogError(c.logger, 0)
-	mqtt.CRITICAL = newLogError(c.logger, 2)
-	mqtt.WARN = newLogInfo(c.logger, 2)
+	mqtt.ERROR = newLogError(c.logger, 1)
+	mqtt.CRITICAL = newLogError(c.logger, 5)
+	mqtt.WARN = newLogInfo(c.logger, 8)
 	mqtt.DEBUG = newLogInfo(c.logger, 10)
 
 	opts.SetOnConnectHandler(
@@ -129,6 +129,20 @@ func (c *Client) Disconnect() {
 	for _, d := range c.devices {
 		d.UnSubscribe()
 	}
+}
+
+// Subscribe is a pass-through of MQTT Subscribe
+func (c *Client) Subscribe(topic string, qos byte, callback mqtt.MessageHandler) mqtt.Token {
+	return c.mqtt.Subscribe(topic, qos, callback)
+}
+
+// Unsubscribe is a pass-through of MQTT Unsubscribe
+func (c *Client) Unsubscribe(topics ...string) mqtt.Token {
+	return c.mqtt.Unsubscribe(topics...)
+}
+
+func (c *Client) Publish(topic string, qos byte, retained bool, payload interface{}) mqtt.Token {
+	return c.mqtt.Publish(topic, qos, retained, payload)
 }
 
 func defaultLogger() logr.Logger {

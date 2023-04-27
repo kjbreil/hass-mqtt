@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -161,6 +162,7 @@ func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, erro
 		a.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		a.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
@@ -195,6 +197,9 @@ func (d *AlarmControlPanel) AddMessageHandler() {
 }
 func (d *AlarmControlPanel) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *AlarmControlPanel) GetDomainEntity() string {
+	return fmt.Sprintf("alarm_control_panel.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *AlarmControlPanel) GetName() string {
 	return *d.Name

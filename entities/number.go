@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -134,6 +135,7 @@ func NewNumber(o *NumberOptions) (*Number, error) {
 		n.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		n.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.unitOfMeasurement).IsZero() {
@@ -171,6 +173,9 @@ func (d *Number) AddMessageHandler() {
 }
 func (d *Number) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Number) GetDomainEntity() string {
+	return fmt.Sprintf("number.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Number) GetName() string {
 	return *d.Name

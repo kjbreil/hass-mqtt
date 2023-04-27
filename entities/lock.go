@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -157,6 +158,7 @@ func NewLock(o *LockOptions) (*Lock, error) {
 		l.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		l.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
@@ -191,6 +193,9 @@ func (d *Lock) AddMessageHandler() {
 }
 func (d *Lock) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Lock) GetDomainEntity() string {
+	return fmt.Sprintf("lock.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Lock) GetName() string {
 	return *d.Name

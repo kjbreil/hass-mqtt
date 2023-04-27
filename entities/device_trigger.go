@@ -78,6 +78,9 @@ func (d *DeviceTrigger) AddMessageHandler() {
 func (d DeviceTrigger) GetUniqueId() string {
 	return ""
 }
+func (d DeviceTrigger) GetDomainEntity() string {
+	return ""
+}
 func (d DeviceTrigger) GetName() string {
 	return ""
 }

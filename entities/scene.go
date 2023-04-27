@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -50,6 +51,9 @@ func NewScene(o *SceneOptions) (*Scene, error) {
 	if !reflect.ValueOf(o.availabilityFunc).IsZero() {
 		s.availabilityFunc = o.availabilityFunc
 	}
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		s.commandFunc = o.commandFunc
+	}
 	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
 		s.EnabledByDefault = &o.enabledByDefault
 	}
@@ -86,6 +90,7 @@ func NewScene(o *SceneOptions) (*Scene, error) {
 		s.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		s.UniqueId = &uniqueId
 	}
 	return &s, nil
@@ -104,6 +109,9 @@ func (d *Scene) AddMessageHandler() {
 }
 func (d *Scene) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Scene) GetDomainEntity() string {
+	return fmt.Sprintf("scene.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Scene) GetName() string {
 	return *d.Name

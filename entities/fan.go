@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -214,6 +215,7 @@ func NewFan(o *FanOptions) (*Fan, error) {
 		f.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		f.UniqueId = &uniqueId
 	}
 	return &f, nil
@@ -263,6 +265,9 @@ func (d *Fan) AddMessageHandler() {
 }
 func (d *Fan) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Fan) GetDomainEntity() string {
+	return fmt.Sprintf("fan.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Fan) GetName() string {
 	return *d.Name

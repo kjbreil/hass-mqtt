@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -60,6 +61,9 @@ func NewButton(o *ButtonOptions) (*Button, error) {
 	if !reflect.ValueOf(o.commandTemplate).IsZero() {
 		b.CommandTemplate = &o.commandTemplate
 	}
+	if !reflect.ValueOf(o.commandFunc).IsZero() {
+		b.commandFunc = o.commandFunc
+	}
 	if !reflect.ValueOf(o.deviceClass).IsZero() {
 		b.DeviceClass = &o.deviceClass
 	}
@@ -108,6 +112,7 @@ func NewButton(o *ButtonOptions) (*Button, error) {
 		b.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		b.UniqueId = &uniqueId
 	}
 	return &b, nil
@@ -133,6 +138,9 @@ func (d *Button) AddMessageHandler() {
 }
 func (d *Button) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Button) GetDomainEntity() string {
+	return fmt.Sprintf("button.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Button) GetName() string {
 	return *d.Name

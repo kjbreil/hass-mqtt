@@ -7,6 +7,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -103,6 +104,7 @@ func NewDeviceTracker(o *DeviceTrackerOptions) (*DeviceTracker, error) {
 		d.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		d.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
@@ -137,6 +139,9 @@ func (d *DeviceTracker) AddMessageHandler() {
 }
 func (d *DeviceTracker) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *DeviceTracker) GetDomainEntity() string {
+	return fmt.Sprintf("device_tracker.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *DeviceTracker) GetName() string {
 	return *d.Name

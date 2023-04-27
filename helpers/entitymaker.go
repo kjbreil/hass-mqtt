@@ -98,6 +98,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 						case "uniqueId":
 							el = jen.Else().Block(
 								jen.Id("uniqueId").Op(":=").Qual("github.com/iancoleman/strcase", "ToDelimited").Params(jen.Id("o").Dot("name"), jen.Id("uint8(0x2d)")),
+								jen.Id("uniqueId").Op("=").Qual("strings", "ReplaceAll").Params(jen.Id("uniqueId"), jen.Lit("'"), jen.Lit("_")),
 								jen.Id(firstLetter).Dot(v.main.camelName).Op("=").Op("&").Id("uniqueId"),
 							)
 						}
@@ -120,20 +121,19 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 						}
 
 						if v.setter.lowerCamelName == "commandFunc" {
-							if _, ok := st["state_topic"]; !ok {
-								continue
+							if _, ok := st["state_topic"]; ok {
+								el = jen.Else().Block(
+									jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params(
+										jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
+										jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
+									).Block(
+
+										jen.Id("o").Dot("states").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+
+										//jen.Id("l").Dot("UpdateState").Params(),
+									),
+								)
 							}
-							el = jen.Else().Block(
-								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params(
-									jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
-									jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
-								).Block(
-
-									jen.Id("o").Dot("states").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
-
-									//jen.Id("l").Dot("UpdateState").Params(),
-								),
-							)
 						}
 						g.Add(
 							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.lowerCamelName)).Dot("IsZero").Params()).Block(
@@ -229,6 +229,26 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				jen.Return(jen.Lit("")),
 			)
 		}
+		// d.GetDomainEntity()
+		if d.JSONContainer.Exists("unique_id") {
+			external[d.Name].Func().Params(
+				jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
+			).Id("GetDomainEntity").Params().String().Block(
+
+				jen.Return(jen.Qual("fmt", "Sprintf").
+					Params(jen.Lit(
+						fmt.Sprintf("%s.%s", d.Name, "%s")),
+						jen.Qual("strings", "ReplaceAll").Params(jen.Op("*").Id("d").Dot("UniqueId"), jen.Lit("-"), jen.Lit("_")),
+					)),
+			)
+		} else {
+			external[d.Name].Func().Params(
+				jen.Id("d").Id(strcase.ToCamel(d.Name)),
+			).Id("GetDomainEntity").Params().String().Block(
+				jen.Return(jen.Lit("")),
+			)
+		}
+
 		// d.GetName()
 		if d.JSONContainer.Exists("unique_id") {
 			external[d.Name].Func().Params(
@@ -520,6 +540,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 									jen.Op("*").Id("d").Dot("Name"),
 									jen.Lit(uint8('-')),
 								))
+
 						},
 					),
 				)

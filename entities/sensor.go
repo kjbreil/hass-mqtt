@@ -7,6 +7,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -124,6 +125,7 @@ func NewSensor(o *SensorOptions) (*Sensor, error) {
 		s.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		s.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.unitOfMeasurement).IsZero() {
@@ -161,6 +163,9 @@ func (d *Sensor) AddMessageHandler() {
 }
 func (d *Sensor) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Sensor) GetDomainEntity() string {
+	return fmt.Sprintf("sensor.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Sensor) GetName() string {
 	return *d.Name

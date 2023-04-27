@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -117,6 +118,7 @@ func NewSelect(o *SelectOptions) (*Select, error) {
 		s.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		s.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
@@ -151,6 +153,9 @@ func (d *Select) AddMessageHandler() {
 }
 func (d *Select) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Select) GetDomainEntity() string {
+	return fmt.Sprintf("select.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Select) GetName() string {
 	return *d.Name

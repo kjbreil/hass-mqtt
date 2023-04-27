@@ -8,6 +8,7 @@ import "encoding/json"
 type Entity interface {
 	GetRawId() string
 	GetUniqueId() string
+	GetDomainEntity() string
 	GetName() string
 	PopulateDevice(Manufacturer string, SoftwareName string, InstanceName string, SWVersion string, Identifier string)
 	UpdateState()

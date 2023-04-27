@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -340,6 +341,7 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		c.UniqueId = &uniqueId
 	}
 	if !reflect.ValueOf(o.valueTemplate).IsZero() {
@@ -434,6 +436,9 @@ func (d *Climate) AddMessageHandler() {
 }
 func (d *Climate) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Climate) GetDomainEntity() string {
+	return fmt.Sprintf("climate.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Climate) GetName() string {
 	return *d.Name

@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -156,6 +157,7 @@ func NewSiren(o *SirenOptions) (*Siren, error) {
 		s.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		s.UniqueId = &uniqueId
 	}
 	return &s, nil
@@ -187,6 +189,9 @@ func (d *Siren) AddMessageHandler() {
 }
 func (d *Siren) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Siren) GetDomainEntity() string {
+	return fmt.Sprintf("siren.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Siren) GetName() string {
 	return *d.Name

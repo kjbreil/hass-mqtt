@@ -7,6 +7,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -90,6 +91,7 @@ func NewCamera(o *CameraOptions) (*Camera, error) {
 		c.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		c.UniqueId = &uniqueId
 	}
 	return &c, nil
@@ -121,6 +123,9 @@ func (d *Camera) AddMessageHandler() {
 }
 func (d *Camera) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Camera) GetDomainEntity() string {
+	return fmt.Sprintf("camera.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Camera) GetName() string {
 	return *d.Name

@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -192,6 +193,7 @@ func NewHumidifier(o *HumidifierOptions) (*Humidifier, error) {
 		h.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		h.UniqueId = &uniqueId
 	}
 	return &h, nil
@@ -235,6 +237,9 @@ func (d *Humidifier) AddMessageHandler() {
 }
 func (d *Humidifier) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Humidifier) GetDomainEntity() string {
+	return fmt.Sprintf("humidifier.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Humidifier) GetName() string {
 	return *d.Name

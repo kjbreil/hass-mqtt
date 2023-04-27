@@ -58,6 +58,9 @@ func (d *Tag) AddMessageHandler() {
 func (d Tag) GetUniqueId() string {
 	return ""
 }
+func (d Tag) GetDomainEntity() string {
+	return ""
+}
 func (d Tag) GetName() string {
 	return ""
 }

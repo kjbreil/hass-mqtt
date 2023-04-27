@@ -8,6 +8,7 @@ import (
 	common "github.com/kjbreil/hass-mqtt/common"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -146,6 +147,7 @@ func NewVacuum(o *VacuumOptions) (*Vacuum, error) {
 		v.UniqueId = &o.uniqueId
 	} else {
 		uniqueId := strcase.ToDelimited(o.name, uint8(0x2d))
+		uniqueId = strings.ReplaceAll(uniqueId, "'", "_")
 		v.UniqueId = &uniqueId
 	}
 	return &v, nil
@@ -177,6 +179,9 @@ func (d *Vacuum) AddMessageHandler() {
 }
 func (d *Vacuum) GetUniqueId() string {
 	return *d.UniqueId
+}
+func (d *Vacuum) GetDomainEntity() string {
+	return fmt.Sprintf("vacuum.%s", strings.ReplaceAll(*d.UniqueId, "-", "_"))
 }
 func (d *Vacuum) GetName() string {
 	return *d.Name
