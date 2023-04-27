@@ -66,7 +66,14 @@ func NewUpdate(o *UpdateOptions) (*Update, error) {
 		u.availabilityFunc = o.availabilityFunc
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		u.commandFunc = o.commandFunc
+		u.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			u.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		u.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())

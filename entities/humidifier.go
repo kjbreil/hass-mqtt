@@ -84,7 +84,14 @@ func NewHumidifier(o *HumidifierOptions) (*Humidifier, error) {
 		h.CommandTemplate = &o.commandTemplate
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		h.commandFunc = o.commandFunc
+		h.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			h.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		h.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())
@@ -121,7 +128,14 @@ func NewHumidifier(o *HumidifierOptions) (*Humidifier, error) {
 		h.ModeCommandTemplate = &o.modeCommandTemplate
 	}
 	if !reflect.ValueOf(o.modeCommandFunc).IsZero() {
-		h.modeCommandFunc = o.modeCommandFunc
+		h.modeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Mode == string(message.Payload()) {
+				return
+			}
+			o.states.Mode = string(message.Payload())
+			h.UpdateState()
+			o.modeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.modeStateTemplate).IsZero() {
 		h.ModeStateTemplate = &o.modeStateTemplate
@@ -181,7 +195,14 @@ func NewHumidifier(o *HumidifierOptions) (*Humidifier, error) {
 		h.TargetHumidityCommandTemplate = &o.targetHumidityCommandTemplate
 	}
 	if !reflect.ValueOf(o.targetHumidityCommandFunc).IsZero() {
-		h.targetHumidityCommandFunc = o.targetHumidityCommandFunc
+		h.targetHumidityCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.TargetHumidity == string(message.Payload()) {
+				return
+			}
+			o.states.TargetHumidity = string(message.Payload())
+			h.UpdateState()
+			o.targetHumidityCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.targetHumidityStateTemplate).IsZero() {
 		h.TargetHumidityStateTemplate = &o.targetHumidityStateTemplate

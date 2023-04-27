@@ -129,7 +129,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.actionFunc = o.actionFunc
 	}
 	if !reflect.ValueOf(o.auxCommandFunc).IsZero() {
-		c.auxCommandFunc = o.auxCommandFunc
+		c.auxCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Aux == string(message.Payload()) {
+				return
+			}
+			o.states.Aux = string(message.Payload())
+			c.UpdateState()
+			o.auxCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.auxStateTemplate).IsZero() {
 		c.AuxStateTemplate = &o.auxStateTemplate
@@ -171,7 +178,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.FanModeCommandTemplate = &o.fanModeCommandTemplate
 	}
 	if !reflect.ValueOf(o.fanModeCommandFunc).IsZero() {
-		c.fanModeCommandFunc = o.fanModeCommandFunc
+		c.fanModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.FanMode == string(message.Payload()) {
+				return
+			}
+			o.states.FanMode = string(message.Payload())
+			c.UpdateState()
+			o.fanModeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.fanModeStateTemplate).IsZero() {
 		c.FanModeStateTemplate = &o.fanModeStateTemplate
@@ -210,7 +224,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.ModeCommandTemplate = &o.modeCommandTemplate
 	}
 	if !reflect.ValueOf(o.modeCommandFunc).IsZero() {
-		c.modeCommandFunc = o.modeCommandFunc
+		c.modeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Mode == string(message.Payload()) {
+				return
+			}
+			o.states.Mode = string(message.Payload())
+			c.UpdateState()
+			o.modeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.modeStateTemplate).IsZero() {
 		c.ModeStateTemplate = &o.modeStateTemplate
@@ -251,7 +272,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.PresetModeCommandTemplate = &o.presetModeCommandTemplate
 	}
 	if !reflect.ValueOf(o.presetModeCommandFunc).IsZero() {
-		c.presetModeCommandFunc = o.presetModeCommandFunc
+		c.presetModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.PresetMode == string(message.Payload()) {
+				return
+			}
+			o.states.PresetMode = string(message.Payload())
+			c.UpdateState()
+			o.presetModeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.presetModeStateFunc).IsZero() {
 		c.presetModeStateFunc = o.presetModeStateFunc
@@ -272,7 +300,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.SwingModeCommandTemplate = &o.swingModeCommandTemplate
 	}
 	if !reflect.ValueOf(o.swingModeCommandFunc).IsZero() {
-		c.swingModeCommandFunc = o.swingModeCommandFunc
+		c.swingModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.SwingMode == string(message.Payload()) {
+				return
+			}
+			o.states.SwingMode = string(message.Payload())
+			c.UpdateState()
+			o.swingModeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.swingModeStateTemplate).IsZero() {
 		c.SwingModeStateTemplate = &o.swingModeStateTemplate
@@ -287,7 +322,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.TargetHumidityCommandTemplate = &o.targetHumidityCommandTemplate
 	}
 	if !reflect.ValueOf(o.targetHumidityCommandFunc).IsZero() {
-		c.targetHumidityCommandFunc = o.targetHumidityCommandFunc
+		c.targetHumidityCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.TargetHumidity == string(message.Payload()) {
+				return
+			}
+			o.states.TargetHumidity = string(message.Payload())
+			c.UpdateState()
+			o.targetHumidityCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.targetHumidityStateTemplate).IsZero() {
 		c.TargetHumidityStateTemplate = &o.targetHumidityStateTemplate
@@ -302,13 +344,27 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.TemperatureCommandTemplate = &o.temperatureCommandTemplate
 	}
 	if !reflect.ValueOf(o.temperatureCommandFunc).IsZero() {
-		c.temperatureCommandFunc = o.temperatureCommandFunc
+		c.temperatureCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Temperature == string(message.Payload()) {
+				return
+			}
+			o.states.Temperature = string(message.Payload())
+			c.UpdateState()
+			o.temperatureCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.temperatureHighCommandTemplate).IsZero() {
 		c.TemperatureHighCommandTemplate = &o.temperatureHighCommandTemplate
 	}
 	if !reflect.ValueOf(o.temperatureHighCommandFunc).IsZero() {
-		c.temperatureHighCommandFunc = o.temperatureHighCommandFunc
+		c.temperatureHighCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.TemperatureHigh == string(message.Payload()) {
+				return
+			}
+			o.states.TemperatureHigh = string(message.Payload())
+			c.UpdateState()
+			o.temperatureHighCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.temperatureHighStateTemplate).IsZero() {
 		c.TemperatureHighStateTemplate = &o.temperatureHighStateTemplate
@@ -320,7 +376,14 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 		c.TemperatureLowCommandTemplate = &o.temperatureLowCommandTemplate
 	}
 	if !reflect.ValueOf(o.temperatureLowCommandFunc).IsZero() {
-		c.temperatureLowCommandFunc = o.temperatureLowCommandFunc
+		c.temperatureLowCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.TemperatureLow == string(message.Payload()) {
+				return
+			}
+			o.states.TemperatureLow = string(message.Payload())
+			c.UpdateState()
+			o.temperatureLowCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.temperatureLowStateTemplate).IsZero() {
 		c.TemperatureLowStateTemplate = &o.temperatureLowStateTemplate

@@ -76,7 +76,14 @@ func NewLock(o *LockOptions) (*Lock, error) {
 		l.CommandTemplate = &o.commandTemplate
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		l.commandFunc = o.commandFunc
+		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			l.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())

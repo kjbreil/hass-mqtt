@@ -86,7 +86,14 @@ func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, erro
 		a.CommandTemplate = &o.commandTemplate
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		a.commandFunc = o.commandFunc
+		a.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			a.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		a.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())

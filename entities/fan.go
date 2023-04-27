@@ -91,7 +91,14 @@ func NewFan(o *FanOptions) (*Fan, error) {
 		f.CommandTemplate = &o.commandTemplate
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		f.commandFunc = o.commandFunc
+		f.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			f.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		f.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())
@@ -130,7 +137,14 @@ func NewFan(o *FanOptions) (*Fan, error) {
 		f.OscillationCommandTemplate = &o.oscillationCommandTemplate
 	}
 	if !reflect.ValueOf(o.oscillationCommandFunc).IsZero() {
-		f.oscillationCommandFunc = o.oscillationCommandFunc
+		f.oscillationCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Oscillation == string(message.Payload()) {
+				return
+			}
+			o.states.Oscillation = string(message.Payload())
+			f.UpdateState()
+			o.oscillationCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.oscillationStateFunc).IsZero() {
 		f.oscillationStateFunc = o.oscillationStateFunc
@@ -166,7 +180,14 @@ func NewFan(o *FanOptions) (*Fan, error) {
 		f.PercentageCommandTemplate = &o.percentageCommandTemplate
 	}
 	if !reflect.ValueOf(o.percentageCommandFunc).IsZero() {
-		f.percentageCommandFunc = o.percentageCommandFunc
+		f.percentageCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Percentage == string(message.Payload()) {
+				return
+			}
+			o.states.Percentage = string(message.Payload())
+			f.UpdateState()
+			o.percentageCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.percentageStateFunc).IsZero() {
 		f.percentageStateFunc = o.percentageStateFunc
@@ -178,7 +199,14 @@ func NewFan(o *FanOptions) (*Fan, error) {
 		f.PresetModeCommandTemplate = &o.presetModeCommandTemplate
 	}
 	if !reflect.ValueOf(o.presetModeCommandFunc).IsZero() {
-		f.presetModeCommandFunc = o.presetModeCommandFunc
+		f.presetModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.PresetMode == string(message.Payload()) {
+				return
+			}
+			o.states.PresetMode = string(message.Payload())
+			f.UpdateState()
+			o.presetModeCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.presetModeStateFunc).IsZero() {
 		f.presetModeStateFunc = o.presetModeStateFunc

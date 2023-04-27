@@ -73,6 +73,23 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 			},
 		)
 
+		stateObjects := make(map[string]struct{})
+
+		for _, key := range sortedKeys {
+			if key == "device" {
+				continue
+			}
+			v := st[key]
+			if v.main != nil && v.main.topic && !v.main.command {
+				stateName := strings.TrimSuffix(v.main.stripTopic, "State")
+				if stateName == "" {
+					stateName = v.main.stripTopic
+				}
+				stateObjects[stateName] = struct{}{}
+			}
+
+		}
+
 		external[d.Name].Func().
 			Id(fmt.Sprintf("New%s", camelName)).
 			Params(jen.Id("o").Op("*").Id(optionsCamelName)).
@@ -135,11 +152,43 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 								)
 							}
 						}
-						g.Add(
-							jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.lowerCamelName)).Dot("IsZero").Params()).Block(
-								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Id("o").Dot(v.setter.lowerCamelName),
-							).Add(el),
-						)
+						//&& v.main != nil && v.main.topic && !v.main.command
+						var hasState bool
+						var stateName string
+						if v.main != nil {
+							stateName = strings.TrimSuffix(v.main.stripTopic, "Command")
+							if stateName == "" {
+								stateName = "State"
+							}
+							_, hasState = stateObjects[stateName]
+						}
+						if v.setter.command && hasState {
+							g.Add(
+								jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.lowerCamelName)).Dot("IsZero").Params()).Block(
+									jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").
+										Func().Params(
+										jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
+										jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
+									).Block(
+										//jen.If(jen.Id("o").Dot("states").Dot(stateName).Op("==").String().Id("message").Dot("Payload").Params()),
+										jen.If(jen.Id("o").Dot("states").Dot(stateName).Op("==").String().Params(jen.Id("message").Dot("Payload").Params())).Block(
+											jen.Return(),
+										),
+										jen.Id("o").Dot("states").Dot(stateName).Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
+										jen.Id(firstLetter).Dot("UpdateState").Params(),
+										jen.Id("o").Dot(v.setter.lowerCamelName).Params(jen.Id("message"), jen.Id("client")),
+									),
+								).Add(el),
+							)
+						} else {
+							g.Add(
+								jen.If(jen.Op("!").Qual("reflect", "ValueOf").Params(jen.Id("o").Dot(v.setter.lowerCamelName)).Dot("IsZero").Params()).Block(
+									jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Id("o").Dot(v.setter.lowerCamelName),
+								).Add(el),
+							)
+
+						}
+
 					}
 
 				}

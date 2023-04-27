@@ -125,7 +125,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.BrightnessCommandTemplate = &o.brightnessCommandTemplate
 	}
 	if !reflect.ValueOf(o.brightnessCommandFunc).IsZero() {
-		l.brightnessCommandFunc = o.brightnessCommandFunc
+		l.brightnessCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Brightness == string(message.Payload()) {
+				return
+			}
+			o.states.Brightness = string(message.Payload())
+			l.UpdateState()
+			o.brightnessCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.brightnessScale).IsZero() {
 		l.BrightnessScale = &o.brightnessScale
@@ -146,7 +153,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.ColorTempCommandTemplate = &o.colorTempCommandTemplate
 	}
 	if !reflect.ValueOf(o.colorTempCommandFunc).IsZero() {
-		l.colorTempCommandFunc = o.colorTempCommandFunc
+		l.colorTempCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.ColorTemp == string(message.Payload()) {
+				return
+			}
+			o.states.ColorTemp = string(message.Payload())
+			l.UpdateState()
+			o.colorTempCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.colorTempStateFunc).IsZero() {
 		l.colorTempStateFunc = o.colorTempStateFunc
@@ -155,7 +169,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.ColorTempValueTemplate = &o.colorTempValueTemplate
 	}
 	if !reflect.ValueOf(o.commandFunc).IsZero() {
-		l.commandFunc = o.commandFunc
+		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.State == string(message.Payload()) {
+				return
+			}
+			o.states.State = string(message.Payload())
+			l.UpdateState()
+			o.commandFunc(message, client)
+		}
 	} else {
 		l.commandFunc = func(message mqtt.Message, client mqtt.Client) {
 			o.states.State = string(message.Payload())
@@ -165,7 +186,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.EffectCommandTemplate = &o.effectCommandTemplate
 	}
 	if !reflect.ValueOf(o.effectCommandFunc).IsZero() {
-		l.effectCommandFunc = o.effectCommandFunc
+		l.effectCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Effect == string(message.Payload()) {
+				return
+			}
+			o.states.Effect = string(message.Payload())
+			l.UpdateState()
+			o.effectCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.effectList).IsZero() {
 		l.EffectList = &o.effectList
@@ -189,7 +217,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.HsCommandTemplate = &o.hsCommandTemplate
 	}
 	if !reflect.ValueOf(o.hsCommandFunc).IsZero() {
-		l.hsCommandFunc = o.hsCommandFunc
+		l.hsCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Hs == string(message.Payload()) {
+				return
+			}
+			o.states.Hs = string(message.Payload())
+			l.UpdateState()
+			o.hsCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.hsStateFunc).IsZero() {
 		l.hsStateFunc = o.hsStateFunc
@@ -248,7 +283,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.RgbCommandTemplate = &o.rgbCommandTemplate
 	}
 	if !reflect.ValueOf(o.rgbCommandFunc).IsZero() {
-		l.rgbCommandFunc = o.rgbCommandFunc
+		l.rgbCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Rgb == string(message.Payload()) {
+				return
+			}
+			o.states.Rgb = string(message.Payload())
+			l.UpdateState()
+			o.rgbCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.rgbStateFunc).IsZero() {
 		l.rgbStateFunc = o.rgbStateFunc
@@ -260,7 +302,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.RgbwCommandTemplate = &o.rgbwCommandTemplate
 	}
 	if !reflect.ValueOf(o.rgbwCommandFunc).IsZero() {
-		l.rgbwCommandFunc = o.rgbwCommandFunc
+		l.rgbwCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Rgbw == string(message.Payload()) {
+				return
+			}
+			o.states.Rgbw = string(message.Payload())
+			l.UpdateState()
+			o.rgbwCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.rgbwStateFunc).IsZero() {
 		l.rgbwStateFunc = o.rgbwStateFunc
@@ -272,7 +321,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.RgbwwCommandTemplate = &o.rgbwwCommandTemplate
 	}
 	if !reflect.ValueOf(o.rgbwwCommandFunc).IsZero() {
-		l.rgbwwCommandFunc = o.rgbwwCommandFunc
+		l.rgbwwCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Rgbww == string(message.Payload()) {
+				return
+			}
+			o.states.Rgbww = string(message.Payload())
+			l.UpdateState()
+			o.rgbwwCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.rgbwwStateFunc).IsZero() {
 		l.rgbwwStateFunc = o.rgbwwStateFunc
@@ -310,7 +366,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 		l.XyCommandTemplate = &o.xyCommandTemplate
 	}
 	if !reflect.ValueOf(o.xyCommandFunc).IsZero() {
-		l.xyCommandFunc = o.xyCommandFunc
+		l.xyCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Xy == string(message.Payload()) {
+				return
+			}
+			o.states.Xy = string(message.Payload())
+			l.UpdateState()
+			o.xyCommandFunc(message, client)
+		}
 	}
 	if !reflect.ValueOf(o.xyStateFunc).IsZero() {
 		l.xyStateFunc = o.xyStateFunc
