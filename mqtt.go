@@ -57,10 +57,6 @@ var (
 )
 
 func (c *Client) Connect() error {
-	if len(c.devices) == 0 {
-		return ErrNoDeviceFound
-	}
-
 	entities.NodeID = c.NodeID
 
 	var err error

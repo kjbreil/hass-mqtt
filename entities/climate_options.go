@@ -8,7 +8,7 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 type ClimateOptions struct {
 	states                         ClimateState // External state update location
 	actionTemplate                 string       // "A template to render the value received on the `action_topic` with."
-	actionFunc                     func(mqtt.Message, mqtt.Client)
+	actionFunc                     func() string
 	auxCommandFunc                 func(mqtt.Message, mqtt.Client)
 	auxStateTemplate               string // "A template to render the value received on the `aux_state_topic` with."
 	auxStateFunc                   func() string
@@ -92,7 +92,7 @@ func (o *ClimateOptions) ActionTemplate(template string) *ClimateOptions {
 	o.actionTemplate = template
 	return o
 }
-func (o *ClimateOptions) ActionFunc(f func(mqtt.Message, mqtt.Client)) *ClimateOptions {
+func (o *ClimateOptions) ActionFunc(f func() string) *ClimateOptions {
 	o.actionFunc = f
 	return o
 }

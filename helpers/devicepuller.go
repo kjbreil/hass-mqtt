@@ -15,34 +15,34 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-//var DeviceNames = []string{
+// var DeviceNames = []string{
 //	//"button",
 //	"light",
-//}
+// }
 
 var DeviceNames = []string{
-	"alarm_control_panel",
-	"binary_sensor",
-	"button",
-	"camera",
+	// "alarm_control_panel",
+	// "binary_sensor",
+	// "button",
+	// "camera",
 	"climate",
-	//"cover",
-	"device_tracker",
-	"device_trigger",
-	"fan",
-	"humidifier",
-	"light",
-	"lock",
-	"number",
-	"scene",
-	"select",
-	"sensor",
-	"siren",
-	"switch",
-	"tag",
-	"text",
-	"update",
-	"vacuum",
+	// //"cover",
+	// "device_tracker",
+	// "device_trigger",
+	// "fan",
+	// "humidifier",
+	// "light",
+	// "lock",
+	// "number",
+	// "scene",
+	// "select",
+	// "sensor",
+	// "siren",
+	// "switch",
+	// "tag",
+	// "text",
+	// "update",
+	// "vacuum",
 }
 
 type Device struct {

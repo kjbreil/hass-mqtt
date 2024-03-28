@@ -18,7 +18,7 @@ import (
 type Climate struct {
 	ActionTemplate                 *string `json:"action_template,omitempty"` // "A template to render the value received on the `action_topic` with."
 	ActionTopic                    *string `json:"action_topic,omitempty"`    // "The MQTT topic to subscribe for changes of the current action. If this is set, the climate graph uses the value received as data source. Valid values: `off`, `heating`, `cooling`, `drying`, `idle`, `fan`."
-	actionFunc                     func(mqtt.Message, mqtt.Client)
+	actionFunc                     func() string
 	AuxCommandTopic                *string `json:"aux_command_topic,omitempty"` // "The MQTT topic to publish commands to switch auxiliary heat."
 	auxCommandFunc                 func(mqtt.Message, mqtt.Client)
 	AuxStateTemplate               *string `json:"aux_state_template,omitempty"` // "A template to render the value received on the `aux_state_topic` with."
@@ -414,6 +414,7 @@ func NewClimate(o *ClimateOptions) (*Climate, error) {
 }
 
 type climateState struct {
+	Action             *string
 	Aux                *string
 	Availability       *string
 	CurrentHumidity    *string
@@ -429,6 +430,7 @@ type climateState struct {
 	Temperature        *string
 }
 type ClimateState struct {
+	Action             string
 	Aux                string
 	CurrentHumidity    string
 	CurrentTemperature string
@@ -443,6 +445,10 @@ type ClimateState struct {
 	Temperature        string
 }
 
+func (d *Climate) Action(s string) {
+	d.States.Action = s
+	d.UpdateState()
+}
 func (d *Climate) Aux(s string) {
 	d.States.Aux = s
 	d.UpdateState()
@@ -514,6 +520,14 @@ func (d *Climate) PopulateDevice(Manufacturer string, SoftwareName string, Insta
 	d.Device.Identifiers = &Identifier
 }
 func (d *Climate) UpdateState() {
+	if d.ActionTopic != nil {
+		state := d.actionFunc()
+		if d.states.Action == nil || state != *d.states.Action || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+			token := (*d.MQTT.Client).Publish(*d.ActionTopic, byte(*d.Qos), true, state)
+			token.WaitTimeout(common.WaitTimeout)
+			d.states.Action = &state
+		}
+	}
 	if d.AuxStateTopic != nil {
 		state := d.auxStateFunc()
 		if d.states.Aux == nil || state != *d.states.Aux || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
@@ -625,13 +639,6 @@ func (d *Climate) Subscribe() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if d.ActionTopic != nil {
-		t := c.Subscribe(*d.ActionTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
 	if d.AuxCommandTopic != nil {
 		t := c.Subscribe(*d.AuxCommandTopic, 0, d.MQTT.MessageHandler)
 		t.WaitTimeout(common.WaitTimeout)
@@ -704,13 +711,6 @@ func (d *Climate) UnSubscribe() {
 	c := *d.MQTT.Client
 	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
 	token.WaitTimeout(common.WaitTimeout)
-	if d.ActionTopic != nil {
-		t := c.Unsubscribe(*d.ActionTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
 	if d.AuxCommandTopic != nil {
 		t := c.Unsubscribe(*d.AuxCommandTopic)
 		t.WaitTimeout(common.WaitTimeout)
@@ -812,7 +812,6 @@ func (d *Climate) populateTopics() {
 	if d.actionFunc != nil {
 		d.ActionTopic = new(string)
 		*d.ActionTopic = GetTopic(d, "action_topic")
-		common.TopicStore[*d.ActionTopic] = &d.actionFunc
 	}
 	if d.auxCommandFunc != nil {
 		d.AuxCommandTopic = new(string)
