@@ -5,11 +5,11 @@ package hass_mqtt
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-logr/logr"
-	"github.com/go-logr/logr/funcr"
 	"github.com/iancoleman/strcase"
 	"github.com/kjbreil/hass-mqtt/device"
 	"github.com/kjbreil/hass-mqtt/entities"
+	"log/slog"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -20,7 +20,7 @@ type Client struct {
 	OnConnect func(client mqtt.Client)
 	devices   map[string]*device.Device // Device Identifiers map to devices
 	mqtt      mqtt.Client
-	logger    logr.Logger
+	logger    *slog.Logger
 }
 
 type Config struct {
@@ -37,7 +37,7 @@ type Config struct {
 func NewClient(c Config) (*Client, error) {
 	return NewClientWithLogger(c, defaultLogger())
 }
-func NewClientWithLogger(c Config, logger logr.Logger) (*Client, error) {
+func NewClientWithLogger(c Config, logger *slog.Logger) (*Client, error) {
 	// TODO: Validate Config
 	client := &Client{
 		NodeID:  strcase.ToDelimited(c.NodeID, uint8(0x2d)),
@@ -48,8 +48,8 @@ func NewClientWithLogger(c Config, logger logr.Logger) (*Client, error) {
 	return client, nil
 }
 
-func (c *Client) Logger() *logr.Logger {
-	return &c.logger
+func (c *Client) Logger() *slog.Logger {
+	return c.logger
 }
 
 var (
@@ -75,10 +75,10 @@ func (c *Client) Connect() error {
 		c.logger.Info(fmt.Sprintf("Received message on Default Handler: %s from topic: %s", msg.Payload(), filepath.Base(msg.Topic())))
 	})
 
-	mqtt.ERROR = newLogError(c.logger, 1)
-	mqtt.CRITICAL = newLogError(c.logger, 5)
-	mqtt.WARN = newLogInfo(c.logger, 8)
-	mqtt.DEBUG = newLogInfo(c.logger, 10)
+	mqtt.ERROR = newMQTTLog(c.logger, slog.LevelError)
+	mqtt.CRITICAL = newMQTTLog(c.logger, slog.LevelInfo)
+	// mqtt.WARN = newMQTTLog(c.logger, slog.LevelWarn)
+	mqtt.DEBUG = newMQTTLog(c.logger, slog.LevelDebug)
 
 	opts.SetOnConnectHandler(
 		func(client mqtt.Client) {
@@ -91,7 +91,7 @@ func (c *Client) Connect() error {
 		},
 	)
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
-		c.logger.V(0).Info("MQTT connection lost")
+		c.logger.Info("MQTT connection lost")
 	}
 
 	c.mqtt = mqtt.NewClient(opts)
@@ -111,6 +111,12 @@ func (c *Client) Add(dev *device.Device) error {
 		return fmt.Errorf("%s entity already exists", dev.GetUniqueId())
 	}
 	c.devices[dev.GetUniqueId()] = dev
+
+	if c.mqtt.IsConnected() {
+		dev.Initialize()
+		dev.SetMQTTFields(c.mqtt)
+		dev.Subscribe()
+	}
 	return nil
 }
 
@@ -141,13 +147,15 @@ func (c *Client) Publish(topic string, qos byte, retained bool, payload interfac
 	return c.mqtt.Publish(topic, qos, retained, payload)
 }
 
-func defaultLogger() logr.Logger {
-	log := funcr.New(
-		func(pfx, args string) { fmt.Println(pfx, args) },
-		funcr.Options{
-			LogCaller:    funcr.None,
-			LogTimestamp: true,
-			Verbosity:    1,
-		})
-	return log.WithName("hass-ws")
+func defaultLogger() *slog.Logger {
+	return slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	// log := funcr.New(
+	// 	func(pfx, args string) { fmt.Println(pfx, args) },
+	// 	funcr.Options{
+	// 		LogCaller:    funcr.None,
+	// 		LogTimestamp: true,
+	// 		Verbosity:    1,
+	// 	})
+	// return log.WithName("hass-ws")
 }
