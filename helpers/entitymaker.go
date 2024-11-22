@@ -12,7 +12,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 	for _, d := range devices {
 
-		///
+		// /
 		commandParams := make(map[string]struct{})
 		camelName := strcase.ToCamel(d.Name)
 		lowerCamelName := strcase.ToLowerCamel(d.Name)
@@ -21,7 +21,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 		optionsCamelName := fmt.Sprintf("%sOptions", strcase.ToCamel(d.Name))
 		internalStateTypeName := fmt.Sprintf("%sState", lowerCamelName)
 		externalStateTypeName := fmt.Sprintf("%sState", camelName)
-		///
+		// /
 
 		// Add standalone base level fields
 		st := make(map[string]item)
@@ -132,7 +132,16 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 							el = jen.Else().Block(
 								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params().String().Block(
 									jen.Return(jen.Id(firstLetter).Dot("States").Dot("State")),
-									//jen.Id("l").Dot("UpdateState").Params(),
+									// jen.Id("l").Dot("UpdateState").Params(),
+								),
+							)
+						}
+
+						if v.setter.lowerCamelName == "positionFunc" {
+							el = jen.Else().Block(
+								jen.Id(firstLetter).Dot(v.setter.lowerCamelName).Op("=").Func().Params().String().Block(
+									jen.Return(jen.Id(firstLetter).Dot("States").Dot("Position")),
+									// jen.Id("l").Dot("UpdateState").Params(),
 								),
 							)
 						}
@@ -147,12 +156,12 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 
 										jen.Id("o").Dot("states").Dot("State").Op("=").String().Params(jen.Id("message").Dot("Payload").Params()),
 
-										//jen.Id("l").Dot("UpdateState").Params(),
+										// jen.Id("l").Dot("UpdateState").Params(),
 									),
 								)
 							}
 						}
-						//&& v.main != nil && v.main.topic && !v.main.command
+						// && v.main != nil && v.main.topic && !v.main.command
 						var hasState bool
 						var stateName string
 						if v.main != nil {
@@ -170,7 +179,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 										jen.Id("message").Qual("github.com/eclipse/paho.mqtt.golang", "Message"),
 										jen.Id("client").Qual("github.com/eclipse/paho.mqtt.golang", "Client"),
 									).Block(
-										//jen.If(jen.Id("o").Dot("states").Dot(stateName).Op("==").String().Id("message").Dot("Payload").Params()),
+										// jen.If(jen.Id("o").Dot("states").Dot(stateName).Op("==").String().Id("message").Dot("Payload").Params()),
 										jen.If(jen.Id("o").Dot("states").Dot(stateName).Op("==").String().Params(jen.Id("message").Dot("Payload").Params())).Block(
 											jen.Return(),
 										),
@@ -345,7 +354,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 		external[d.Name].Func().Params(
 			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
 		).Id("UpdateState").Params(
-		//jen.Id("state").Id("string"),
+		// jen.Id("state").Id("string"),
 		).BlockFunc(
 			func(g *jen.Group) {
 				for _, key := range sortedKeys {
@@ -384,11 +393,11 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 													g.Add(jen.Lit(2))
 												}
 
-												//if d.JSONContainer.Exists("retain") && cam != "AvailabilityTopic" {
+												// if d.JSONContainer.Exists("retain") && cam != "AvailabilityTopic" {
 												//	g.Add(jen.Op("*").Id("d").Dot("Retain"))
-												//} else {
+												// } else {
 												g.Add(jen.Lit(true))
-												//}
+												// }
 
 												g.Add(jen.Id("state"))
 											},
@@ -662,7 +671,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 				}
 			}
 
-			//for _, name := range keyNames {
+			// for _, name := range keyNames {
 			//	if strings.HasSuffix(name, "topic") && d.JSONContainer.Exists(name) {
 			//		if name == "topic" {
 			//			name = "state_topic"
@@ -706,7 +715,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 			//			),
 			//		)
 			//	}
-			//}
+			// }
 		})
 
 		external[d.Name].Func().Params(
@@ -874,7 +883,7 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 }
 
 type item struct {
-	//statements []statement
+	// statements []statement
 	main      *statement
 	setter    *statement
 	camelName string

@@ -7,6 +7,7 @@ import (
 func IsCommand(name string) bool {
 
 	retval := (!strings.Contains(name, "state")) &&
+		(!strings.HasPrefix(name, "position")) &&
 		(!strings.Contains(name, "availability")) &&
 		// (!d.JSONContainer.Exists("set_" + name)) &&
 		(!strings.Contains(name, "status")) &&
