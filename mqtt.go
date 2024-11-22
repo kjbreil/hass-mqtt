@@ -70,9 +70,9 @@ func (c *Client) Connect() error {
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", c.config.MQTT.Host, c.config.MQTT.Port))
 	opts.SetClientID(c.NodeID)
 	opts.SetOrderMatters(true)
-	opts.SetKeepAlive(10 * time.Second)
+	opts.SetKeepAlive(30 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		c.logger.Info(fmt.Sprintf("Received message on Default Handler: %s from topic: %s", msg.Payload(), filepath.Base(msg.Topic())))
+		c.logger.Info(fmt.Sprintf("Received message on Default Handler: %s from topic: %s with QoS: %d", msg.Payload(), filepath.Base(msg.Topic()), msg.Qos()))
 	})
 
 	mqtt.ERROR = newMQTTLog(c.logger, slog.LevelError)
@@ -91,7 +91,15 @@ func (c *Client) Connect() error {
 		},
 	)
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
-		c.logger.Info("MQTT connection lost")
+		c.logger.Info("MQTT connection lost, attempting to reconnect")
+		for {
+			if token := c.mqtt.Connect(); token.Wait() && token.Error() == nil {
+				c.logger.Info("Reconnected to MQTT broker")
+				break
+			}
+			c.logger.Error("Reconnection failed, retrying in 5 seconds", token.Error())
+			time.Sleep(5 * time.Second)
+		}
 	}
 
 	c.mqtt = mqtt.NewClient(opts)
