@@ -10,6 +10,7 @@ import (
 )
 
 // initDeviceNames creates all required name variations for a device
+// initDeviceNames creates all required name variations for a device for code generation.
 func initDeviceNames(d Device) (string, string, string, string, string, string, string) {
 	camelName := strcase.ToCamel(d.Name)
 	lowerCamelName := strcase.ToLowerCamel(d.Name)
@@ -22,6 +23,7 @@ func initDeviceNames(d Device) (string, string, string, string, string, string, 
 }
 
 // generateDeviceFields creates the device fields and returns sorted keys
+// generateDeviceFields creates the device fields and returns sorted keys for code generation.
 func generateDeviceFields(d Device) (map[string]item, []string) {
 	// Add standalone base level fields
 	st := make(map[string]item)

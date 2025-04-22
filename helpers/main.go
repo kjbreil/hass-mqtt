@@ -8,6 +8,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+// main is the entry point for the code generation tool. It initializes devices, loads key names, and generates entity and type files for Home Assistant MQTT integration.
 func main() {
 
 	devices := DevicesInit()

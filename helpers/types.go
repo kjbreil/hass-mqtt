@@ -5,6 +5,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+// generateTypes generates Go interface and struct types for Home Assistant MQTT entities and devices.
 func generateTypes(external map[string]*jen.File) {
 	external["types"].Type().Id("Entity").Interface(
 		// jen.UnionFunc(

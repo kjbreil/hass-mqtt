@@ -45,6 +45,7 @@ var DeviceNames = []string{
 	// "vacuum",
 }
 
+// Device represents a Home Assistant MQTT device with its name and JSON definition.
 type Device struct {
 	Name          string
 	JSONContainer *gabs.Container
@@ -52,6 +53,7 @@ type Device struct {
 
 var PullNew = false
 
+// DevicesInit initializes all devices listed in DeviceNames and returns them as a slice.
 func DevicesInit() (retval []Device) {
 	for _, name := range DeviceNames {
 		d := Device{
@@ -63,10 +65,12 @@ func DevicesInit() (retval []Device) {
 	return retval
 }
 
+// init populates the JSONContainer of the Device using its name.
 func (dev *Device) init() {
 	dev.JSONContainer = JsonExtractor(dev.Name)
 }
 
+// JsonExtractor retrieves the JSON definition for a given device name.
 func JsonExtractor(deviceName string) *gabs.Container {
 	yamlString, err := splitDocument(deviceName)
 	if err != nil {
@@ -86,6 +90,7 @@ func JsonExtractor(deviceName string) *gabs.Container {
 	return jsonParsed
 }
 
+// between returns the substring found between two specified substrings a and b in value.
 func between(value string, a string, b string) string {
 	// Get substring between two strings.
 	posFirst := strings.Index(value, a)
@@ -106,6 +111,7 @@ func between(value string, a string, b string) string {
 	return value[posFirstAdjusted:posLast]
 }
 
+// splitDocument fetches and extracts the configuration YAML section for a device from its documentation.
 func splitDocument(devicename string) (string, error) {
 
 	data, err := fetchDocument(devicename)
@@ -134,11 +140,13 @@ func splitDocument(devicename string) (string, error) {
 
 }
 
+// exists checks if a file exists at the given path.
 func exists(path string) bool {
 	_, err := os.Stat(path)
 	return !errors.Is(err, os.ErrNotExist)
 }
 
+// fetchDocument retrieves the raw markdown documentation for a device, caching it locally if not already present.
 func fetchDocument(devicename string) ([]byte, error) {
 
 	url := "https://raw.githubusercontent.com/home-assistant/home-assistant.io/next/source/_integrations/" + devicename + ".mqtt.markdown"
@@ -178,6 +186,7 @@ func fetchDocument(devicename string) ([]byte, error) {
 
 }
 
+// Unquote removes surrounding quotes from a string, if present.
 func Unquote(s string) string {
 	if len(s) > 0 && s[0] == '"' {
 		s = s[1:]
@@ -188,6 +197,7 @@ func Unquote(s string) string {
 	return s
 }
 
+// TypeTranslator maps a string type name to the corresponding jen.Statement for code generation.
 func TypeTranslator(t string, s *jen.Statement) *jen.Statement {
 
 	v := Unquote(t)
@@ -210,6 +220,7 @@ func TypeTranslator(t string, s *jen.Statement) *jen.Statement {
 	}
 }
 
+// FieldAdder creates a statement representing a struct field for a given key in the device's JSON definition.
 func (dev *Device) FieldAdder(key string) *statement {
 	snakeName := func(key string) string {
 		var s string
@@ -246,6 +257,7 @@ func (dev *Device) FieldAdder(key string) *statement {
 	}
 }
 
+// FunctionAdder creates a statement representing a function for a given key in the device's JSON definition.
 func (dev *Device) FunctionAdder(key string) *statement {
 
 	if strings.HasSuffix(key, "topic") && (key != "availability") {

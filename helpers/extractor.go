@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// entity represents a Home Assistant entity with its configuration and state information.
 type entity struct {
 	name     string
 	device   bool
@@ -15,6 +16,7 @@ type entity struct {
 	states   map[string]entry
 }
 
+// entry represents a single configuration entry for an entity.
 type entry struct {
 	name     string
 	t        reflect.Kind
@@ -28,6 +30,7 @@ var ignoreKeys = map[string]struct{}{
 	"availability": struct{}{},
 }
 
+// extractEntity extracts entity information from a slice of Devices for code generation.
 func extractEntity(devices []Device) []entity {
 	var entities []entity
 	for _, d := range devices {
@@ -74,6 +77,7 @@ func extractEntity(devices []Device) []entity {
 	return entities
 }
 
+// isRequired checks if a configuration field is required, as indicated in its JSON definition.
 func isRequired(c *gabs.Container) bool {
 	req := c.Path("required")
 	if req != nil {
@@ -86,6 +90,7 @@ func isRequired(c *gabs.Container) bool {
 	return false
 }
 
+// dataType determines the Go reflect.Kind for a configuration field based on its JSON definition.
 func dataType(c *gabs.Container) reflect.Kind {
 	t := c.Path("type")
 	if t != nil {
@@ -110,6 +115,7 @@ func dataType(c *gabs.Container) reflect.Kind {
 	return reflect.Invalid
 }
 
+// comment extracts the description comment from a configuration field's JSON definition, if present.
 func comment(c *gabs.Container) string {
 	req := c.Path("description")
 	if req != nil {

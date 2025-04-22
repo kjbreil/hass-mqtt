@@ -4,13 +4,16 @@ import (
 	"sort"
 )
 
+// keyNames holds all unique configuration keys found in devices.
 var keyNames = []string{}
 
+// blacklistKeys are keys to be excluded from code generation.
 var blacklistKeys = []string{
 	"device",
 	"availability",
 }
 
+// loadKeyNames populates keyNames with all unique configuration keys from DeviceNames, excluding blacklistKeys.
 func loadKeyNames() {
 	for _, devicename := range DeviceNames {
 		g := JsonExtractor(devicename)

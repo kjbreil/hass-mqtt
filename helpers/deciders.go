@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// IsCommand determines whether a given key name represents a command topic, based on naming conventions and exclusions.
 func IsCommand(name string) bool {
 
 	retval := (!strings.Contains(name, "state")) &&

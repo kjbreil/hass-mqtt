@@ -4,14 +4,15 @@ package hass_mqtt
 
 import (
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/iancoleman/strcase"
-	"github.com/kjbreil/hass-mqtt/device"
-	"github.com/kjbreil/hass-mqtt/entities"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/iancoleman/strcase"
+	"github.com/kjbreil/hass-mqtt/device"
+	"github.com/kjbreil/hass-mqtt/entities"
 )
 
 type Client struct {
@@ -93,7 +94,8 @@ func (c *Client) Connect() error {
 	opts.OnConnectionLost = func(client mqtt.Client, err error) {
 		c.logger.Info("MQTT connection lost, attempting to reconnect")
 		for {
-			if token := c.mqtt.Connect(); token.Wait() && token.Error() == nil {
+			token := c.mqtt.Connect()
+			if token.Wait() && token.Error() == nil {
 				c.logger.Info("Reconnected to MQTT broker")
 				break
 			}
