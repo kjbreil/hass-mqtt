@@ -16,3 +16,4 @@
 
 helpers/cache/**
 .idea
+**.DS_Store

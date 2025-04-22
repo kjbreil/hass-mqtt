@@ -2,78 +2,250 @@ package main
 
 import (
 	"fmt"
-	"github.com/dave/jennifer/jen"
-	"github.com/iancoleman/strcase"
 	"sort"
 	"strings"
+
+	"github.com/dave/jennifer/jen"
+	"github.com/iancoleman/strcase"
 )
 
+// initDeviceNames creates all required name variations for a device
+func initDeviceNames(d Device) (string, string, string, string, string, string, string) {
+	camelName := strcase.ToCamel(d.Name)
+	lowerCamelName := strcase.ToLowerCamel(d.Name)
+	firstLetter := string(lowerCamelName[0])
+	optionsFileName := fmt.Sprintf("%s_options", d.Name)
+	optionsCamelName := fmt.Sprintf("%sOptions", strcase.ToCamel(d.Name))
+	internalStateTypeName := fmt.Sprintf("%sState", lowerCamelName)
+	externalStateTypeName := fmt.Sprintf("%sState", camelName)
+	return camelName, lowerCamelName, firstLetter, optionsFileName, optionsCamelName, internalStateTypeName, externalStateTypeName
+}
+
+// generateDeviceFields creates the device fields and returns sorted keys
+func generateDeviceFields(d Device) (map[string]item, []string) {
+	// Add standalone base level fields
+	st := make(map[string]item)
+	for _, key := range keyNames {
+		if d.JSONContainer.Exists(key) {
+			st[key] = item{
+				main:   d.FieldAdder(key),
+				setter: d.FunctionAdder(key),
+			}
+		}
+	}
+
+	// Add device field if it exists
+	if d.JSONContainer.Exists("device") {
+		st["device"] = item{
+			main: &statement{
+				camelName: "Device",
+				topic:     false,
+				required:  true,
+				name:      jen.Id(strcase.ToCamel("device")),
+				t:         jen.Id("Device"),
+				tag:       jen.Tag(map[string]string{"json": "device,omitempty"}),
+				comment:   jen.Comment("Device configuration parameters"),
+			},
+		}
+	}
+
+	// Sort keys for consistent output
+	sortedKeys := []string{}
+	for key := range st {
+		sortedKeys = append(sortedKeys, key)
+	}
+	sort.Strings(sortedKeys)
+
+	return st, sortedKeys
+}
+
+// generateStateObjects creates state objects from device fields
+func generateStateObjects(st map[string]item, sortedKeys []string) map[string]struct{} {
+	stateObjects := make(map[string]struct{})
+	for _, key := range sortedKeys {
+		if key == "device" {
+			continue
+		}
+		v := st[key]
+		if v.main != nil && v.main.topic && !v.main.command {
+			stateName := strings.TrimSuffix(v.main.stripTopic, "State")
+			if stateName == "" {
+				stateName = v.main.stripTopic
+			}
+			stateObjects[stateName] = struct{}{}
+		}
+	}
+	return stateObjects
+}
+
+// generateDeviceStruct generates the main device struct with all its fields
+func generateDeviceStruct(d Device, external map[string]*jen.File, st map[string]item, sortedKeys []string, camelName, internalStateTypeName, externalStateTypeName string) {
+	external[d.Name].Type().Id(camelName).StructFunc(
+		func(g *jen.Group) {
+			for _, key := range sortedKeys {
+				v := st[key]
+				if v.main != nil {
+					g.Add(v.main.combinePointer())
+				}
+				if v.setter != nil {
+					g.Add(v.setter.combineLower())
+				}
+			}
+			g.Id("MQTT").Op("*").Id("MQTTFields").Tag(map[string]string{"json": "-"}).Comment("MQTT configuration parameters")
+			g.Id("states").Id(internalStateTypeName).Comment("Internal Holder of States")
+			g.Id("States").Op("*").Id(externalStateTypeName).Tag(map[string]string{"json": "-"}).Comment("External state update location")
+		},
+	)
+}
+
+// generateMQTTSubscription generates MQTT subscription related code
+func generateMQTTSubscription(d Device, external map[string]*jen.File, st map[string]item, sortedKeys []string, camelName string) {
+	external[d.Name].Func().Params(
+		jen.Id("d").Op("*").Id(camelName),
+	).Id("Subscribe").Params().BlockFunc(
+		func(g *jen.Group) {
+			g.Add(
+				jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+			)
+
+			g.Add(
+				jen.List(jen.Id("message"), jen.Err()).Op(":=").Qual("encoding/json", "Marshal").Params(jen.Id("d")),
+			)
+			g.Add(
+				jen.If(
+					jen.Id("err").Op("!=").Id("nil"),
+				).Block(
+					jen.Qual("log", "Fatal").Params(jen.Err()),
+				),
+			)
+
+			// Generate subscription for command topics
+			for _, key := range sortedKeys {
+				if strings.HasSuffix(key, "topic") && IsCommand(key) {
+					cam := strcase.ToCamel(key)
+					g.Add(
+						jen.If(
+							jen.Id("d").Dot(cam).Op("!=").Nil(),
+						).Block(
+							jen.Id("t").Op(":=").Id("c").Dot("Subscribe").Params(
+								jen.Op("*").Id("d").Dot(cam),
+								jen.Lit(0),
+								jen.Id("d").Dot("MQTT").Dot("MessageHandler"),
+							),
+							jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+							jen.If(
+								jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
+							).Block(
+								jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
+							),
+						),
+					)
+				}
+			}
+
+			// Publish discovery topic
+			g.Add(
+				jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+					jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
+					jen.Lit(2),
+					jen.Lit(true),
+					jen.Id("message"),
+				),
+			)
+
+			g.Add(
+				jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+			)
+
+			// Handle availability topics
+			for _, key := range keyNames {
+				if d.JSONContainer.Exists(key) && key == "availability_topic" {
+					g.Add(
+						jen.Id("d").Dot("availabilityFunc").Params(),
+					)
+				}
+			}
+
+			g.Add(
+				jen.Id("d").Dot("UpdateState").Params(),
+			)
+		},
+	)
+}
+
+// generateMQTTUnsubscription generates MQTT unsubscription related code
+func generateMQTTUnsubscription(d Device, external map[string]*jen.File, st map[string]item, sortedKeys []string, camelName string) {
+	external[d.Name].Func().Params(
+		jen.Id("d").Op("*").Id(camelName),
+	).Id("UnSubscribe").Params().BlockFunc(
+		func(g *jen.Group) {
+			if d.JSONContainer.Exists("availability_topic") {
+				g.Add(
+					jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
+				)
+
+				g.Add(
+					jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
+						jen.Op("*").Id("d").Dot("AvailabilityTopic"),
+						jen.Lit(2),
+						jen.Lit(false),
+						jen.Lit("offline"),
+					),
+				)
+
+				g.Add(
+					jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+				)
+
+				// Unsubscribe from command topics
+				for _, key := range sortedKeys {
+					if strings.HasSuffix(key, "topic") && IsCommand(key) {
+						cam := strcase.ToCamel(key)
+						g.Add(
+							jen.If(
+								jen.Id("d").Dot(cam).Op("!=").Nil(),
+							).Block(
+								jen.Id("t").Op(":=").Id("c").Dot("Unsubscribe").Params(
+									jen.Op("*").Id("d").Dot(cam),
+								),
+								jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
+								jen.If(
+									jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
+								).Block(
+									jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
+								),
+							),
+						)
+					}
+				}
+			}
+		},
+	)
+}
+
+// generateEntities generates MQTT device entities with their associated types and methods
 func generateEntities(devices []Device, external map[string]*jen.File) {
 
 	for _, d := range devices {
 
-		// /
+		// Initialize device naming
+		camelName, _, firstLetter, optionsFileName, optionsCamelName, internalStateTypeName, externalStateTypeName := initDeviceNames(d)
+
+		// Generate device fields
+		st, sortedKeys := generateDeviceFields(d)
+
+		// Generate state objects
+		stateObjects := generateStateObjects(st, sortedKeys)
+
+		// Generate device struct
+		generateDeviceStruct(d, external, st, sortedKeys, camelName, internalStateTypeName, externalStateTypeName)
+
+		// Generate MQTT subscription and unsubscription methods
+		generateMQTTSubscription(d, external, st, sortedKeys, camelName)
+		generateMQTTUnsubscription(d, external, st, sortedKeys, camelName)
+
+		// Initialize command parameters
 		commandParams := make(map[string]struct{})
-		camelName := strcase.ToCamel(d.Name)
-		lowerCamelName := strcase.ToLowerCamel(d.Name)
-		firstLetter := string(lowerCamelName[0])
-		optionsFileName := fmt.Sprintf("%s_options", d.Name)
-		optionsCamelName := fmt.Sprintf("%sOptions", strcase.ToCamel(d.Name))
-		internalStateTypeName := fmt.Sprintf("%sState", lowerCamelName)
-		externalStateTypeName := fmt.Sprintf("%sState", camelName)
-		// /
-
-		// Add standalone base level fields
-		st := make(map[string]item)
-		for _, key := range keyNames {
-			if d.JSONContainer.Exists(key) {
-				st[key] = item{
-					main:   d.FieldAdder(key),
-					setter: d.FunctionAdder(key),
-				}
-			}
-		}
-
-		if d.JSONContainer.Exists("device") {
-			st["device"] = item{
-				main: &statement{
-					camelName: "Device",
-					topic:     false,
-					required:  true,
-					name:      jen.Id(strcase.ToCamel("device")),
-					t:         jen.Id("Device"),
-					tag:       jen.Tag(map[string]string{"json": "device,omitempty"}),
-					comment:   jen.Comment("Device configuration parameters"),
-				},
-			}
-
-		}
-
-		sortedKeys := []string{}
-		for key := range st {
-			sortedKeys = append(sortedKeys, key)
-		}
-		sort.Strings(sortedKeys)
-
-		// Device MQTT Struct
-		external[d.Name].Type().Id(strcase.ToCamel(d.Name)).StructFunc(
-			func(g *jen.Group) {
-				for _, key := range sortedKeys {
-					v := st[key]
-					if v.main != nil {
-						g.Add(v.main.combinePointer())
-					}
-					if v.setter != nil {
-						g.Add(v.setter.combineLower())
-					}
-				}
-				g.Id("MQTT").Op("*").Id("MQTTFields").Tag(map[string]string{"json": "-"}).Comment("MQTT configuration parameters")
-				g.Id("states").Id(internalStateTypeName).Comment("Internal Holder of States")
-				g.Id("States").Op("*").Id(externalStateTypeName).Tag(map[string]string{"json": "-"}).Comment("External state update location")
-			},
-		)
-
-		stateObjects := make(map[string]struct{})
 
 		for _, key := range sortedKeys {
 			if key == "device" {
@@ -409,157 +581,6 @@ func generateEntities(devices []Device, external map[string]*jen.File) {
 							)
 						}
 					}
-				}
-			},
-		)
-
-		// d.Subscribe()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("Subscribe").Params().BlockFunc(
-			func(g *jen.Group) {
-
-				g.Add(
-					jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-				)
-
-				g.Add(
-					jen.List(jen.Id("message"), jen.Err()).Op(":=").Qual("encoding/json", "Marshal").Params(jen.Id("d")),
-				)
-				g.Add(
-					jen.If(
-						jen.Id("err").Op("!=").Id("nil"),
-					).Block(
-						jen.Qual("log", "Fatal").Params(jen.Err()),
-					),
-				)
-
-				for _, key := range sortedKeys {
-					if strings.HasSuffix(key, "topic") {
-						if IsCommand(key) {
-							cam := strcase.ToCamel(key)
-
-							g.Add(
-								jen.If(
-									jen.Id("d").Dot(cam).Op("!=").Nil(),
-								).Block(
-									jen.Id("t").Op(":=").Id("c").Dot("Subscribe").Params(
-										jen.Op("*").Id("d").Dot(cam),
-										jen.Lit(0),
-										jen.Id("d").Dot("MQTT").Dot("MessageHandler"),
-									),
-									jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-									jen.If(
-										jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
-									).Block(
-										jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
-									),
-								),
-							)
-						}
-					}
-				}
-
-				g.Add(
-					jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-						jen.Id("GetDiscoveryTopic").Params(jen.Id("d")),
-						jen.Lit(2),
-						jen.Lit(true),
-						jen.Id("message"),
-					),
-				)
-
-				g.Add(
-					jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-				)
-
-				for _, key := range keyNames {
-					if d.JSONContainer.Exists(key) {
-						if key == "availability_topic" {
-							g.Add(
-								jen.Id("d").Dot("availabilityFunc").Params(),
-							)
-						}
-					}
-				}
-
-				g.Add(
-					jen.Id("d").Dot("UpdateState").Params(),
-				)
-
-			},
-		)
-
-		// d.UnSubscribe()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("UnSubscribe").Params().BlockFunc(
-			func(g *jen.Group) {
-				if d.JSONContainer.Exists("availability_topic") {
-					g.Add(
-						jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-					)
-
-					g.Add(
-						jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-							jen.Op("*").Id("d").Dot("AvailabilityTopic"),
-							jen.Lit(2),
-							jen.Lit(false),
-							jen.Lit("offline"),
-						),
-					)
-
-					g.Add(
-						jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-					)
-
-					for _, key := range sortedKeys {
-						if strings.HasSuffix(key, "topic") {
-							if IsCommand(key) {
-								cam := strcase.ToCamel(key)
-
-								g.Add(
-									jen.If(
-										jen.Id("d").Dot(cam).Op("!=").Nil(),
-									).Block(
-										jen.Id("t").Op(":=").Id("c").Dot("Unsubscribe").Params(
-											jen.Op("*").Id("d").Dot(cam),
-										),
-										jen.Id("t").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-										jen.If(
-											jen.Id("t").Dot("Error").Params().Op("!=").Nil(),
-										).Block(
-											jen.Qual("log", "Fatal").Params(jen.Id("t").Dot("Error").Params()),
-										),
-									),
-								)
-							}
-						}
-					}
-				}
-			},
-		)
-
-		// d.AnnounceAvailable()
-		external[d.Name].Func().Params(
-			jen.Id("d").Op("*").Id(strcase.ToCamel(d.Name)),
-		).Id("AnnounceAvailable").Params().BlockFunc(
-			func(g *jen.Group) {
-				if d.JSONContainer.Exists("availability_topic") {
-					g.Add(
-						jen.Id("c").Op(":=").Op("*").Id("d").Dot("MQTT").Dot("Client"),
-					)
-					g.Add(
-						jen.Id("token").Op(":=").Id("c").Dot("Publish").Params(
-							jen.Op("*").Id("d").Dot("AvailabilityTopic"),
-							jen.Lit(2),
-							jen.Lit(true),
-							jen.Lit("online"),
-						),
-					)
-					g.Add(
-						jen.Id("token").Dot("WaitTimeout").Params(jen.Qual("github.com/kjbreil/hass-mqtt/common", "WaitTimeout")),
-					)
 				}
 			},
 		)
