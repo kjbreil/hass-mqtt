@@ -74,6 +74,64 @@ type Cover struct {
 	States                 *CoverState `json:"-"` // External state update location
 }
 
+func (d *Cover) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SetPositionTopic != nil {
+		t := c.Subscribe(*d.SetPositionTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.TiltCommandTopic != nil {
+		t := c.Subscribe(*d.TiltCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Cover) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SetPositionTopic != nil {
+		t := c.Unsubscribe(*d.SetPositionTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.TiltCommandTopic != nil {
+		t := c.Unsubscribe(*d.TiltCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewCover(o *CoverOptions) (*Cover, error) {
 	var c Cover
 
@@ -331,69 +389,6 @@ func (d *Cover) UpdateState() {
 			d.states.TiltStatus = &state
 		}
 	}
-}
-func (d *Cover) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SetPositionTopic != nil {
-		t := c.Subscribe(*d.SetPositionTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.TiltCommandTopic != nil {
-		t := c.Subscribe(*d.TiltCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Cover) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SetPositionTopic != nil {
-		t := c.Unsubscribe(*d.SetPositionTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.TiltCommandTopic != nil {
-		t := c.Unsubscribe(*d.TiltCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Cover) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Cover) Initialize() {
 	if d.Qos == nil {
