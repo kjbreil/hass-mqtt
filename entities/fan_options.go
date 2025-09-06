@@ -8,47 +8,53 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 type FanOptions struct {
 	states                     FanState // External state update location
 	availabilityMode           string   // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	availabilityTemplate       string   // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityTemplate       string   // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	availabilityFunc           func() string
-	commandTemplate            string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandTemplate            string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	commandFunc                func(mqtt.Message, mqtt.Client)
+	directionCommandTemplate   string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `direction_command_topic`."
+	directionCommandFunc       func(mqtt.Message, mqtt.Client)
+	directionStateFunc         func() string
+	directionValueTemplate     string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the direction."
 	enabledByDefault           bool   // "Flag which defines if the entity should be enabled when first added."
 	encoding                   string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	entityCategory             string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	entityPicture              string // "Picture URL for the entity."
 	icon                       string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	jsonAttributesTemplate     string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesTemplate     string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	jsonAttributesFunc         func() string
-	name                       string // "The name of the fan."
-	objectId                   string // "Used instead of `name` for automatic generation of `entity_id`"
+	name                       string // "The name of the fan. Can be set to `null` if only the device name is relevant."
+	objectId                   string // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	optimistic                 bool   // "Flag that defines if fan works in optimistic mode"
-	oscillationCommandTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `oscillation_command_topic`."
+	oscillationCommandTemplate string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `oscillation_command_topic`."
 	oscillationCommandFunc     func(mqtt.Message, mqtt.Client)
 	oscillationStateFunc       func() string
-	oscillationValueTemplate   string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the oscillation."
+	oscillationValueTemplate   string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the oscillation."
 	payloadAvailable           string // "The payload that represents the available state."
 	payloadNotAvailable        string // "The payload that represents the unavailable state."
 	payloadOff                 string // "The payload that represents the stop state."
 	payloadOn                  string // "The payload that represents the running state."
 	payloadOscillationOff      string // "The payload that represents the oscillation off state."
 	payloadOscillationOn       string // "The payload that represents the oscillation on state."
-	payloadResetPercentage     string // "A special payload that resets the `percentage` state attribute to `None` when received at the `percentage_state_topic`."
-	payloadResetPresetMode     string // "A special payload that resets the `preset_mode` state attribute to `None` when received at the `preset_mode_state_topic`."
-	percentageCommandTemplate  string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `percentage_command_topic`."
+	payloadResetPercentage     string // "A special payload that resets the `percentage` state attribute to `unknown` when received at the `percentage_state_topic`."
+	payloadResetPresetMode     string // "A special payload that resets the `preset_mode` state attribute to `unknown` when received at the `preset_mode_state_topic`."
+	percentageCommandTemplate  string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `percentage_command_topic`."
 	percentageCommandFunc      func(mqtt.Message, mqtt.Client)
 	percentageStateFunc        func() string
-	percentageValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the `percentage` value from the payload received on `percentage_state_topic`."
-	presetModeCommandTemplate  string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `preset_mode_command_topic`."
+	percentageValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the `percentage` value from the payload received on `percentage_state_topic`."
+	platform                   string // "Must be `fan`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	presetModeCommandTemplate  string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `preset_mode_command_topic`."
 	presetModeCommandFunc      func(mqtt.Message, mqtt.Client)
 	presetModeStateFunc        func() string
-	presetModeValueTemplate    string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
+	presetModeValueTemplate    string     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
 	presetModes                ([]string) // "List of preset modes this fan is capable of running at. Common examples include `auto`, `smart`, `whoosh`, `eco` and `breeze`."
-	qos                        int        // "The maximum QoS level of the state topic."
+	qos                        int        // "The maximum QoS level to be used when receiving and publishing messages."
 	retain                     bool       // "If the published message should have the retain flag on or not."
-	speedRangeMax              int        // "The maximum of numeric output range (representing 100 %). The number of speeds within the `speed_range` / `100` will determine the `percentage_step`."
-	speedRangeMin              int        // "The minimum of numeric output range (`off` not included, so `speed_range_min` - `1` represents 0 %). The number of speeds within the speed_range / 100 will determine the `percentage_step`."
+	speedRangeMax              int        // "The maximum of numeric output range (representing 100 %). The `percentage_step` is defined by `100` / the number of speeds within the speed range."
+	speedRangeMin              int        // "The minimum of numeric output range (`off` not included, so `speed_range_min` - `1` represents 0 %). The `percentage_step` is defined by `100` / the number of speeds within the speed range."
 	stateFunc                  func() string
-	stateValueTemplate         string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the state."
-	uniqueId                   string // "An ID that uniquely identifies this fan. If two fans have the same unique ID, Home Assistant will raise an exception."
+	stateValueTemplate         string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the state."
+	uniqueId                   string // "An ID that uniquely identifies this fan. If two fans have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 }
 
 func NewFanOptions() *FanOptions {
@@ -77,6 +83,31 @@ func (o *FanOptions) CommandFunc(f func(mqtt.Message, mqtt.Client)) *FanOptions 
 	o.commandFunc = f
 	return o
 }
+func (o *FanOptions) DirectionCommandTemplate(template string) *FanOptions {
+	o.directionCommandTemplate = template
+	return o
+}
+func (o *FanOptions) DirectionCommandFunc(f func(mqtt.Message, mqtt.Client)) *FanOptions {
+	o.directionCommandFunc = f
+	return o
+}
+func (o *FanOptions) DirectionStateFunc(f func() string) *FanOptions {
+	o.directionStateFunc = f
+	return o
+}
+func (o *FanOptions) EnableDirection() *FanOptions {
+	o.directionStateFunc = func() string {
+		return o.states.Direction
+	}
+	o.directionCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.states.Direction = string(message.Payload())
+	}
+	return o
+}
+func (o *FanOptions) DirectionValueTemplate(template string) *FanOptions {
+	o.directionValueTemplate = template
+	return o
+}
 func (o *FanOptions) EnabledByDefault(d bool) *FanOptions {
 	o.enabledByDefault = d
 	return o
@@ -87,6 +118,10 @@ func (o *FanOptions) Encoding(encoding string) *FanOptions {
 }
 func (o *FanOptions) EntityCategory(category string) *FanOptions {
 	o.entityCategory = category
+	return o
+}
+func (o *FanOptions) EntityPicture(picture string) *FanOptions {
+	o.entityPicture = picture
 	return o
 }
 func (o *FanOptions) Icon(icon string) *FanOptions {
@@ -193,6 +228,10 @@ func (o *FanOptions) EnablePercentage() *FanOptions {
 }
 func (o *FanOptions) PercentageValueTemplate(template string) *FanOptions {
 	o.percentageValueTemplate = template
+	return o
+}
+func (o *FanOptions) Platform(platform string) *FanOptions {
+	o.platform = platform
 	return o
 }
 func (o *FanOptions) PresetModeCommandTemplate(template string) *FanOptions {

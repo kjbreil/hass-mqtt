@@ -6,80 +6,85 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 // Do not modify this file, it is automatically generated
 // //////////////////////////////////////////////////////////////////////////////
 type ClimateOptions struct {
-	states                         ClimateState // External state update location
-	actionTemplate                 string       // "A template to render the value received on the `action_topic` with."
-	actionFunc                     func() string
-	auxCommandFunc                 func(mqtt.Message, mqtt.Client)
-	auxStateTemplate               string // "A template to render the value received on the `aux_state_topic` with."
-	auxStateFunc                   func() string
-	availabilityMode               string // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	availabilityTemplate           string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	availabilityFunc               func() string
-	currentHumidityTemplate        string // "A template with which the value received on `current_humidity_topic` will be rendered."
-	currentHumidityFunc            func() string
-	currentTemperatureTemplate     string // "A template with which the value received on `current_temperature_topic` will be rendered."
-	currentTemperatureFunc         func() string
-	enabledByDefault               bool   // "Flag which defines if the entity should be enabled when first added."
-	encoding                       string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
-	entityCategory                 string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	fanModeCommandTemplate         string // "A template to render the value sent to the `fan_mode_command_topic` with."
-	fanModeCommandFunc             func(mqtt.Message, mqtt.Client)
-	fanModeStateTemplate           string // "A template to render the value received on the `fan_mode_state_topic` with."
-	fanModeStateFunc               func() string
-	fanModes                       ([]string) // "A list of supported fan modes."
-	icon                           string     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	initial                        int        // "Set the initial target temperature."
-	jsonAttributesTemplate         string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
-	jsonAttributesFunc             func() string
-	maxHumidity                    int     // "The minimum target humidity percentage that can be set."
-	maxTemp                        float64 // "Maximum set point available."
-	minHumidity                    int     // "The maximum target humidity percentage that can be set."
-	minTemp                        float64 // "Minimum set point available."
-	modeCommandTemplate            string  // "A template to render the value sent to the `mode_command_topic` with."
-	modeCommandFunc                func(mqtt.Message, mqtt.Client)
-	modeStateTemplate              string // "A template to render the value received on the `mode_state_topic` with."
-	modeStateFunc                  func() string
-	modes                          ([]string) // "A list of supported modes. Needs to be a subset of the default values."
-	name                           string     // "The name of the HVAC."
-	objectId                       string     // "Used instead of `name` for automatic generation of `entity_id`"
-	optimistic                     bool       // "Flag that defines if the climate works in optimistic mode"
-	payloadAvailable               string     // "The payload that represents the available state."
-	payloadNotAvailable            string     // "The payload that represents the unavailable state."
-	payloadOff                     string     // "The payload that represents disabled state."
-	payloadOn                      string     // "The payload that represents enabled state."
-	precision                      float64    // "The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`."
-	presetModeCommandTemplate      string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `preset_mode_command_topic`."
-	presetModeCommandFunc          func(mqtt.Message, mqtt.Client)
-	presetModeStateFunc            func() string
-	presetModeValueTemplate        string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
-	presetModes                    ([]string) // "List of preset modes this climate is supporting. Common examples include `eco`, `away`, `boost`, `comfort`, `home`, `sleep` and `activity`."
-	qos                            int        // "The maximum QoS level to be used when receiving and publishing messages."
-	retain                         bool       // "Defines if published messages should have the retain flag set."
-	swingModeCommandTemplate       string     // "A template to render the value sent to the `swing_mode_command_topic` with."
-	swingModeCommandFunc           func(mqtt.Message, mqtt.Client)
-	swingModeStateTemplate         string // "A template to render the value received on the `swing_mode_state_topic` with."
-	swingModeStateFunc             func() string
-	swingModes                     ([]string) // "A list of supported swing modes."
-	targetHumidityCommandTemplate  string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `target_humidity_command_topic`."
-	targetHumidityCommandFunc      func(mqtt.Message, mqtt.Client)
-	targetHumidityStateTemplate    string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value for the climate `target_humidity` state."
-	targetHumidityStateFunc        func() string
-	tempStep                       float64 // "Step size for temperature set point."
-	temperatureCommandTemplate     string  // "A template to render the value sent to the `temperature_command_topic` with."
-	temperatureCommandFunc         func(mqtt.Message, mqtt.Client)
-	temperatureHighCommandTemplate string // "A template to render the value sent to the `temperature_high_command_topic` with."
-	temperatureHighCommandFunc     func(mqtt.Message, mqtt.Client)
-	temperatureHighStateTemplate   string // "A template to render the value received on the `temperature_high_state_topic` with. A `\"None\"` value received will reset the temperature high set point. Empty values (`'''`) will be ignored."
-	temperatureHighStateFunc       func() string
-	temperatureLowCommandTemplate  string // "A template to render the value sent to the `temperature_low_command_topic` with."
-	temperatureLowCommandFunc      func(mqtt.Message, mqtt.Client)
-	temperatureLowStateTemplate    string // "A template to render the value received on the `temperature_low_state_topic` with. A `\"None\"` value received will reset the temperature low set point. Empty values (`'''`) will be ignored."
-	temperatureLowStateFunc        func() string
-	temperatureStateTemplate       string // "A template to render the value received on the `temperature_state_topic` with."
-	temperatureStateFunc           func() string
-	temperatureUnit                string // "Defines the temperature unit of the device, `C` or `F`. If this is not set, the temperature unit is set to the system temperature unit."
-	uniqueId                       string // "An ID that uniquely identifies this HVAC device. If two HVAC devices have the same unique ID, Home Assistant will raise an exception."
-	valueTemplate                  string // "Default template to render the payloads on *all* `*_state_topic`s with."
+	states                             ClimateState // External state update location
+	actionTemplate                     string       // "A template to render the value received on the `action_topic` with."
+	actionFunc                         func() string
+	availabilityMode                   string // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
+	availabilityTemplate               string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityFunc                   func() string
+	currentHumidityTemplate            string // "A template with which the value received on `current_humidity_topic` will be rendered."
+	currentHumidityFunc                func() string
+	currentTemperatureTemplate         string // "A template with which the value received on `current_temperature_topic` will be rendered."
+	currentTemperatureFunc             func() string
+	enabledByDefault                   bool   // "Flag which defines if the entity should be enabled when first added."
+	encoding                           string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
+	entityCategory                     string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	entityPicture                      string // "Picture URL for the entity."
+	fanModeCommandTemplate             string // "A template to render the value sent to the `fan_mode_command_topic` with."
+	fanModeCommandFunc                 func(mqtt.Message, mqtt.Client)
+	fanModeStateTemplate               string // "A template to render the value received on the `fan_mode_state_topic` with."
+	fanModeStateFunc                   func() string
+	fanModes                           ([]string) // "A list of supported fan modes."
+	icon                               string     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
+	initial                            float64    // "Set the initial target temperature. The default value depends on the temperature unit and will be 21° or 69.8°F."
+	jsonAttributesTemplate             string     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesFunc                 func() string
+	maxHumidity                        float64 // "The minimum target humidity percentage that can be set."
+	maxTemp                            float64 // "Maximum set point available. The default value depends on the temperature unit, and will be 35°C or 95°F."
+	minHumidity                        float64 // "The maximum target humidity percentage that can be set."
+	minTemp                            float64 // "Minimum set point available. The default value depends on the temperature unit, and will be 7°C or 44.6°F."
+	modeCommandTemplate                string  // "A template to render the value sent to the `mode_command_topic` with."
+	modeCommandFunc                    func(mqtt.Message, mqtt.Client)
+	modeStateTemplate                  string // "A template to render the value received on the `mode_state_topic` with."
+	modeStateFunc                      func() string
+	modes                              ([]string) // "A list of supported modes. Needs to be a subset of the default values."
+	name                               string     // "The name of the HVAC. Can be set to `null` if only the device name is relevant."
+	objectId                           string     // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
+	optimistic                         bool       // "Flag that defines if the climate works in optimistic mode"
+	payloadAvailable                   string     // "The payload that represents the available state."
+	payloadNotAvailable                string     // "The payload that represents the unavailable state."
+	payloadOff                         string     // "The payload sent to turn off the device."
+	payloadOn                          string     // "The payload sent to turn the device on."
+	powerCommandTemplate               string     // "A template to render the value sent to the `power_command_topic` with. The `value` parameter is the payload set for `payload_on` or `payload_off`."
+	powerCommandFunc                   func(mqtt.Message, mqtt.Client)
+	precision                          float64 // "The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`."
+	presetModeCommandTemplate          string  // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `preset_mode_command_topic`."
+	presetModeCommandFunc              func(mqtt.Message, mqtt.Client)
+	presetModeStateFunc                func() string
+	presetModeValueTemplate            string     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
+	presetModes                        ([]string) // "List of preset modes this climate is supporting. Common examples include `eco`, `away`, `boost`, `comfort`, `home`, `sleep` and `activity`."
+	qos                                int        // "The maximum QoS level to be used when receiving and publishing messages."
+	retain                             bool       // "Defines if published messages should have the retain flag set."
+	swingHorizontalModeCommandTemplate string     // "A template to render the value sent to the `swing_horizontal_mode_command_topic` with."
+	swingHorizontalModeCommandFunc     func(mqtt.Message, mqtt.Client)
+	swingHorizontalModeStateTemplate   string // "A template to render the value received on the `swing_horizontal_mode_state_topic` with."
+	swingHorizontalModeStateFunc       func() string
+	swingHorizontalModes               ([]string) // "A list of supported swing horizontal modes."
+	swingModeCommandTemplate           string     // "A template to render the value sent to the `swing_mode_command_topic` with."
+	swingModeCommandFunc               func(mqtt.Message, mqtt.Client)
+	swingModeStateTemplate             string // "A template to render the value received on the `swing_mode_state_topic` with."
+	swingModeStateFunc                 func() string
+	swingModes                         ([]string) // "A list of supported swing modes."
+	targetHumidityCommandTemplate      string     // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `target_humidity_command_topic`."
+	targetHumidityCommandFunc          func(mqtt.Message, mqtt.Client)
+	targetHumidityStateTemplate        string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value for the climate `target_humidity` state."
+	targetHumidityStateFunc            func() string
+	tempStep                           float64 // "Step size for temperature set point."
+	temperatureCommandTemplate         string  // "A template to render the value sent to the `temperature_command_topic` with."
+	temperatureCommandFunc             func(mqtt.Message, mqtt.Client)
+	temperatureHighCommandTemplate     string // "A template to render the value sent to the `temperature_high_command_topic` with."
+	temperatureHighCommandFunc         func(mqtt.Message, mqtt.Client)
+	temperatureHighStateTemplate       string // "A template to render the value received on the `temperature_high_state_topic` with. A `\"None\"` value received will reset the upper temperature setpoint. Empty values (`\"\"'`) will be ignored."
+	temperatureHighStateFunc           func() string
+	temperatureLowCommandTemplate      string // "A template to render the value sent to the `temperature_low_command_topic` with."
+	temperatureLowCommandFunc          func(mqtt.Message, mqtt.Client)
+	temperatureLowStateTemplate        string // "A template to render the value received on the `temperature_low_state_topic` with. A `\"None\"` value received will reset the lower temperature setpoint. Empty values (`\"\"`) will be ignored."
+	temperatureLowStateFunc            func() string
+	temperatureStateTemplate           string // "A template to render the value received on the `temperature_state_topic` with."
+	temperatureStateFunc               func() string
+	temperatureUnit                    string // "Defines the temperature unit of the device, `C` or `F`. If this is not set, the temperature unit is set to the system temperature unit."
+	uniqueId                           string // "An ID that uniquely identifies this HVAC device. If two HVAC devices have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
+	valueTemplate                      string // "Default template to render the payloads on *all* `*_state_topic`s with."
 }
 
 func NewClimateOptions() *ClimateOptions {
@@ -94,27 +99,6 @@ func (o *ClimateOptions) ActionTemplate(template string) *ClimateOptions {
 }
 func (o *ClimateOptions) ActionFunc(f func() string) *ClimateOptions {
 	o.actionFunc = f
-	return o
-}
-func (o *ClimateOptions) AuxCommandFunc(f func(mqtt.Message, mqtt.Client)) *ClimateOptions {
-	o.auxCommandFunc = f
-	return o
-}
-func (o *ClimateOptions) AuxStateTemplate(template string) *ClimateOptions {
-	o.auxStateTemplate = template
-	return o
-}
-func (o *ClimateOptions) AuxStateFunc(f func() string) *ClimateOptions {
-	o.auxStateFunc = f
-	return o
-}
-func (o *ClimateOptions) EnableAux() *ClimateOptions {
-	o.auxStateFunc = func() string {
-		return o.states.Aux
-	}
-	o.auxCommandFunc = func(message mqtt.Message, client mqtt.Client) {
-		o.states.Aux = string(message.Payload())
-	}
 	return o
 }
 func (o *ClimateOptions) AvailabilityMode(mode string) *ClimateOptions {
@@ -157,6 +141,10 @@ func (o *ClimateOptions) EntityCategory(category string) *ClimateOptions {
 	o.entityCategory = category
 	return o
 }
+func (o *ClimateOptions) EntityPicture(picture string) *ClimateOptions {
+	o.entityPicture = picture
+	return o
+}
 func (o *ClimateOptions) FanModeCommandTemplate(template string) *ClimateOptions {
 	o.fanModeCommandTemplate = template
 	return o
@@ -190,7 +178,7 @@ func (o *ClimateOptions) Icon(icon string) *ClimateOptions {
 	o.icon = icon
 	return o
 }
-func (o *ClimateOptions) Initial(initial int) *ClimateOptions {
+func (o *ClimateOptions) Initial(initial float64) *ClimateOptions {
 	o.initial = initial
 	return o
 }
@@ -202,7 +190,7 @@ func (o *ClimateOptions) JsonAttributesFunc(f func() string) *ClimateOptions {
 	o.jsonAttributesFunc = f
 	return o
 }
-func (o *ClimateOptions) MaxHumidity(humidity int) *ClimateOptions {
+func (o *ClimateOptions) MaxHumidity(humidity float64) *ClimateOptions {
 	o.maxHumidity = humidity
 	return o
 }
@@ -210,7 +198,7 @@ func (o *ClimateOptions) MaxTemp(temp float64) *ClimateOptions {
 	o.maxTemp = temp
 	return o
 }
-func (o *ClimateOptions) MinHumidity(humidity int) *ClimateOptions {
+func (o *ClimateOptions) MinHumidity(humidity float64) *ClimateOptions {
 	o.minHumidity = humidity
 	return o
 }
@@ -275,6 +263,14 @@ func (o *ClimateOptions) PayloadOn(on string) *ClimateOptions {
 	o.payloadOn = on
 	return o
 }
+func (o *ClimateOptions) PowerCommandTemplate(template string) *ClimateOptions {
+	o.powerCommandTemplate = template
+	return o
+}
+func (o *ClimateOptions) PowerCommandFunc(f func(mqtt.Message, mqtt.Client)) *ClimateOptions {
+	o.powerCommandFunc = f
+	return o
+}
 func (o *ClimateOptions) Precision(precision float64) *ClimateOptions {
 	o.precision = precision
 	return o
@@ -314,6 +310,35 @@ func (o *ClimateOptions) Qos(qos int) *ClimateOptions {
 }
 func (o *ClimateOptions) Retain(retain bool) *ClimateOptions {
 	o.retain = retain
+	return o
+}
+func (o *ClimateOptions) SwingHorizontalModeCommandTemplate(template string) *ClimateOptions {
+	o.swingHorizontalModeCommandTemplate = template
+	return o
+}
+func (o *ClimateOptions) SwingHorizontalModeCommandFunc(f func(mqtt.Message, mqtt.Client)) *ClimateOptions {
+	o.swingHorizontalModeCommandFunc = f
+	return o
+}
+func (o *ClimateOptions) SwingHorizontalModeStateTemplate(template string) *ClimateOptions {
+	o.swingHorizontalModeStateTemplate = template
+	return o
+}
+func (o *ClimateOptions) SwingHorizontalModeStateFunc(f func() string) *ClimateOptions {
+	o.swingHorizontalModeStateFunc = f
+	return o
+}
+func (o *ClimateOptions) EnableSwingHorizontalMode() *ClimateOptions {
+	o.swingHorizontalModeStateFunc = func() string {
+		return o.states.SwingHorizontalMode
+	}
+	o.swingHorizontalModeCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+		o.states.SwingHorizontalMode = string(message.Payload())
+	}
+	return o
+}
+func (o *ClimateOptions) SwingHorizontalModes(modes []string) *ClimateOptions {
+	o.swingHorizontalModes = modes
 	return o
 }
 func (o *ClimateOptions) SwingModeCommandTemplate(template string) *ClimateOptions {

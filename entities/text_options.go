@@ -8,26 +8,28 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 type TextOptions struct {
 	states                 TextState // External state update location
 	availabilityMode       string    // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	availabilityTemplate   string    // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityTemplate   string    // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	availabilityFunc       func() string
-	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
 	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	entityPicture          string // "Picture URL for the entity."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
 	jsonAttributesFunc     func() string
 	max                    int    // "The maximum size of a text being set or received (maximum is 255)."
 	min                    int    // "The minimum size of a text being set or received."
 	mode                   string // "The mode off the text entity. Must be either `text` or `password`."
-	name                   string // "The name of the text entity."
-	objectId               string // "Used instead of `name` for automatic generation of `entity_id`"
+	name                   string // "The name of the text entity. Can be set to `null` if only the device name is relevant."
+	objectId               string // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	pattern                string // "A valid regular expression the text being set or received must match with."
-	qos                    int    // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	platform               string // "Must be `text`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	qos                    int    // "The maximum QoS level to be used when receiving and publishing messages."
 	retain                 bool   // "If the published message should have the retain flag on or not."
 	stateFunc              func() string
-	uniqueId               string // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception."
-	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the text state value from the payload received on `state_topic`."
+	uniqueId               string // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception. Required when used with device-based discovery."
+	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the text state value from the payload received on `state_topic`."
 }
 
 func NewTextOptions() *TextOptions {
@@ -68,6 +70,10 @@ func (o *TextOptions) EntityCategory(category string) *TextOptions {
 	o.entityCategory = category
 	return o
 }
+func (o *TextOptions) EntityPicture(picture string) *TextOptions {
+	o.entityPicture = picture
+	return o
+}
 func (o *TextOptions) JsonAttributesTemplate(template string) *TextOptions {
 	o.jsonAttributesTemplate = template
 	return o
@@ -98,6 +104,10 @@ func (o *TextOptions) ObjectId(id string) *TextOptions {
 }
 func (o *TextOptions) Pattern(pattern string) *TextOptions {
 	o.pattern = pattern
+	return o
+}
+func (o *TextOptions) Platform(platform string) *TextOptions {
+	o.platform = platform
 	return o
 }
 func (o *TextOptions) Qos(qos int) *TextOptions {

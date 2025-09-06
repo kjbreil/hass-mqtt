@@ -17,7 +17,7 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Vacuum struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
 	CommandTopic           *string `json:"command_topic,omitempty"` // "The MQTT topic to publish commands to control the vacuum."
@@ -25,11 +25,11 @@ type Vacuum struct {
 	Device                 Device      `json:"device,omitempty"`                   // Device configuration parameters
 	Encoding               *string     `json:"encoding,omitempty"`                 // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	FanSpeedList           *([]string) `json:"fan_speed_list,omitempty"`           // "List of possible fan speeds for the vacuum."
-	JsonAttributesTemplate *string     `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate *string     `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic    *string     `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc     func() string
-	Name                   *string `json:"name,omitempty"`                   // "The name of the vacuum."
-	ObjectId               *string `json:"object_id,omitempty"`              // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string `json:"name,omitempty"`                   // "The name of the vacuum. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string `json:"object_id,omitempty"`              // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	PayloadAvailable       *string `json:"payload_available,omitempty"`      // "The payload that represents the available state."
 	PayloadCleanSpot       *string `json:"payload_clean_spot,omitempty"`     // "The payload to send to the `command_topic` to begin a spot cleaning cycle."
 	PayloadLocate          *string `json:"payload_locate,omitempty"`         // "The payload to send to the `command_topic` to locate the vacuum (typically plays a song)."
@@ -38,22 +38,80 @@ type Vacuum struct {
 	PayloadReturnToBase    *string `json:"payload_return_to_base,omitempty"` // "The payload to send to the `command_topic` to tell the vacuum to return to base."
 	PayloadStart           *string `json:"payload_start,omitempty"`          // "The payload to send to the `command_topic` to begin the cleaning cycle."
 	PayloadStop            *string `json:"payload_stop,omitempty"`           // "The payload to send to the `command_topic` to stop cleaning."
-	Qos                    *int    `json:"qos,omitempty"`                    // "The maximum QoS level of the state topic."
+	Platform               *string `json:"platform,omitempty"`               // "Must be `vacuum`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                    *int    `json:"qos,omitempty"`                    // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                 *bool   `json:"retain,omitempty"`                 // "If the published message should have the retain flag on or not."
-	Schema                 *string `json:"schema,omitempty"`                 // "The schema to use. Must be `state` to select the state schema."
 	SendCommandTopic       *string `json:"send_command_topic,omitempty"`     // "The MQTT topic to publish custom commands to the vacuum."
 	sendCommandFunc        func(mqtt.Message, mqtt.Client)
 	SetFanSpeedTopic       *string `json:"set_fan_speed_topic,omitempty"` // "The MQTT topic to publish commands to control the vacuum's fan speed."
 	setFanSpeedFunc        func(mqtt.Message, mqtt.Client)
-	StateTopic             *string `json:"state_topic,omitempty"` // "The MQTT topic subscribed to receive state messages from the vacuum. Messages received on the `state_topic` must be a valid JSON dictionary, with a mandatory `state` key and optionally `battery_level` and `fan_speed` keys as shown in the [example](#state-mqtt-protocol)."
+	StateTopic             *string `json:"state_topic,omitempty"` // "The MQTT topic subscribed to receive state messages from the vacuum. Messages received on the `state_topic` must be a valid JSON dictionary, with a mandatory `state` key and optionally `fan_speed` keys as shown in the [example](#configuration-example)."
 	stateFunc              func() string
-	SupportedFeatures      *([]string)  `json:"supported_features,omitempty"` // "List of features that the vacuum supports (possible values are `start`, `stop`, `pause`, `return_home`, `battery`, `status`, `locate`, `clean_spot`, `fan_speed`, `send_command`)."
-	UniqueId               *string      `json:"unique_id,omitempty"`          // "An ID that uniquely identifies this vacuum. If two vacuums have the same unique ID, Home Assistant will raise an exception."
+	SupportedFeatures      *([]string)  `json:"supported_features,omitempty"` // "List of features that the vacuum supports (possible values are `start`, `stop`, `pause`, `return_home`, `status`, `locate`, `clean_spot`, `fan_speed`, `send_command`)."
+	UniqueId               *string      `json:"unique_id,omitempty"`          // "An ID that uniquely identifies this vacuum. If two vacuums have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 	MQTT                   *MQTTFields  `json:"-"`                            // MQTT configuration parameters
 	states                 vacuumState  // Internal Holder of States
 	States                 *VacuumState `json:"-"` // External state update location
 }
 
+func (d *Vacuum) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SendCommandTopic != nil {
+		t := c.Subscribe(*d.SendCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SetFanSpeedTopic != nil {
+		t := c.Subscribe(*d.SetFanSpeedTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Vacuum) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SendCommandTopic != nil {
+		t := c.Unsubscribe(*d.SendCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.SetFanSpeedTopic != nil {
+		t := c.Unsubscribe(*d.SetFanSpeedTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewVacuum(o *VacuumOptions) (*Vacuum, error) {
 	var v Vacuum
 
@@ -125,14 +183,14 @@ func NewVacuum(o *VacuumOptions) (*Vacuum, error) {
 	if !reflect.ValueOf(o.payloadStop).IsZero() {
 		v.PayloadStop = &o.payloadStop
 	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		v.Platform = &o.platform
+	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		v.Qos = &o.qos
 	}
 	if !reflect.ValueOf(o.retain).IsZero() {
 		v.Retain = &o.retain
-	}
-	if !reflect.ValueOf(o.schema).IsZero() {
-		v.Schema = &o.schema
 	}
 	if !reflect.ValueOf(o.sendCommandFunc).IsZero() {
 		v.sendCommandFunc = o.sendCommandFunc
@@ -225,69 +283,6 @@ func (d *Vacuum) UpdateState() {
 			d.states.State = &state
 		}
 	}
-}
-func (d *Vacuum) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SendCommandTopic != nil {
-		t := c.Subscribe(*d.SendCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SetFanSpeedTopic != nil {
-		t := c.Subscribe(*d.SetFanSpeedTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Vacuum) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SendCommandTopic != nil {
-		t := c.Unsubscribe(*d.SendCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.SetFanSpeedTopic != nil {
-		t := c.Unsubscribe(*d.SetFanSpeedTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Vacuum) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Vacuum) Initialize() {
 	if d.Qos == nil {

@@ -8,69 +8,74 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 type LightOptions struct {
 	states                    LightState // External state update location
 	availabilityMode          string     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	availabilityTemplate      string     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityTemplate      string     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	availabilityFunc          func() string
-	brightnessCommandTemplate string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `brightness_command_topic`. Available variables: `value`."
+	brightnessCommandTemplate string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `brightness_command_topic`. Available variables: `value`."
 	brightnessCommandFunc     func(mqtt.Message, mqtt.Client)
 	brightnessScale           int // "Defines the maximum brightness value (i.e., 100%) of the MQTT device."
 	brightnessStateFunc       func() string
-	brightnessValueTemplate   string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the brightness value."
+	brightnessValueTemplate   string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the brightness value."
 	colorModeStateFunc        func() string
-	colorModeValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the color mode."
-	colorTempCommandTemplate  string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `color_temp_command_topic`. Available variables: `value`."
+	colorModeValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the color mode."
+	colorTempCommandTemplate  string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `color_temp_command_topic`. Available variables: `value`."
 	colorTempCommandFunc      func(mqtt.Message, mqtt.Client)
+	colorTempKelvin           bool // "When set to `true`, `color_temp_command_topic` will publish color mode updates in Kelvin and process `color_temp_state_topic` will process state updates in Kelvin. When not set the `color_temp` values are converted to mireds."
 	colorTempStateFunc        func() string
-	colorTempValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the color temperature value."
+	colorTempValueTemplate    string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the color temperature value."
 	commandFunc               func(mqtt.Message, mqtt.Client)
-	effectCommandTemplate     string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `effect_command_topic`. Available variables: `value`."
+	effectCommandTemplate     string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `effect_command_topic`. Available variables: `value`."
 	effectCommandFunc         func(mqtt.Message, mqtt.Client)
 	effectList                ([]string) // "The list of effects the light supports."
 	effectStateFunc           func() string
-	effectValueTemplate       string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the effect value."
+	effectValueTemplate       string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the effect value."
 	enabledByDefault          bool   // "Flag which defines if the entity should be enabled when first added."
 	encoding                  string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	entityCategory            string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	hsCommandTemplate         string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `hs_command_topic`. Available variables: `hue` and `sat`."
+	entityPicture             string // "Picture URL for the entity."
+	hsCommandTemplate         string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `hs_command_topic`. Available variables: `hue` and `sat`."
 	hsCommandFunc             func(mqtt.Message, mqtt.Client)
 	hsStateFunc               func() string
-	hsValueTemplate           string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the HS value."
+	hsValueTemplate           string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the HS value."
 	icon                      string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	jsonAttributesTemplate    string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesTemplate    string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	jsonAttributesFunc        func() string
+	maxKelvin                 int    // "The maximum color temperature in Kelvin."
 	maxMireds                 int    // "The maximum color temperature in mireds."
+	minKelvin                 int    // "The minimum color temperature in Kelvin."
 	minMireds                 int    // "The minimum color temperature in mireds."
-	name                      string // "The name of the light."
-	objectId                  string // "Used instead of `name` for automatic generation of `entity_id`"
+	name                      string // "The name of the light. Can be set to `null` if only the device name is relevant."
+	objectId                  string // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	onCommandType             string // "Defines when on the payload_on is sent. Using `last` (the default) will send any style (brightness, color, etc) topics first and then a `payload_on` to the `command_topic`. Using `first` will send the `payload_on` and then any style topics. Using `brightness` will only send brightness commands instead of the `payload_on` to turn the light on."
 	optimistic                bool   // "Flag that defines if switch works in optimistic mode."
 	payloadAvailable          string // "The payload that represents the available state."
 	payloadNotAvailable       string // "The payload that represents the unavailable state."
-	payloadOff                string // "The payload that represents disabled state."
-	payloadOn                 string // "The payload that represents enabled state."
-	qos                       int    // "The maximum QoS level of the state topic."
+	payloadOff                string // "The payload that represents the off state."
+	payloadOn                 string // "The payload that represents the on state."
+	platform                  string // "Must be `light`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	qos                       int    // "The maximum QoS level to be used when receiving and publishing messages."
 	retain                    bool   // "If the published message should have the retain flag on or not."
-	rgbCommandTemplate        string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgb_command_topic`. Available variables: `red`, `green` and `blue`."
+	rgbCommandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgb_command_topic`. Available variables: `red`, `green` and `blue`."
 	rgbCommandFunc            func(mqtt.Message, mqtt.Client)
 	rgbStateFunc              func() string
-	rgbValueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGB value."
-	rgbwCommandTemplate       string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`."
+	rgbValueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGB value."
+	rgbwCommandTemplate       string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`."
 	rgbwCommandFunc           func(mqtt.Message, mqtt.Client)
 	rgbwStateFunc             func() string
-	rgbwValueTemplate         string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGBW value."
-	rgbwwCommandTemplate      string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbww_command_topic`. Available variables: `red`, `green`, `blue`, `cold_white` and `warm_white`."
+	rgbwValueTemplate         string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGBW value."
+	rgbwwCommandTemplate      string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgbww_command_topic`. Available variables: `red`, `green`, `blue`, `cold_white` and `warm_white`."
 	rgbwwCommandFunc          func(mqtt.Message, mqtt.Client)
 	rgbwwStateFunc            func() string
-	rgbwwValueTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGBWW value."
-	schema                    string // "The schema to use. Must be `default` or omitted to select the default schema."
+	rgbwwValueTemplate        string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGBWW value."
+	schema                    string // "The schema to use. Must be `basic` or omitted to select the default schema."
 	stateFunc                 func() string
-	stateValueTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the state value. The template should match the payload `on` and `off` values, so if your light uses `power on` to turn on, your `state_value_template` string should return `power on` when the switch is on. For example if the message is just `on`, your `state_value_template` should be `power {{ value }}`."
-	uniqueId                  string // "An ID that uniquely identifies this light. If two lights have the same unique ID, Home Assistant will raise an exception."
+	stateValueTemplate        string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the state value. The template should return the values defined by `payload_on` (defaults to \"ON\") and `payload_off` (defaults to \"OFF\") settings, or \"None\"."
+	uniqueId                  string // "An ID that uniquely identifies this light. If two lights have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 	whiteCommandFunc          func(mqtt.Message, mqtt.Client)
 	whiteScale                int    // "Defines the maximum white level (i.e., 100%) of the MQTT device."
-	xyCommandTemplate         string // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `xy_command_topic`. Available variables: `x` and `y`."
+	xyCommandTemplate         string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `xy_command_topic`. Available variables: `x` and `y`."
 	xyCommandFunc             func(mqtt.Message, mqtt.Client)
 	xyStateFunc               func() string
-	xyValueTemplate           string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the XY value."
+	xyValueTemplate           string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the XY value."
 }
 
 func NewLightOptions() *LightOptions {
@@ -136,6 +141,10 @@ func (o *LightOptions) ColorTempCommandFunc(f func(mqtt.Message, mqtt.Client)) *
 	o.colorTempCommandFunc = f
 	return o
 }
+func (o *LightOptions) ColorTempKelvin(kelvin bool) *LightOptions {
+	o.colorTempKelvin = kelvin
+	return o
+}
 func (o *LightOptions) ColorTempStateFunc(f func() string) *LightOptions {
 	o.colorTempStateFunc = f
 	return o
@@ -198,6 +207,10 @@ func (o *LightOptions) EntityCategory(category string) *LightOptions {
 	o.entityCategory = category
 	return o
 }
+func (o *LightOptions) EntityPicture(picture string) *LightOptions {
+	o.entityPicture = picture
+	return o
+}
 func (o *LightOptions) HsCommandTemplate(template string) *LightOptions {
 	o.hsCommandTemplate = template
 	return o
@@ -235,8 +248,16 @@ func (o *LightOptions) JsonAttributesFunc(f func() string) *LightOptions {
 	o.jsonAttributesFunc = f
 	return o
 }
+func (o *LightOptions) MaxKelvin(kelvin int) *LightOptions {
+	o.maxKelvin = kelvin
+	return o
+}
 func (o *LightOptions) MaxMireds(mireds int) *LightOptions {
 	o.maxMireds = mireds
+	return o
+}
+func (o *LightOptions) MinKelvin(kelvin int) *LightOptions {
+	o.minKelvin = kelvin
 	return o
 }
 func (o *LightOptions) MinMireds(mireds int) *LightOptions {
@@ -273,6 +294,10 @@ func (o *LightOptions) PayloadOff(off string) *LightOptions {
 }
 func (o *LightOptions) PayloadOn(on string) *LightOptions {
 	o.payloadOn = on
+	return o
+}
+func (o *LightOptions) Platform(platform string) *LightOptions {
+	o.platform = platform
 	return o
 }
 func (o *LightOptions) Qos(qos int) *LightOptions {

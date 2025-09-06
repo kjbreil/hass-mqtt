@@ -8,26 +8,29 @@ import mqtt "github.com/eclipse/paho.mqtt.golang"
 type LockOptions struct {
 	states                 LockState // External state update location
 	availabilityMode       string    // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	availabilityTemplate   string    // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	availabilityTemplate   string    // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	availabilityFunc       func() string
-	codeFormat             string // "A regular expression to validate a supplied code when it is set during the service call to `open`, `lock` or `unlock` the MQTT lock."
-	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`. The lock command template accepts the parameters `value` and `code`. The `value` parameter will contain the configured value for either `payload_open`, `payload_lock` or `payload_unlock`. The `code` parameter is set during the service call to `open`, `lock` or `unlock` the MQTT lock and will be set `None` if no code was passed."
+	codeFormat             string // "A regular expression to validate a supplied code when it is set during the action to `open`, `lock` or `unlock` the MQTT lock."
+	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`. The lock command template accepts the parameters `value` and `code`. The `value` parameter will contain the configured value for either `payload_open`, `payload_lock` or `payload_unlock`. The `code` parameter is set during the action to `open`, `lock` or `unlock` the MQTT lock and will be set `None` if no code was passed."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
 	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	entityPicture          string // "Picture URL for the entity."
 	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	jsonAttributesFunc     func() string
-	name                   string // "The name of the lock."
-	objectId               string // "Used instead of `name` for automatic generation of `entity_id`"
+	name                   string // "The name of the lock. Can be set to `null` if only the device name is relevant."
+	objectId               string // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	optimistic             bool   // "Flag that defines if lock works in optimistic mode."
 	payloadAvailable       string // "The payload that represents the available state."
 	payloadLock            string // "The payload sent to the lock to lock it."
 	payloadNotAvailable    string // "The payload that represents the unavailable state."
 	payloadOpen            string // "The payload sent to the lock to open it."
+	payloadReset           string // "A special payload that resets the state to `unknown` when received on the `state_topic`."
 	payloadUnlock          string // "The payload sent to the lock to unlock it."
-	qos                    int    // "The maximum QoS level of the state topic. It will also be used for messages published to command topic."
+	platform               string // "Must be `lock`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	qos                    int    // "The maximum QoS level to be used when receiving and publishing messages."
 	retain                 bool   // "If the published message should have the retain flag on or not."
 	stateJammed            string // "The payload sent to `state_topic` by the lock when it's jammed."
 	stateLocked            string // "The payload sent to `state_topic` by the lock when it's locked."
@@ -35,8 +38,8 @@ type LockOptions struct {
 	stateFunc              func() string
 	stateUnlocked          string // "The payload sent to `state_topic` by the lock when it's unlocked."
 	stateUnlocking         string // "The payload sent to `state_topic` by the lock when it's unlocking."
-	uniqueId               string // "An ID that uniquely identifies this lock. If two locks have the same unique ID, Home Assistant will raise an exception."
-	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a state value from the payload."
+	uniqueId               string // "An ID that uniquely identifies this lock. If two locks have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
+	valueTemplate          string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a state value from the payload."
 }
 
 func NewLockOptions() *LockOptions {
@@ -81,6 +84,10 @@ func (o *LockOptions) EntityCategory(category string) *LockOptions {
 	o.entityCategory = category
 	return o
 }
+func (o *LockOptions) EntityPicture(picture string) *LockOptions {
+	o.entityPicture = picture
+	return o
+}
 func (o *LockOptions) Icon(icon string) *LockOptions {
 	o.icon = icon
 	return o
@@ -121,8 +128,16 @@ func (o *LockOptions) PayloadOpen(open string) *LockOptions {
 	o.payloadOpen = open
 	return o
 }
+func (o *LockOptions) PayloadReset(reset string) *LockOptions {
+	o.payloadReset = reset
+	return o
+}
 func (o *LockOptions) PayloadUnlock(unlock string) *LockOptions {
 	o.payloadUnlock = unlock
+	return o
+}
+func (o *LockOptions) Platform(platform string) *LockOptions {
+	o.platform = platform
 	return o
 }
 func (o *LockOptions) Qos(qos int) *LockOptions {

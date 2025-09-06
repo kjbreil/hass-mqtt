@@ -16,28 +16,45 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Camera struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
 	EnabledByDefault       *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding               *string `json:"encoding,omitempty"`                 // "The encoding of the payloads received. Set to `\"\"` to disable decoding of incoming payload. Use `image_encoding` to enable `Base64` decoding on `topic`."
 	EntityCategory         *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	EntityPicture          *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
 	Icon                   *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
 	ImageEncoding          *string `json:"image_encoding,omitempty"`           // "The encoding of the image payloads received. Set to `\"b64\"` to enable base64 decoding of image payload. If not set, the image payload must be raw binary data."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
 	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Implies `force_update` of the current sensor state when a message is received on this topic."
 	jsonAttributesFunc     func() string
-	Name                   *string `json:"name,omitempty"`      // "The name of the camera."
-	ObjectId               *string `json:"object_id,omitempty"` // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string `json:"name,omitempty"`      // "The name of the camera. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string `json:"object_id,omitempty"` // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	StateTopic             *string `json:"topic,omitempty"`     // "The MQTT topic to subscribe to."
 	stateFunc              func() string
-	UniqueId               *string      `json:"unique_id,omitempty"` // "An ID that uniquely identifies this camera. If two cameras have the same unique ID Home Assistant will raise an exception."
+	UniqueId               *string      `json:"unique_id,omitempty"` // "An ID that uniquely identifies this camera. If two cameras have the same unique ID Home Assistant will raise an exception. Required when used with device-based discovery."
 	MQTT                   *MQTTFields  `json:"-"`                   // MQTT configuration parameters
 	states                 cameraState  // Internal Holder of States
 	States                 *CameraState `json:"-"` // External state update location
 }
 
+func (d *Camera) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Camera) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+}
 func NewCamera(o *CameraOptions) (*Camera, error) {
 	var c Camera
 
@@ -59,6 +76,9 @@ func NewCamera(o *CameraOptions) (*Camera, error) {
 	}
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		c.EntityCategory = &o.entityCategory
+	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		c.EntityPicture = &o.entityPicture
 	}
 	if !reflect.ValueOf(o.icon).IsZero() {
 		c.Icon = &o.icon
@@ -162,27 +182,6 @@ func (d *Camera) UpdateState() {
 			d.states.State = &state
 		}
 	}
-}
-func (d *Camera) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Camera) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-}
-func (d *Camera) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Camera) Initialize() {
 	if d.UniqueId == nil {

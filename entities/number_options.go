@@ -9,29 +9,31 @@ type NumberOptions struct {
 	states                 NumberState // External state update location
 	availabilityMode       string      // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
 	availabilityFunc       func() string
-	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	commandTemplate        string // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	commandFunc            func(mqtt.Message, mqtt.Client)
-	deviceClass            string // "The [type/class](/integrations/number/#device-class) of the number."
+	deviceClass            string // "The [type/class](/integrations/number/#device-class) of the number. The `device_class` can be `null`."
 	enabledByDefault       bool   // "Flag which defines if the entity should be enabled when first added."
 	encoding               string // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	entityCategory         string // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	entityPicture          string // "Picture URL for the entity."
 	icon                   string // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	jsonAttributesTemplate string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
 	jsonAttributesFunc     func() string
 	max                    float64 // "Maximum value."
 	min                    float64 // "Minimum value."
 	mode                   string  // "Control how the number should be displayed in the UI. Can be set to `box` or `slider` to force a display mode."
-	name                   string  // "The name of the Number."
-	objectId               string  // "Used instead of `name` for automatic generation of `entity_id`"
+	name                   string  // "The name of the Number. Can be set to `null` if only the device name is relevant."
+	objectId               string  // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	optimistic             bool    // "Flag that defines if number works in optimistic mode."
-	payloadReset           string  // "A special payload that resets the state to `None` when received on the `state_topic`."
-	qos                    int     // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	payloadReset           string  // "A special payload that resets the state to `unknown` when received on the `state_topic`."
+	platform               string  // "Must be `number`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	qos                    int     // "The maximum QoS level to be used when receiving and publishing messages."
 	retain                 bool    // "If the published message should have the retain flag on or not."
 	stateFunc              func() string
 	step                   float64 // "Step value. Smallest value `0.001`."
-	uniqueId               string  // "An ID that uniquely identifies this Number. If two Numbers have the same unique ID Home Assistant will raise an exception."
-	unitOfMeasurement      string  // "Defines the unit of measurement of the sensor, if any."
-	valueTemplate          string  // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
+	uniqueId               string  // "An ID that uniquely identifies this Number. If two Numbers have the same unique ID Home Assistant will raise an exception. Required when used with device-based discovery."
+	unitOfMeasurement      string  // "Defines the unit of measurement of the sensor, if any. The `unit_of_measurement` can be `null`."
+	valueTemplate          string  // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the value."
 }
 
 func NewNumberOptions() *NumberOptions {
@@ -72,6 +74,10 @@ func (o *NumberOptions) EntityCategory(category string) *NumberOptions {
 	o.entityCategory = category
 	return o
 }
+func (o *NumberOptions) EntityPicture(picture string) *NumberOptions {
+	o.entityPicture = picture
+	return o
+}
 func (o *NumberOptions) Icon(icon string) *NumberOptions {
 	o.icon = icon
 	return o
@@ -110,6 +116,10 @@ func (o *NumberOptions) Optimistic(optimistic bool) *NumberOptions {
 }
 func (o *NumberOptions) PayloadReset(reset string) *NumberOptions {
 	o.payloadReset = reset
+	return o
+}
+func (o *NumberOptions) Platform(platform string) *NumberOptions {
+	o.platform = platform
 	return o
 }
 func (o *NumberOptions) Qos(qos int) *NumberOptions {

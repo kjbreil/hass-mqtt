@@ -10,8 +10,7 @@ Massive work in progress right now.
 
 To generate a new cache of Home Assistant MQTT device definitions:
 
-1. Navigate to the helpers directory: `cd helpers`
-2. Run the cache generation tool: `go run .`
+1. From the project root directory, run: `go run ./helpers/`
 
 This will:
 - Fetch the latest device documentation from Home Assistant's GitHub repository

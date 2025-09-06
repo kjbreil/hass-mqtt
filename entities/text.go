@@ -17,36 +17,68 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Text struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
-	CommandTemplate        *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	CommandTemplate        *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	CommandTopic           *string `json:"command_topic,omitempty"`    // "The MQTT topic to publish the text value that is set."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
 	EnabledByDefault       *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding               *string `json:"encoding,omitempty"`                 // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	EntityCategory         *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
+	EntityPicture          *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`."
 	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as entity attributes. Implies `force_update` of the current select state when a message is received on this topic."
 	jsonAttributesFunc     func() string
 	Max                    *int    `json:"max,omitempty"`         // "The maximum size of a text being set or received (maximum is 255)."
 	Min                    *int    `json:"min,omitempty"`         // "The minimum size of a text being set or received."
 	Mode                   *string `json:"mode,omitempty"`        // "The mode off the text entity. Must be either `text` or `password`."
-	Name                   *string `json:"name,omitempty"`        // "The name of the text entity."
-	ObjectId               *string `json:"object_id,omitempty"`   // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string `json:"name,omitempty"`        // "The name of the text entity. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string `json:"object_id,omitempty"`   // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	Pattern                *string `json:"pattern,omitempty"`     // "A valid regular expression the text being set or received must match with."
-	Qos                    *int    `json:"qos,omitempty"`         // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	Platform               *string `json:"platform,omitempty"`    // "Must be `text`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                    *int    `json:"qos,omitempty"`         // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                 *bool   `json:"retain,omitempty"`      // "If the published message should have the retain flag on or not."
 	StateTopic             *string `json:"state_topic,omitempty"` // "The MQTT topic subscribed to receive text state updates. Text state updates should match the `pattern` (if set) and meet the size constraints `min` and `max`. Can be used with `value_template` to render the incoming payload to a text update."
 	stateFunc              func() string
-	UniqueId               *string     `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception."
-	ValueTemplate          *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the text state value from the payload received on `state_topic`."
+	UniqueId               *string     `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this Select. If two Selects have the same unique ID Home Assistant will raise an exception. Required when used with device-based discovery."
+	ValueTemplate          *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the text state value from the payload received on `state_topic`."
 	MQTT                   *MQTTFields `json:"-"`                        // MQTT configuration parameters
 	states                 textState   // Internal Holder of States
 	States                 *TextState  `json:"-"` // External state update location
 }
 
+func (d *Text) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Text) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewText(o *TextOptions) (*Text, error) {
 	var t Text
 
@@ -86,6 +118,9 @@ func NewText(o *TextOptions) (*Text, error) {
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		t.EntityCategory = &o.entityCategory
 	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		t.EntityPicture = &o.entityPicture
+	}
 	if !reflect.ValueOf(o.jsonAttributesTemplate).IsZero() {
 		t.JsonAttributesTemplate = &o.jsonAttributesTemplate
 	}
@@ -111,6 +146,9 @@ func NewText(o *TextOptions) (*Text, error) {
 	}
 	if !reflect.ValueOf(o.pattern).IsZero() {
 		t.Pattern = &o.pattern
+	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		t.Platform = &o.platform
 	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		t.Qos = &o.qos
@@ -203,41 +241,6 @@ func (d *Text) UpdateState() {
 			d.states.State = &state
 		}
 	}
-}
-func (d *Text) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Text) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Text) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Text) Initialize() {
 	if d.Qos == nil {

@@ -17,34 +17,66 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Button struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
-	CommandTemplate        *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	CommandTemplate        *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	CommandTopic           *string `json:"command_topic,omitempty"`    // "The MQTT topic to publish commands to trigger the button."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
-	DeviceClass            *string `json:"device_class,omitempty"`             // "The [type/class](/integrations/button/#device-class) of the button to set the icon in the frontend."
+	DeviceClass            *string `json:"device_class,omitempty"`             // "The [type/class](/integrations/button/#device-class) of the button to set the icon in the frontend. The `device_class` can be `null`."
 	EnabledByDefault       *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding               *string `json:"encoding,omitempty"`                 // "The encoding of the published messages."
 	EntityCategory         *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	EntityPicture          *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
 	Icon                   *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc     func() string
-	Name                   *string      `json:"name,omitempty"`                  // "The name to use when displaying this button."
-	ObjectId               *string      `json:"object_id,omitempty"`             // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string      `json:"name,omitempty"`                  // "The name to use when displaying this button. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string      `json:"object_id,omitempty"`             // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	PayloadAvailable       *string      `json:"payload_available,omitempty"`     // "The payload that represents the available state."
 	PayloadNotAvailable    *string      `json:"payload_not_available,omitempty"` // "The payload that represents the unavailable state."
 	PayloadPress           *string      `json:"payload_press,omitempty"`         // "The payload To send to trigger the button."
-	Qos                    *int         `json:"qos,omitempty"`                   // "The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages."
+	Platform               *string      `json:"platform,omitempty"`              // "Must be `button`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                    *int         `json:"qos,omitempty"`                   // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                 *bool        `json:"retain,omitempty"`                // "If the published message should have the retain flag on or not."
-	UniqueId               *string      `json:"unique_id,omitempty"`             // "An ID that uniquely identifies this button entity. If two buttons have the same unique ID, Home Assistant will raise an exception."
+	UniqueId               *string      `json:"unique_id,omitempty"`             // "An ID that uniquely identifies this button entity. If two buttons have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 	MQTT                   *MQTTFields  `json:"-"`                               // MQTT configuration parameters
 	states                 buttonState  // Internal Holder of States
 	States                 *ButtonState `json:"-"` // External state update location
 }
 
+func (d *Button) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Button) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewButton(o *ButtonOptions) (*Button, error) {
 	var b Button
 
@@ -76,6 +108,9 @@ func NewButton(o *ButtonOptions) (*Button, error) {
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		b.EntityCategory = &o.entityCategory
 	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		b.EntityPicture = &o.entityPicture
+	}
 	if !reflect.ValueOf(o.icon).IsZero() {
 		b.Icon = &o.icon
 	}
@@ -101,6 +136,9 @@ func NewButton(o *ButtonOptions) (*Button, error) {
 	}
 	if !reflect.ValueOf(o.payloadPress).IsZero() {
 		b.PayloadPress = &o.payloadPress
+	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		b.Platform = &o.platform
 	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		b.Qos = &o.qos
@@ -169,41 +207,6 @@ func (d *Button) UpdateState() {
 			d.states.JsonAttributes = &state
 		}
 	}
-}
-func (d *Button) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Button) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Button) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Button) Initialize() {
 	if d.Qos == nil {

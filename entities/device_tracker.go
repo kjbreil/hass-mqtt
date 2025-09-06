@@ -16,32 +16,49 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type DeviceTracker struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
 	Icon                   *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
-	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as device_tracker attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary message containing device tracker attributes. This topic can be used to set the location of the device tracker under the following conditions:\n- If the attributes in the JSON message include `longitude`, `latitude`, and `gps_accuracy` (optional).\n - If the device tracker is within a configured [zone](/integrations/zone/).\n\nIf these conditions are met, it is not required to configure `state_topic`.\n\n Be aware that any location message received at `state_topic`  overrides the location received via `json_attributes_topic` until a message configured with `payload_reset` is received at `state_topic`. For a more generic usage example of the `json_attributes_topic`, refer to the [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc     func() string
 	Name                   *string `json:"name,omitempty"`                  // "The name of the MQTT device_tracker."
-	ObjectId               *string `json:"object_id,omitempty"`             // "Used instead of `name` for automatic generation of `entity_id`"
+	ObjectId               *string `json:"object_id,omitempty"`             // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	PayloadAvailable       *string `json:"payload_available,omitempty"`     // "The payload that represents the available state."
 	PayloadHome            *string `json:"payload_home,omitempty"`          // "The payload value that represents the 'home' state for the device."
 	PayloadNotAvailable    *string `json:"payload_not_available,omitempty"` // "The payload that represents the unavailable state."
 	PayloadNotHome         *string `json:"payload_not_home,omitempty"`      // "The payload value that represents the 'not_home' state for the device."
 	PayloadReset           *string `json:"payload_reset,omitempty"`         // "The payload value that will have the device's location automatically derived from Home Assistant's zones."
-	Qos                    *int    `json:"qos,omitempty"`                   // "The maximum QoS level of the state topic."
+	Platform               *string `json:"platform,omitempty"`              // "Must be `device_tracker`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                    *int    `json:"qos,omitempty"`                   // "The maximum QoS level to be used when receiving and publishing messages."
 	SourceType             *string `json:"source_type,omitempty"`           // "Attribute of a device tracker that affects state when being used to track a [person](/integrations/person/). Valid options are `gps`, `router`, `bluetooth`, or `bluetooth_le`."
-	StateTopic             *string `json:"state_topic,omitempty"`           // "The MQTT topic subscribed to receive device tracker state changes."
+	StateTopic             *string `json:"state_topic,omitempty"`           // "The MQTT topic subscribed to receive device tracker state changes. The states defined in `state_topic` override the location states defined by the `json_attributes_topic`. This state override is turned inactive if the `state_topic` receives a message containing `payload_reset`. The `state_topic` can only be omitted if `json_attributes_topic` is used. An empty payload is ignored. Valid payloads are `not_home`, `home` or any other custom location or zone name. Payloads for `not_home`, `home` can be overridden with the `payload_not_home`and `payload_home` config options."
 	stateFunc              func() string
-	UniqueId               *string             `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this device_tracker. If two device_trackers have the same unique ID, Home Assistant will raise an exception."
-	ValueTemplate          *string             `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a device tracker state."
+	UniqueId               *string             `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this device_tracker. If two device_trackers have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
+	ValueTemplate          *string             `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that returns a device tracker state."
 	MQTT                   *MQTTFields         `json:"-"`                        // MQTT configuration parameters
 	states                 deviceTrackerState  // Internal Holder of States
 	States                 *DeviceTrackerState `json:"-"` // External state update location
 }
 
+func (d *DeviceTracker) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *DeviceTracker) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+}
 func NewDeviceTracker(o *DeviceTrackerOptions) (*DeviceTracker, error) {
 	var d DeviceTracker
 
@@ -86,6 +103,9 @@ func NewDeviceTracker(o *DeviceTrackerOptions) (*DeviceTracker, error) {
 	}
 	if !reflect.ValueOf(o.payloadReset).IsZero() {
 		d.PayloadReset = &o.payloadReset
+	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		d.Platform = &o.platform
 	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		d.Qos = &o.qos
@@ -178,27 +198,6 @@ func (d *DeviceTracker) UpdateState() {
 			d.states.State = &state
 		}
 	}
-}
-func (d *DeviceTracker) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *DeviceTracker) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-}
-func (d *DeviceTracker) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *DeviceTracker) Initialize() {
 	if d.Qos == nil {

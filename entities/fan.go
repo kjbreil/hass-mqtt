@@ -17,63 +17,157 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Fan struct {
 	AvailabilityMode           *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate       *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate       *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic          *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc           func() string
-	CommandTemplate            *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`."
+	CommandTemplate            *string `json:"command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `command_topic`."
 	CommandTopic               *string `json:"command_topic,omitempty"`    // "The MQTT topic to publish commands to change the fan state."
 	commandFunc                func(mqtt.Message, mqtt.Client)
-	Device                     Device  `json:"device,omitempty"`                   // Device configuration parameters
+	Device                     Device  `json:"device,omitempty"`                     // Device configuration parameters
+	DirectionCommandTemplate   *string `json:"direction_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `direction_command_topic`."
+	DirectionCommandTopic      *string `json:"direction_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the direction state."
+	directionCommandFunc       func(mqtt.Message, mqtt.Client)
+	DirectionStateTopic        *string `json:"direction_state_topic,omitempty"` // "The MQTT topic subscribed to receive direction state updates."
+	directionStateFunc         func() string
+	DirectionValueTemplate     *string `json:"direction_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the direction."
 	EnabledByDefault           *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding                   *string `json:"encoding,omitempty"`                 // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	EntityCategory             *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	EntityPicture              *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
 	Icon                       *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate     *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate     *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic        *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc         func() string
-	Name                       *string `json:"name,omitempty"`                         // "The name of the fan."
-	ObjectId                   *string `json:"object_id,omitempty"`                    // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                       *string `json:"name,omitempty"`                         // "The name of the fan. Can be set to `null` if only the device name is relevant."
+	ObjectId                   *string `json:"object_id,omitempty"`                    // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	Optimistic                 *bool   `json:"optimistic,omitempty"`                   // "Flag that defines if fan works in optimistic mode"
-	OscillationCommandTemplate *string `json:"oscillation_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `oscillation_command_topic`."
+	OscillationCommandTemplate *string `json:"oscillation_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `oscillation_command_topic`."
 	OscillationCommandTopic    *string `json:"oscillation_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the oscillation state."
 	oscillationCommandFunc     func(mqtt.Message, mqtt.Client)
 	OscillationStateTopic      *string `json:"oscillation_state_topic,omitempty"` // "The MQTT topic subscribed to receive oscillation state updates."
 	oscillationStateFunc       func() string
-	OscillationValueTemplate   *string `json:"oscillation_value_template,omitempty"`  // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the oscillation."
+	OscillationValueTemplate   *string `json:"oscillation_value_template,omitempty"`  // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the oscillation."
 	PayloadAvailable           *string `json:"payload_available,omitempty"`           // "The payload that represents the available state."
 	PayloadNotAvailable        *string `json:"payload_not_available,omitempty"`       // "The payload that represents the unavailable state."
 	PayloadOff                 *string `json:"payload_off,omitempty"`                 // "The payload that represents the stop state."
 	PayloadOn                  *string `json:"payload_on,omitempty"`                  // "The payload that represents the running state."
 	PayloadOscillationOff      *string `json:"payload_oscillation_off,omitempty"`     // "The payload that represents the oscillation off state."
 	PayloadOscillationOn       *string `json:"payload_oscillation_on,omitempty"`      // "The payload that represents the oscillation on state."
-	PayloadResetPercentage     *string `json:"payload_reset_percentage,omitempty"`    // "A special payload that resets the `percentage` state attribute to `None` when received at the `percentage_state_topic`."
-	PayloadResetPresetMode     *string `json:"payload_reset_preset_mode,omitempty"`   // "A special payload that resets the `preset_mode` state attribute to `None` when received at the `preset_mode_state_topic`."
-	PercentageCommandTemplate  *string `json:"percentage_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `percentage_command_topic`."
+	PayloadResetPercentage     *string `json:"payload_reset_percentage,omitempty"`    // "A special payload that resets the `percentage` state attribute to `unknown` when received at the `percentage_state_topic`."
+	PayloadResetPresetMode     *string `json:"payload_reset_preset_mode,omitempty"`   // "A special payload that resets the `preset_mode` state attribute to `unknown` when received at the `preset_mode_state_topic`."
+	PercentageCommandTemplate  *string `json:"percentage_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `percentage_command_topic`."
 	PercentageCommandTopic     *string `json:"percentage_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the fan speed state based on a percentage."
 	percentageCommandFunc      func(mqtt.Message, mqtt.Client)
 	PercentageStateTopic       *string `json:"percentage_state_topic,omitempty"` // "The MQTT topic subscribed to receive fan speed based on percentage."
 	percentageStateFunc        func() string
-	PercentageValueTemplate    *string `json:"percentage_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the `percentage` value from the payload received on `percentage_state_topic`."
-	PresetModeCommandTemplate  *string `json:"preset_mode_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `preset_mode_command_topic`."
+	PercentageValueTemplate    *string `json:"percentage_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the `percentage` value from the payload received on `percentage_state_topic`."
+	Platform                   *string `json:"platform,omitempty"`                     // "Must be `fan`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	PresetModeCommandTemplate  *string `json:"preset_mode_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to generate the payload to send to `preset_mode_command_topic`."
 	PresetModeCommandTopic     *string `json:"preset_mode_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the preset mode."
 	presetModeCommandFunc      func(mqtt.Message, mqtt.Client)
 	PresetModeStateTopic       *string `json:"preset_mode_state_topic,omitempty"` // "The MQTT topic subscribed to receive fan speed based on presets."
 	presetModeStateFunc        func() string
-	PresetModeValueTemplate    *string     `json:"preset_mode_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
+	PresetModeValueTemplate    *string     `json:"preset_mode_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`."
 	PresetModes                *([]string) `json:"preset_modes,omitempty"`               // "List of preset modes this fan is capable of running at. Common examples include `auto`, `smart`, `whoosh`, `eco` and `breeze`."
-	Qos                        *int        `json:"qos,omitempty"`                        // "The maximum QoS level of the state topic."
+	Qos                        *int        `json:"qos,omitempty"`                        // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                     *bool       `json:"retain,omitempty"`                     // "If the published message should have the retain flag on or not."
-	SpeedRangeMax              *int        `json:"speed_range_max,omitempty"`            // "The maximum of numeric output range (representing 100 %). The number of speeds within the `speed_range` / `100` will determine the `percentage_step`."
-	SpeedRangeMin              *int        `json:"speed_range_min,omitempty"`            // "The minimum of numeric output range (`off` not included, so `speed_range_min` - `1` represents 0 %). The number of speeds within the speed_range / 100 will determine the `percentage_step`."
-	StateTopic                 *string     `json:"state_topic,omitempty"`                // "The MQTT topic subscribed to receive state updates."
+	SpeedRangeMax              *int        `json:"speed_range_max,omitempty"`            // "The maximum of numeric output range (representing 100 %). The `percentage_step` is defined by `100` / the number of speeds within the speed range."
+	SpeedRangeMin              *int        `json:"speed_range_min,omitempty"`            // "The minimum of numeric output range (`off` not included, so `speed_range_min` - `1` represents 0 %). The `percentage_step` is defined by `100` / the number of speeds within the speed range."
+	StateTopic                 *string     `json:"state_topic,omitempty"`                // "The MQTT topic subscribed to receive state updates. A \"None\" payload resets to an `unknown` state. An empty payload is ignored. By default, valid state payloads are `OFF` and `ON`. The accepted payloads can be overridden with the `payload_off` and `payload_on` config options."
 	stateFunc                  func() string
-	StateValueTemplate         *string     `json:"state_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the state."
-	UniqueId                   *string     `json:"unique_id,omitempty"`            // "An ID that uniquely identifies this fan. If two fans have the same unique ID, Home Assistant will raise an exception."
+	StateValueTemplate         *string     `json:"state_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract a value from the state."
+	UniqueId                   *string     `json:"unique_id,omitempty"`            // "An ID that uniquely identifies this fan. If two fans have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 	MQTT                       *MQTTFields `json:"-"`                              // MQTT configuration parameters
 	states                     fanState    // Internal Holder of States
 	States                     *FanState   `json:"-"` // External state update location
 }
 
+func (d *Fan) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.DirectionCommandTopic != nil {
+		t := c.Subscribe(*d.DirectionCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.OscillationCommandTopic != nil {
+		t := c.Subscribe(*d.OscillationCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.PercentageCommandTopic != nil {
+		t := c.Subscribe(*d.PercentageCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.PresetModeCommandTopic != nil {
+		t := c.Subscribe(*d.PresetModeCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Fan) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.DirectionCommandTopic != nil {
+		t := c.Unsubscribe(*d.DirectionCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.OscillationCommandTopic != nil {
+		t := c.Unsubscribe(*d.OscillationCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.PercentageCommandTopic != nil {
+		t := c.Unsubscribe(*d.PercentageCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.PresetModeCommandTopic != nil {
+		t := c.Unsubscribe(*d.PresetModeCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewFan(o *FanOptions) (*Fan, error) {
 	var f Fan
 
@@ -104,6 +198,25 @@ func NewFan(o *FanOptions) (*Fan, error) {
 			o.states.State = string(message.Payload())
 		}
 	}
+	if !reflect.ValueOf(o.directionCommandTemplate).IsZero() {
+		f.DirectionCommandTemplate = &o.directionCommandTemplate
+	}
+	if !reflect.ValueOf(o.directionCommandFunc).IsZero() {
+		f.directionCommandFunc = func(message mqtt.Message, client mqtt.Client) {
+			if o.states.Direction == string(message.Payload()) {
+				return
+			}
+			o.states.Direction = string(message.Payload())
+			f.UpdateState()
+			o.directionCommandFunc(message, client)
+		}
+	}
+	if !reflect.ValueOf(o.directionStateFunc).IsZero() {
+		f.directionStateFunc = o.directionStateFunc
+	}
+	if !reflect.ValueOf(o.directionValueTemplate).IsZero() {
+		f.DirectionValueTemplate = &o.directionValueTemplate
+	}
 	if !reflect.ValueOf(o.enabledByDefault).IsZero() {
 		f.EnabledByDefault = &o.enabledByDefault
 	}
@@ -112,6 +225,9 @@ func NewFan(o *FanOptions) (*Fan, error) {
 	}
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		f.EntityCategory = &o.entityCategory
+	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		f.EntityPicture = &o.entityPicture
 	}
 	if !reflect.ValueOf(o.icon).IsZero() {
 		f.Icon = &o.icon
@@ -195,6 +311,9 @@ func NewFan(o *FanOptions) (*Fan, error) {
 	if !reflect.ValueOf(o.percentageValueTemplate).IsZero() {
 		f.PercentageValueTemplate = &o.percentageValueTemplate
 	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		f.Platform = &o.platform
+	}
 	if !reflect.ValueOf(o.presetModeCommandTemplate).IsZero() {
 		f.PresetModeCommandTemplate = &o.presetModeCommandTemplate
 	}
@@ -251,6 +370,7 @@ func NewFan(o *FanOptions) (*Fan, error) {
 
 type fanState struct {
 	Availability   *string
+	Direction      *string
 	JsonAttributes *string
 	Oscillation    *string
 	Percentage     *string
@@ -258,6 +378,7 @@ type fanState struct {
 	State          *string
 }
 type FanState struct {
+	Direction      string
 	JsonAttributes string
 	Oscillation    string
 	Percentage     string
@@ -265,6 +386,10 @@ type FanState struct {
 	State          string
 }
 
+func (d *Fan) Direction(s string) {
+	d.States.Direction = s
+	d.UpdateState()
+}
 func (d *Fan) JsonAttributes(s string) {
 	d.States.JsonAttributes = s
 	d.UpdateState()
@@ -316,6 +441,14 @@ func (d *Fan) UpdateState() {
 			d.states.Availability = &state
 		}
 	}
+	if d.DirectionStateTopic != nil {
+		state := d.directionStateFunc()
+		if d.states.Direction == nil || state != *d.states.Direction || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
+			token := (*d.MQTT.Client).Publish(*d.DirectionStateTopic, byte(*d.Qos), true, state)
+			token.WaitTimeout(common.WaitTimeout)
+			d.states.Direction = &state
+		}
+	}
 	if d.JsonAttributesTopic != nil {
 		state := d.jsonAttributesFunc()
 		if d.states.JsonAttributes == nil || state != *d.states.JsonAttributes || (d.MQTT.ForceUpdate != nil && *d.MQTT.ForceUpdate) {
@@ -357,83 +490,6 @@ func (d *Fan) UpdateState() {
 		}
 	}
 }
-func (d *Fan) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.OscillationCommandTopic != nil {
-		t := c.Subscribe(*d.OscillationCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.PercentageCommandTopic != nil {
-		t := c.Subscribe(*d.PercentageCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.PresetModeCommandTopic != nil {
-		t := c.Subscribe(*d.PresetModeCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Fan) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.OscillationCommandTopic != nil {
-		t := c.Unsubscribe(*d.OscillationCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.PercentageCommandTopic != nil {
-		t := c.Unsubscribe(*d.PercentageCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.PresetModeCommandTopic != nil {
-		t := c.Unsubscribe(*d.PresetModeCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Fan) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
-}
 func (d *Fan) Initialize() {
 	if d.Qos == nil {
 		d.Qos = new(int)
@@ -471,6 +527,15 @@ func (d *Fan) populateTopics() {
 		d.CommandTopic = new(string)
 		*d.CommandTopic = GetTopic(d, "command_topic")
 		common.TopicStore[*d.CommandTopic] = &d.commandFunc
+	}
+	if d.directionCommandFunc != nil {
+		d.DirectionCommandTopic = new(string)
+		*d.DirectionCommandTopic = GetTopic(d, "direction_command_topic")
+		common.TopicStore[*d.DirectionCommandTopic] = &d.directionCommandFunc
+	}
+	if d.directionStateFunc != nil {
+		d.DirectionStateTopic = new(string)
+		*d.DirectionStateTopic = GetTopic(d, "direction_state_topic")
 	}
 	if d.jsonAttributesFunc != nil {
 		d.JsonAttributesTopic = new(string)

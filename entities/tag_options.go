@@ -6,7 +6,7 @@ package entities
 type TagOptions struct {
 	states        TagState // External state update location
 	stateFunc     func() string
-	valueTemplate string // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a tag ID."
+	valueTemplate string // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that returns a tag ID."
 }
 
 func NewTagOptions() *TagOptions {

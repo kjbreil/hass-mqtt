@@ -17,97 +17,258 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Light struct {
 	AvailabilityMode          *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate      *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate      *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic         *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc          func() string
-	BrightnessCommandTemplate *string `json:"brightness_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `brightness_command_topic`. Available variables: `value`."
+	BrightnessCommandTemplate *string `json:"brightness_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `brightness_command_topic`. Available variables: `value`."
 	BrightnessCommandTopic    *string `json:"brightness_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light’s brightness."
 	brightnessCommandFunc     func(mqtt.Message, mqtt.Client)
 	BrightnessScale           *int    `json:"brightness_scale,omitempty"`       // "Defines the maximum brightness value (i.e., 100%) of the MQTT device."
-	BrightnessStateTopic      *string `json:"brightness_state_topic,omitempty"` // "The MQTT topic subscribed to receive brightness state updates."
+	BrightnessStateTopic      *string `json:"brightness_state_topic,omitempty"` // "The MQTT topic subscribed to receive brightness state updates. Zero brightness values are ignored."
 	brightnessStateFunc       func() string
-	BrightnessValueTemplate   *string `json:"brightness_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the brightness value."
-	ColorModeStateTopic       *string `json:"color_mode_state_topic,omitempty"`    // "The MQTT topic subscribed to receive color mode updates. If this is not configured, `color_mode` will be automatically set according to the last received valid color or color temperature"
+	BrightnessValueTemplate   *string `json:"brightness_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the brightness value."
+	ColorModeStateTopic       *string `json:"color_mode_state_topic,omitempty"`    // "The MQTT topic subscribed to receive color mode updates. If this is not configured, `color_mode` will be automatically set according to the last received valid color or color temperature. The unit used is mireds, or if `color_temp_kelvin` is set to `true`, in Kelvin."
 	colorModeStateFunc        func() string
-	ColorModeValueTemplate    *string `json:"color_mode_value_template,omitempty"`   // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the color mode."
-	ColorTempCommandTemplate  *string `json:"color_temp_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `color_temp_command_topic`. Available variables: `value`."
-	ColorTempCommandTopic     *string `json:"color_temp_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light’s color temperature state. The color temperature command slider has a range of 153 to 500 mireds (micro reciprocal degrees)."
+	ColorModeValueTemplate    *string `json:"color_mode_value_template,omitempty"`   // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the color mode."
+	ColorTempCommandTemplate  *string `json:"color_temp_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `color_temp_command_topic`. Available variables: `value`."
+	ColorTempCommandTopic     *string `json:"color_temp_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light’s color temperature state. By default the color temperature command slider has a range of 153 to 500 mireds (micro reciprocal degrees) or a range of 2000 to 6535 Kelvin if `color_temp_kelvin` is set to `true`."
 	colorTempCommandFunc      func(mqtt.Message, mqtt.Client)
+	ColorTempKelvin           *bool   `json:"color_temp_kelvin,omitempty"`      // "When set to `true`, `color_temp_command_topic` will publish color mode updates in Kelvin and process `color_temp_state_topic` will process state updates in Kelvin. When not set the `color_temp` values are converted to mireds."
 	ColorTempStateTopic       *string `json:"color_temp_state_topic,omitempty"` // "The MQTT topic subscribed to receive color temperature state updates."
 	colorTempStateFunc        func() string
-	ColorTempValueTemplate    *string `json:"color_temp_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the color temperature value."
+	ColorTempValueTemplate    *string `json:"color_temp_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the color temperature value."
 	CommandTopic              *string `json:"command_topic,omitempty"`             // "The MQTT topic to publish commands to change the switch state."
 	commandFunc               func(mqtt.Message, mqtt.Client)
 	Device                    Device  `json:"device,omitempty"`                  // Device configuration parameters
-	EffectCommandTemplate     *string `json:"effect_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `effect_command_topic`. Available variables: `value`."
+	EffectCommandTemplate     *string `json:"effect_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `effect_command_topic`. Available variables: `value`."
 	EffectCommandTopic        *string `json:"effect_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light's effect state."
 	effectCommandFunc         func(mqtt.Message, mqtt.Client)
 	EffectList                *([]string) `json:"effect_list,omitempty"`        // "The list of effects the light supports."
 	EffectStateTopic          *string     `json:"effect_state_topic,omitempty"` // "The MQTT topic subscribed to receive effect state updates."
 	effectStateFunc           func() string
-	EffectValueTemplate       *string `json:"effect_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the effect value."
+	EffectValueTemplate       *string `json:"effect_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the effect value."
 	EnabledByDefault          *bool   `json:"enabled_by_default,omitempty"`    // "Flag which defines if the entity should be enabled when first added."
 	Encoding                  *string `json:"encoding,omitempty"`              // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	EntityCategory            *string `json:"entity_category,omitempty"`       // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
-	HsCommandTemplate         *string `json:"hs_command_template,omitempty"`   // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `hs_command_topic`. Available variables: `hue` and `sat`."
+	EntityPicture             *string `json:"entity_picture,omitempty"`        // "Picture URL for the entity."
+	HsCommandTemplate         *string `json:"hs_command_template,omitempty"`   // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `hs_command_topic`. Available variables: `hue` and `sat`."
 	HsCommandTopic            *string `json:"hs_command_topic,omitempty"`      // "The MQTT topic to publish commands to change the light's color state in HS format (Hue Saturation). Range for Hue: 0° .. 360°, Range of Saturation: 0..100. Note: Brightness is sent separately in the `brightness_command_topic`."
 	hsCommandFunc             func(mqtt.Message, mqtt.Client)
 	HsStateTopic              *string `json:"hs_state_topic,omitempty"` // "The MQTT topic subscribed to receive color state updates in HS format. The expected payload is the hue and saturation values separated by commas, for example, `359.5,100.0`. Note: Brightness is received separately in the `brightness_state_topic`."
 	hsStateFunc               func() string
-	HsValueTemplate           *string `json:"hs_value_template,omitempty"`        // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the HS value."
+	HsValueTemplate           *string `json:"hs_value_template,omitempty"`        // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the HS value."
 	Icon                      *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate    *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate    *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic       *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc        func() string
+	MaxKelvin                 *int    `json:"max_kelvin,omitempty"`            // "The maximum color temperature in Kelvin."
 	MaxMireds                 *int    `json:"max_mireds,omitempty"`            // "The maximum color temperature in mireds."
+	MinKelvin                 *int    `json:"min_kelvin,omitempty"`            // "The minimum color temperature in Kelvin."
 	MinMireds                 *int    `json:"min_mireds,omitempty"`            // "The minimum color temperature in mireds."
-	Name                      *string `json:"name,omitempty"`                  // "The name of the light."
-	ObjectId                  *string `json:"object_id,omitempty"`             // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                      *string `json:"name,omitempty"`                  // "The name of the light. Can be set to `null` if only the device name is relevant."
+	ObjectId                  *string `json:"object_id,omitempty"`             // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	OnCommandType             *string `json:"on_command_type,omitempty"`       // "Defines when on the payload_on is sent. Using `last` (the default) will send any style (brightness, color, etc) topics first and then a `payload_on` to the `command_topic`. Using `first` will send the `payload_on` and then any style topics. Using `brightness` will only send brightness commands instead of the `payload_on` to turn the light on."
 	Optimistic                *bool   `json:"optimistic,omitempty"`            // "Flag that defines if switch works in optimistic mode."
 	PayloadAvailable          *string `json:"payload_available,omitempty"`     // "The payload that represents the available state."
 	PayloadNotAvailable       *string `json:"payload_not_available,omitempty"` // "The payload that represents the unavailable state."
-	PayloadOff                *string `json:"payload_off,omitempty"`           // "The payload that represents disabled state."
-	PayloadOn                 *string `json:"payload_on,omitempty"`            // "The payload that represents enabled state."
-	Qos                       *int    `json:"qos,omitempty"`                   // "The maximum QoS level of the state topic."
+	PayloadOff                *string `json:"payload_off,omitempty"`           // "The payload that represents the off state."
+	PayloadOn                 *string `json:"payload_on,omitempty"`            // "The payload that represents the on state."
+	Platform                  *string `json:"platform,omitempty"`              // "Must be `light`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                       *int    `json:"qos,omitempty"`                   // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                    *bool   `json:"retain,omitempty"`                // "If the published message should have the retain flag on or not."
-	RgbCommandTemplate        *string `json:"rgb_command_template,omitempty"`  // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgb_command_topic`. Available variables: `red`, `green` and `blue`."
+	RgbCommandTemplate        *string `json:"rgb_command_template,omitempty"`  // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgb_command_topic`. Available variables: `red`, `green` and `blue`."
 	RgbCommandTopic           *string `json:"rgb_command_topic,omitempty"`     // "The MQTT topic to publish commands to change the light's RGB state."
 	rgbCommandFunc            func(mqtt.Message, mqtt.Client)
 	RgbStateTopic             *string `json:"rgb_state_topic,omitempty"` // "The MQTT topic subscribed to receive RGB state updates. The expected payload is the RGB values separated by commas, for example, `255,0,127`."
 	rgbStateFunc              func() string
-	RgbValueTemplate          *string `json:"rgb_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGB value."
-	RgbwCommandTemplate       *string `json:"rgbw_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`."
+	RgbValueTemplate          *string `json:"rgb_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGB value."
+	RgbwCommandTemplate       *string `json:"rgbw_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`."
 	RgbwCommandTopic          *string `json:"rgbw_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light's RGBW state."
 	rgbwCommandFunc           func(mqtt.Message, mqtt.Client)
 	RgbwStateTopic            *string `json:"rgbw_state_topic,omitempty"` // "The MQTT topic subscribed to receive RGBW state updates. The expected payload is the RGBW values separated by commas, for example, `255,0,127,64`."
 	rgbwStateFunc             func() string
-	RgbwValueTemplate         *string `json:"rgbw_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGBW value."
-	RgbwwCommandTemplate      *string `json:"rgbww_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbww_command_topic`. Available variables: `red`, `green`, `blue`, `cold_white` and `warm_white`."
+	RgbwValueTemplate         *string `json:"rgbw_value_template,omitempty"`    // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGBW value."
+	RgbwwCommandTemplate      *string `json:"rgbww_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `rgbww_command_topic`. Available variables: `red`, `green`, `blue`, `cold_white` and `warm_white`."
 	RgbwwCommandTopic         *string `json:"rgbww_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light's RGBWW state."
 	rgbwwCommandFunc          func(mqtt.Message, mqtt.Client)
 	RgbwwStateTopic           *string `json:"rgbww_state_topic,omitempty"` // "The MQTT topic subscribed to receive RGBWW state updates. The expected payload is the RGBWW values separated by commas, for example, `255,0,127,64,32`."
 	rgbwwStateFunc            func() string
-	RgbwwValueTemplate        *string `json:"rgbww_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the RGBWW value."
-	Schema                    *string `json:"schema,omitempty"`               // "The schema to use. Must be `default` or omitted to select the default schema."
-	StateTopic                *string `json:"state_topic,omitempty"`          // "The MQTT topic subscribed to receive state updates."
+	RgbwwValueTemplate        *string `json:"rgbww_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the RGBWW value."
+	Schema                    *string `json:"schema,omitempty"`               // "The schema to use. Must be `basic` or omitted to select the default schema."
+	StateTopic                *string `json:"state_topic,omitempty"`          // "The MQTT topic subscribed to receive state updates. A \"None\" payload resets to an `unknown` state. An empty payload is ignored. By default, valid state payloads are `OFF` and `ON`. The accepted payloads can be overridden with the `payload_off` and `payload_on` config options."
 	stateFunc                 func() string
-	StateValueTemplate        *string `json:"state_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the state value. The template should match the payload `on` and `off` values, so if your light uses `power on` to turn on, your `state_value_template` string should return `power on` when the switch is on. For example if the message is just `on`, your `state_value_template` should be `power {{ value }}`."
-	UniqueId                  *string `json:"unique_id,omitempty"`            // "An ID that uniquely identifies this light. If two lights have the same unique ID, Home Assistant will raise an exception."
+	StateValueTemplate        *string `json:"state_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the state value. The template should return the values defined by `payload_on` (defaults to \"ON\") and `payload_off` (defaults to \"OFF\") settings, or \"None\"."
+	UniqueId                  *string `json:"unique_id,omitempty"`            // "An ID that uniquely identifies this light. If two lights have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
 	WhiteCommandTopic         *string `json:"white_command_topic,omitempty"`  // "The MQTT topic to publish commands to change the light to white mode with a given brightness."
 	whiteCommandFunc          func(mqtt.Message, mqtt.Client)
 	WhiteScale                *int    `json:"white_scale,omitempty"`         // "Defines the maximum white level (i.e., 100%) of the MQTT device."
-	XyCommandTemplate         *string `json:"xy_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `xy_command_topic`. Available variables: `x` and `y`."
+	XyCommandTemplate         *string `json:"xy_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to compose message which will be sent to `xy_command_topic`. Available variables: `x` and `y`."
 	XyCommandTopic            *string `json:"xy_command_topic,omitempty"`    // "The MQTT topic to publish commands to change the light's XY state."
 	xyCommandFunc             func(mqtt.Message, mqtt.Client)
 	XyStateTopic              *string `json:"xy_state_topic,omitempty"` // "The MQTT topic subscribed to receive XY state updates. The expected payload is the X and Y color values separated by commas, for example, `0.675,0.322`."
 	xyStateFunc               func() string
-	XyValueTemplate           *string     `json:"xy_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the XY value."
+	XyValueTemplate           *string     `json:"xy_value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the XY value."
 	MQTT                      *MQTTFields `json:"-"`                           // MQTT configuration parameters
 	states                    lightState  // Internal Holder of States
 	States                    *LightState `json:"-"` // External state update location
 }
 
+func (d *Light) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.BrightnessCommandTopic != nil {
+		t := c.Subscribe(*d.BrightnessCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.ColorTempCommandTopic != nil {
+		t := c.Subscribe(*d.ColorTempCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.EffectCommandTopic != nil {
+		t := c.Subscribe(*d.EffectCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.HsCommandTopic != nil {
+		t := c.Subscribe(*d.HsCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbCommandTopic != nil {
+		t := c.Subscribe(*d.RgbCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbwCommandTopic != nil {
+		t := c.Subscribe(*d.RgbwCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbwwCommandTopic != nil {
+		t := c.Subscribe(*d.RgbwwCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.WhiteCommandTopic != nil {
+		t := c.Subscribe(*d.WhiteCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.XyCommandTopic != nil {
+		t := c.Subscribe(*d.XyCommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *Light) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.BrightnessCommandTopic != nil {
+		t := c.Unsubscribe(*d.BrightnessCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.ColorTempCommandTopic != nil {
+		t := c.Unsubscribe(*d.ColorTempCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.EffectCommandTopic != nil {
+		t := c.Unsubscribe(*d.EffectCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.HsCommandTopic != nil {
+		t := c.Unsubscribe(*d.HsCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbCommandTopic != nil {
+		t := c.Unsubscribe(*d.RgbCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbwCommandTopic != nil {
+		t := c.Unsubscribe(*d.RgbwCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.RgbwwCommandTopic != nil {
+		t := c.Unsubscribe(*d.RgbwwCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.WhiteCommandTopic != nil {
+		t := c.Unsubscribe(*d.WhiteCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	if d.XyCommandTopic != nil {
+		t := c.Unsubscribe(*d.XyCommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewLight(o *LightOptions) (*Light, error) {
 	var l Light
 
@@ -162,6 +323,9 @@ func NewLight(o *LightOptions) (*Light, error) {
 			o.colorTempCommandFunc(message, client)
 		}
 	}
+	if !reflect.ValueOf(o.colorTempKelvin).IsZero() {
+		l.ColorTempKelvin = &o.colorTempKelvin
+	}
 	if !reflect.ValueOf(o.colorTempStateFunc).IsZero() {
 		l.colorTempStateFunc = o.colorTempStateFunc
 	}
@@ -213,6 +377,9 @@ func NewLight(o *LightOptions) (*Light, error) {
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		l.EntityCategory = &o.entityCategory
 	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		l.EntityPicture = &o.entityPicture
+	}
 	if !reflect.ValueOf(o.hsCommandTemplate).IsZero() {
 		l.HsCommandTemplate = &o.hsCommandTemplate
 	}
@@ -241,8 +408,14 @@ func NewLight(o *LightOptions) (*Light, error) {
 	if !reflect.ValueOf(o.jsonAttributesFunc).IsZero() {
 		l.jsonAttributesFunc = o.jsonAttributesFunc
 	}
+	if !reflect.ValueOf(o.maxKelvin).IsZero() {
+		l.MaxKelvin = &o.maxKelvin
+	}
 	if !reflect.ValueOf(o.maxMireds).IsZero() {
 		l.MaxMireds = &o.maxMireds
+	}
+	if !reflect.ValueOf(o.minKelvin).IsZero() {
+		l.MinKelvin = &o.minKelvin
 	}
 	if !reflect.ValueOf(o.minMireds).IsZero() {
 		l.MinMireds = &o.minMireds
@@ -272,6 +445,9 @@ func NewLight(o *LightOptions) (*Light, error) {
 	}
 	if !reflect.ValueOf(o.payloadOn).IsZero() {
 		l.PayloadOn = &o.payloadOn
+	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		l.Platform = &o.platform
 	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		l.Qos = &o.qos
@@ -575,167 +751,6 @@ func (d *Light) UpdateState() {
 			d.states.Xy = &state
 		}
 	}
-}
-func (d *Light) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.BrightnessCommandTopic != nil {
-		t := c.Subscribe(*d.BrightnessCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.ColorTempCommandTopic != nil {
-		t := c.Subscribe(*d.ColorTempCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.EffectCommandTopic != nil {
-		t := c.Subscribe(*d.EffectCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.HsCommandTopic != nil {
-		t := c.Subscribe(*d.HsCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbCommandTopic != nil {
-		t := c.Subscribe(*d.RgbCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbwCommandTopic != nil {
-		t := c.Subscribe(*d.RgbwCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbwwCommandTopic != nil {
-		t := c.Subscribe(*d.RgbwwCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.WhiteCommandTopic != nil {
-		t := c.Subscribe(*d.WhiteCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.XyCommandTopic != nil {
-		t := c.Subscribe(*d.XyCommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *Light) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.BrightnessCommandTopic != nil {
-		t := c.Unsubscribe(*d.BrightnessCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.ColorTempCommandTopic != nil {
-		t := c.Unsubscribe(*d.ColorTempCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.EffectCommandTopic != nil {
-		t := c.Unsubscribe(*d.EffectCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.HsCommandTopic != nil {
-		t := c.Unsubscribe(*d.HsCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbCommandTopic != nil {
-		t := c.Unsubscribe(*d.RgbCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbwCommandTopic != nil {
-		t := c.Unsubscribe(*d.RgbwCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.RgbwwCommandTopic != nil {
-		t := c.Unsubscribe(*d.RgbwwCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.WhiteCommandTopic != nil {
-		t := c.Unsubscribe(*d.WhiteCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	if d.XyCommandTopic != nil {
-		t := c.Unsubscribe(*d.XyCommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *Light) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *Light) Initialize() {
 	if d.Qos == nil {

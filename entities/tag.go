@@ -15,12 +15,23 @@ type Tag struct {
 	Device        Device  `json:"device,omitempty"` // Device configuration parameters
 	StateTopic    *string `json:"topic,omitempty"`  // "The MQTT topic subscribed to receive tag scanned events."
 	stateFunc     func() string
-	ValueTemplate *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a tag ID."
+	ValueTemplate *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that returns a tag ID."
 	MQTT          *MQTTFields `json:"-"`                        // MQTT configuration parameters
 	states        tagState    // Internal Holder of States
 	States        *TagState   `json:"-"` // External state update location
 }
 
+func (d *Tag) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.UpdateState()
+}
+func (d *Tag) UnSubscribe() {}
 func NewTag(o *TagOptions) (*Tag, error) {
 	var t Tag
 
@@ -81,18 +92,6 @@ func (d *Tag) UpdateState() {
 		}
 	}
 }
-func (d *Tag) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.UpdateState()
-}
-func (d *Tag) UnSubscribe()       {}
-func (d *Tag) AnnounceAvailable() {}
 func (d *Tag) Initialize() {
 	if d.MQTT == nil {
 		d.MQTT = new(MQTTFields)

@@ -17,26 +17,27 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type AlarmControlPanel struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
 	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to receive availability (online/offline) updates. Must not be used together with `availability`."
 	availabilityFunc       func() string
-	Code                   *string `json:"code,omitempty"`                  // "If defined, specifies a code to enable or disable the alarm in the frontend. Note that the code is validated locally and blocks sending MQTT messages to the remote device. For remote code validation, the code can be configured to either of the special values `REMOTE_CODE` (numeric code) or `REMOTE_CODE_TEXT` (text code). In this case, local code validation is bypassed but the frontend will still show a numeric or text code dialog. Use `command_template` to send the code to the remote device. Example configurations for remote code validation [can be found here](./#configurations-with-remote-code-validation)."
+	Code                   *string `json:"code,omitempty"`                  // "If defined, specifies a code to enable or disable the alarm in the frontend. Note that the code is validated locally and blocks sending MQTT messages to the remote device. For remote code validation, the code can be configured to either of the special values `REMOTE_CODE` (numeric code) or `REMOTE_CODE_TEXT` (text code). In this case, local code validation is bypassed but the frontend will still show a numeric or text code dialog. Use `command_template` to send the code to the remote device. Example configurations for remote code validation [can be found here](#configurations-with-remote-code-validation)."
 	CodeArmRequired        *bool   `json:"code_arm_required,omitempty"`     // "If true the code is required to arm the alarm. If false the code is not validated."
 	CodeDisarmRequired     *bool   `json:"code_disarm_required,omitempty"`  // "If true the code is required to disarm the alarm. If false the code is not validated."
 	CodeTriggerRequired    *bool   `json:"code_trigger_required,omitempty"` // "If true the code is required to trigger the alarm. If false the code is not validated."
-	CommandTemplate        *string `json:"command_template,omitempty"`      // "The [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) used for the command payload. Available variables: `action` and `code`."
+	CommandTemplate        *string `json:"command_template,omitempty"`      // "The [template](/docs/configuration/templating/#using-command-templates-with-mqtt) used for the command payload. Available variables: `action` and `code`."
 	CommandTopic           *string `json:"command_topic,omitempty"`         // "The MQTT topic to publish commands to change the alarm state."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
 	EnabledByDefault       *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding               *string `json:"encoding,omitempty"`                 // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	EntityCategory         *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	EntityPicture          *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
 	Icon                   *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc     func() string
-	Name                   *string `json:"name,omitempty"`                      // "The name of the alarm."
-	ObjectId               *string `json:"object_id,omitempty"`                 // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string `json:"name,omitempty"`                      // "The name of the alarm. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string `json:"object_id,omitempty"`                 // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	PayloadArmAway         *string `json:"payload_arm_away,omitempty"`          // "The payload to set armed-away mode on your Alarm Panel."
 	PayloadArmCustomBypass *string `json:"payload_arm_custom_bypass,omitempty"` // "The payload to set armed-custom-bypass mode on your Alarm Panel."
 	PayloadArmHome         *string `json:"payload_arm_home,omitempty"`          // "The payload to set armed-home mode on your Alarm Panel."
@@ -46,17 +47,49 @@ type AlarmControlPanel struct {
 	PayloadDisarm          *string `json:"payload_disarm,omitempty"`            // "The payload to disarm your Alarm Panel."
 	PayloadNotAvailable    *string `json:"payload_not_available,omitempty"`     // "The payload that represents the unavailable state."
 	PayloadTrigger         *string `json:"payload_trigger,omitempty"`           // "The payload to trigger the alarm on your Alarm Panel."
-	Qos                    *int    `json:"qos,omitempty"`                       // "The maximum QoS level of the state topic."
+	Platform               *string `json:"platform,omitempty"`                  // "Must be `alarm_control_panel`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
+	Qos                    *int    `json:"qos,omitempty"`                       // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                 *bool   `json:"retain,omitempty"`                    // "If the published message should have the retain flag on or not."
-	StateTopic             *string `json:"state_topic,omitempty"`               // "The MQTT topic subscribed to receive state updates."
+	StateTopic             *string `json:"state_topic,omitempty"`               // "The MQTT topic subscribed to receive state updates. A \"None\" payload resets to an `unknown` state. An empty payload is ignored. Valid state payloads are: `armed_away`, `armed_custom_bypass`, `armed_home`, `armed_night`, `armed_vacation`, `arming`, `disarmed`, `disarming` `pending` and `triggered`."
 	stateFunc              func() string
-	UniqueId               *string                 `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this alarm panel. If two alarm panels have the same unique ID, Home Assistant will raise an exception."
-	ValueTemplate          *string                 `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value."
-	MQTT                   *MQTTFields             `json:"-"`                        // MQTT configuration parameters
+	SupportedFeatures      *([]string)             `json:"supported_features,omitempty"` // "A list of features that the alarm control panel supports. The available list options are `arm_home`, `arm_away`, `arm_night`, `arm_vacation`, `arm_custom_bypass`, and `trigger`."
+	UniqueId               *string                 `json:"unique_id,omitempty"`          // "An ID that uniquely identifies this alarm panel. If two alarm panels have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
+	ValueTemplate          *string                 `json:"value_template,omitempty"`     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the value."
+	MQTT                   *MQTTFields             `json:"-"`                            // MQTT configuration parameters
 	states                 alarmControlPanelState  // Internal Holder of States
 	States                 *AlarmControlPanelState `json:"-"` // External state update location
 }
 
+func (d *AlarmControlPanel) Subscribe() {
+	c := *d.MQTT.Client
+	message, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.CommandTopic != nil {
+		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
+	token.WaitTimeout(common.WaitTimeout)
+	d.availabilityFunc()
+	d.UpdateState()
+}
+func (d *AlarmControlPanel) UnSubscribe() {
+	c := *d.MQTT.Client
+	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
+	token.WaitTimeout(common.WaitTimeout)
+	if d.CommandTopic != nil {
+		t := c.Unsubscribe(*d.CommandTopic)
+		t.WaitTimeout(common.WaitTimeout)
+		if t.Error() != nil {
+			log.Fatal(t.Error())
+		}
+	}
+}
 func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, error) {
 	var a AlarmControlPanel
 
@@ -108,6 +141,9 @@ func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, erro
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		a.EntityCategory = &o.entityCategory
 	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		a.EntityPicture = &o.entityPicture
+	}
 	if !reflect.ValueOf(o.icon).IsZero() {
 		a.Icon = &o.icon
 	}
@@ -152,6 +188,9 @@ func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, erro
 	if !reflect.ValueOf(o.payloadTrigger).IsZero() {
 		a.PayloadTrigger = &o.payloadTrigger
 	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		a.Platform = &o.platform
+	}
 	if !reflect.ValueOf(o.qos).IsZero() {
 		a.Qos = &o.qos
 	}
@@ -164,6 +203,9 @@ func NewAlarmControlPanel(o *AlarmControlPanelOptions) (*AlarmControlPanel, erro
 		a.stateFunc = func() string {
 			return a.States.State
 		}
+	}
+	if !reflect.ValueOf(o.supportedFeatures).IsZero() {
+		a.SupportedFeatures = &o.supportedFeatures
 	}
 	if !reflect.ValueOf(o.uniqueId).IsZero() {
 		a.UniqueId = &o.uniqueId
@@ -243,41 +285,6 @@ func (d *AlarmControlPanel) UpdateState() {
 			d.states.State = &state
 		}
 	}
-}
-func (d *AlarmControlPanel) Subscribe() {
-	c := *d.MQTT.Client
-	message, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.CommandTopic != nil {
-		t := c.Subscribe(*d.CommandTopic, 0, d.MQTT.MessageHandler)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-	token := c.Publish(GetDiscoveryTopic(d), 2, true, message)
-	token.WaitTimeout(common.WaitTimeout)
-	d.availabilityFunc()
-	d.UpdateState()
-}
-func (d *AlarmControlPanel) UnSubscribe() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, false, "offline")
-	token.WaitTimeout(common.WaitTimeout)
-	if d.CommandTopic != nil {
-		t := c.Unsubscribe(*d.CommandTopic)
-		t.WaitTimeout(common.WaitTimeout)
-		if t.Error() != nil {
-			log.Fatal(t.Error())
-		}
-	}
-}
-func (d *AlarmControlPanel) AnnounceAvailable() {
-	c := *d.MQTT.Client
-	token := c.Publish(*d.AvailabilityTopic, 2, true, "online")
-	token.WaitTimeout(common.WaitTimeout)
 }
 func (d *AlarmControlPanel) Initialize() {
 	if d.Qos == nil {
