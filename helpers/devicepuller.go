@@ -21,28 +21,28 @@ import (
 // }
 
 var DeviceNames = []string{
-	// "alarm_control_panel",
-	// "binary_sensor",
-	// "button",
-	// "camera",
-	// "climate",
+	"alarm_control_panel",
+	"binary_sensor",
+	"button",
+	"camera",
+	"climate",
 	"cover",
-	// "device_tracker",
-	// "device_trigger",
-	// "fan",
-	// "humidifier",
-	// "light",
-	// "lock",
-	// "number",
-	// "scene",
-	// "select",
-	// "sensor",
-	// "siren",
-	// "switch",
-	// "tag",
-	// "text",
-	// "update",
-	// "vacuum",
+	"device_tracker",
+	"device_trigger",
+	"fan",
+	"humidifier",
+	"light",
+	"lock",
+	"number",
+	"scene",
+	"select",
+	"sensor",
+	"siren",
+	"switch",
+	"tag",
+	"text",
+	"update",
+	"vacuum",
 }
 
 // Device represents a Home Assistant MQTT device with its name and JSON definition.
@@ -51,7 +51,7 @@ type Device struct {
 	JSONContainer *gabs.Container
 }
 
-var PullNew = false
+var PullNew = true
 
 // DevicesInit initializes all devices listed in DeviceNames and returns them as a slice.
 func DevicesInit() (retval []Device) {

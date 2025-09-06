@@ -5,3 +5,20 @@ for a singular use. I wanted to be able to just use Home Assistant Devices/Entit
 was done there.
 
 Massive work in progress right now.
+
+## Generating Device Cache
+
+To generate a new cache of Home Assistant MQTT device definitions:
+
+1. Navigate to the helpers directory: `cd helpers`
+2. Run the cache generation tool: `go run .`
+
+This will:
+- Fetch the latest device documentation from Home Assistant's GitHub repository
+- Extract YAML configuration definitions for each device type  
+- Cache both the raw markdown docs and processed YAML files in `./helpers/cache/`
+- Generate Go code for entities based on the cached definitions
+
+The cache includes device definitions for: alarm_control_panel, binary_sensor, button, camera, climate, cover, device_tracker, device_trigger, fan, humidifier, light, lock, number, scene, select, sensor, siren, switch, tag, text, update, and vacuum.
+
+To force re-downloading of cached files, set `PullNew = true` in `devicepuller.go` before running.

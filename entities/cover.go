@@ -17,36 +17,39 @@ import (
 // //////////////////////////////////////////////////////////////////////////////
 type Cover struct {
 	AvailabilityMode       *string `json:"availability_mode,omitempty"`     // "When `availability` is configured, this controls the conditions needed to set the entity to `available`. Valid entries are `all`, `any`, and `latest`. If set to `all`, `payload_available` must be received on all configured availability topics before the entity is marked as online. If set to `any`, `payload_available` must be received on at least one configured availability topic before the entity is marked as online. If set to `latest`, the last `payload_available` or `payload_not_available` received on any configured availability topic controls the availability."
-	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
-	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The MQTT topic subscribed to to receive birth and LWT messages from the MQTT cover device. If an `availability` topic is not defined, the cover availability state will always be `available`. If an `availability` topic is defined, the cover availability state will be `unavailable` by default. Must not be used together with `availability`."
+	AvailabilityTemplate   *string `json:"availability_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract device's availability from the `availability_topic`. To determine the devices's availability result of this template will be compared to `payload_available` and `payload_not_available`."
+	AvailabilityTopic      *string `json:"availability_topic,omitempty"`    // "The subscribed-to MQTT topic to receive birth and LWT messages from the MQTT cover device. If an `availability` topic is not defined, the cover availability state will always be `available`. If an `availability` topic is defined, the cover availability state will be `unavailable` by default. Must not be used together with `availability`."
 	availabilityFunc       func() string
 	CommandTopic           *string `json:"command_topic,omitempty"` // "The MQTT topic to publish commands to control the cover."
 	commandFunc            func(mqtt.Message, mqtt.Client)
 	Device                 Device  `json:"device,omitempty"`                   // Device configuration parameters
-	DeviceClass            *string `json:"device_class,omitempty"`             // "Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend."
+	DeviceClass            *string `json:"device_class,omitempty"`             // "Sets the [class of the device](/integrations/cover/#device_class), changing the device state and icon that is displayed on the frontend. The `device_class` can be `null`."
 	EnabledByDefault       *bool   `json:"enabled_by_default,omitempty"`       // "Flag which defines if the entity should be enabled when first added."
 	Encoding               *string `json:"encoding,omitempty"`                 // "The encoding of the payloads received and published messages. Set to `\"\"` to disable decoding of incoming payload."
 	EntityCategory         *string `json:"entity_category,omitempty"`          // "The [category](https://developers.home-assistant.io/docs/core/entity#generic-properties) of the entity."
+	EntityPicture          *string `json:"entity_picture,omitempty"`           // "Picture URL for the entity."
 	Icon                   *string `json:"icon,omitempty"`                     // "[Icon](/docs/configuration/customizing-devices/#icon) for the entity."
-	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
+	JsonAttributesTemplate *string `json:"json_attributes_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation."
 	JsonAttributesTopic    *string `json:"json_attributes_topic,omitempty"`    // "The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation."
 	jsonAttributesFunc     func() string
-	Name                   *string `json:"name,omitempty"`                  // "The name of the cover."
-	ObjectId               *string `json:"object_id,omitempty"`             // "Used instead of `name` for automatic generation of `entity_id`"
+	Name                   *string `json:"name,omitempty"`                  // "The name of the cover. Can be set to `null` if only the device name is relevant."
+	ObjectId               *string `json:"object_id,omitempty"`             // "Used `object_id` instead of `name` for automatic generation of `entity_id`. This only works when the entity is added for the first time. When set, this overrides a user-customized Entity ID in case the entity was deleted and added again."
 	Optimistic             *bool   `json:"optimistic,omitempty"`            // "Flag that defines if switch works in optimistic mode."
 	PayloadAvailable       *string `json:"payload_available,omitempty"`     // "The payload that represents the online state."
 	PayloadClose           *string `json:"payload_close,omitempty"`         // "The command payload that closes the cover."
 	PayloadNotAvailable    *string `json:"payload_not_available,omitempty"` // "The payload that represents the offline state."
 	PayloadOpen            *string `json:"payload_open,omitempty"`          // "The command payload that opens the cover."
 	PayloadStop            *string `json:"payload_stop,omitempty"`          // "The command payload that stops the cover."
+	PayloadStopTilt        *string `json:"payload_stop_tilt,omitempty"`     // "The command payload that stops the tilt."
+	Platform               *string `json:"platform,omitempty"`              // "Must be `cover`. Only allowed and required in [MQTT auto discovery device messages](/integrations/mqtt/#device-discovery-payload)."
 	PositionClosed         *int    `json:"position_closed,omitempty"`       // "Number which represents closed position."
 	PositionOpen           *int    `json:"position_open,omitempty"`         // "Number which represents open position."
-	PositionTemplate       *string `json:"position_template,omitempty"`     // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that can be used to extract the payload for the `position_topic` topic. Within the template the following variables are available: `entity_id`, `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [States](/docs/configuration/templating/#States) template function;"
+	PositionTemplate       *string `json:"position_template,omitempty"`     // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that can be used to extract the payload for the `position_topic` topic. Within the template the following variables are available: `entity_id`, `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [states](/docs/configuration/templating/#states) template function;"
 	PositionTopic          *string `json:"position_topic,omitempty"`        // "The MQTT topic subscribed to receive cover position messages."
 	positionFunc           func() string
 	Qos                    *int    `json:"qos,omitempty"`                   // "The maximum QoS level to be used when receiving and publishing messages."
 	Retain                 *bool   `json:"retain,omitempty"`                // "Defines if published messages should have the retain flag set."
-	SetPositionTemplate    *string `json:"set_position_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to define the position to be sent to the `set_position_topic` topic. Incoming position value is available for use in the template `{% raw %}{{ position }}{% endraw %}`. Within the template the following variables are available: `entity_id`, `position`, the target position in percent; `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [States](/docs/configuration/templating/#States) template function;"
+	SetPositionTemplate    *string `json:"set_position_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) to define the position to be sent to the `set_position_topic` topic. Incoming position value is available for use in the template `{% raw %}{{ position }}{% endraw %}`. Within the template the following variables are available: `entity_id`, `position`, the target position in percent; `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [states](/docs/configuration/templating/#states) template function;"
 	SetPositionTopic       *string `json:"set_position_topic,omitempty"`    // "The MQTT topic to publish position commands to. You need to set position_topic as well if you want to use position topic. Use template if position topic wants different values than within range `position_closed` - `position_open`. If template is not defined and `position_closed != 100` and `position_open != 0` then proper position value is calculated from percentage position."
 	setPositionFunc        func(mqtt.Message, mqtt.Client)
 	StateClosed            *string `json:"state_closed,omitempty"`  // "The payload that represents the closed state."
@@ -54,21 +57,21 @@ type Cover struct {
 	StateOpen              *string `json:"state_open,omitempty"`    // "The payload that represents the open state."
 	StateOpening           *string `json:"state_opening,omitempty"` // "The payload that represents the opening state."
 	StateStopped           *string `json:"state_stopped,omitempty"` // "The payload that represents the stopped state (for covers that do not report `open`/`closed` state)."
-	StateTopic             *string `json:"state_topic,omitempty"`   // "The MQTT topic subscribed to receive cover state messages. State topic can only read (`open`, `opening`, `closed`, `closing` or `stopped`) state."
+	StateTopic             *string `json:"state_topic,omitempty"`   // "The MQTT topic subscribed to receive cover state messages. State topic can only read a (`open`, `opening`, `closed`, `closing` or `stopped`) state.  A \"None\" payload resets to an `unknown` state. An empty payload is ignored."
 	stateFunc              func() string
 	TiltClosedValue        *int    `json:"tilt_closed_value,omitempty"`     // "The value that will be sent on a `close_cover_tilt` command."
-	TiltCommandTemplate    *string `json:"tilt_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that can be used to extract the payload for the `tilt_command_topic` topic. Within the template the following variables are available: `entity_id`, `tilt_position`, the target tilt position in percent; `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [States](/docs/configuration/templating/#States) template function;"
+	TiltCommandTemplate    *string `json:"tilt_command_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-command-templates-with-mqtt) that can be used to extract the payload for the `tilt_command_topic` topic. Within the template the following variables are available: `entity_id`, `tilt_position`, the target tilt position in percent; `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [states](/docs/configuration/templating/#states) template function;"
 	TiltCommandTopic       *string `json:"tilt_command_topic,omitempty"`    // "The MQTT topic to publish commands to control the cover tilt."
 	tiltCommandFunc        func(mqtt.Message, mqtt.Client)
 	TiltMax                *int    `json:"tilt_max,omitempty"`             // "The maximum tilt value."
 	TiltMin                *int    `json:"tilt_min,omitempty"`             // "The minimum tilt value."
 	TiltOpenedValue        *int    `json:"tilt_opened_value,omitempty"`    // "The value that will be sent on an `open_cover_tilt` command."
 	TiltOptimistic         *bool   `json:"tilt_optimistic,omitempty"`      // "Flag that determines if tilt works in optimistic mode."
-	TiltStatusTemplate     *string `json:"tilt_status_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that can be used to extract the payload for the `tilt_status_topic` topic. Within the template the following variables are available: `entity_id`, `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [States](/docs/configuration/templating/#States) template function;"
+	TiltStatusTemplate     *string `json:"tilt_status_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that can be used to extract the payload for the `tilt_status_topic` topic. Within the template the following variables are available: `entity_id`, `position_open`; `position_closed`; `tilt_min`; `tilt_max`. The `entity_id` can be used to reference the entity's attributes with help of the [states](/docs/configuration/templating/#states) template function;"
 	TiltStatusTopic        *string `json:"tilt_status_topic,omitempty"`    // "The MQTT topic subscribed to receive tilt status update values."
 	tiltStatusFunc         func() string
-	UniqueId               *string     `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this cover. If two covers have the same unique ID, Home Assistant will raise an exception."
-	ValueTemplate          *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that can be used to extract the payload for the `state_topic` topic."
+	UniqueId               *string     `json:"unique_id,omitempty"`      // "An ID that uniquely identifies this cover. If two covers have the same unique ID, Home Assistant will raise an exception. Required when used with device-based discovery."
+	ValueTemplate          *string     `json:"value_template,omitempty"` // "Defines a [template](/docs/configuration/templating/#using-value-templates-with-mqtt) that can be used to extract the payload for the `state_topic` topic."
 	MQTT                   *MQTTFields `json:"-"`                        // MQTT configuration parameters
 	states                 coverState  // Internal Holder of States
 	States                 *CoverState `json:"-"` // External state update location
@@ -171,6 +174,9 @@ func NewCover(o *CoverOptions) (*Cover, error) {
 	if !reflect.ValueOf(o.entityCategory).IsZero() {
 		c.EntityCategory = &o.entityCategory
 	}
+	if !reflect.ValueOf(o.entityPicture).IsZero() {
+		c.EntityPicture = &o.entityPicture
+	}
 	if !reflect.ValueOf(o.icon).IsZero() {
 		c.Icon = &o.icon
 	}
@@ -205,6 +211,12 @@ func NewCover(o *CoverOptions) (*Cover, error) {
 	}
 	if !reflect.ValueOf(o.payloadStop).IsZero() {
 		c.PayloadStop = &o.payloadStop
+	}
+	if !reflect.ValueOf(o.payloadStopTilt).IsZero() {
+		c.PayloadStopTilt = &o.payloadStopTilt
+	}
+	if !reflect.ValueOf(o.platform).IsZero() {
+		c.Platform = &o.platform
 	}
 	if !reflect.ValueOf(o.positionClosed).IsZero() {
 		c.PositionClosed = &o.positionClosed
